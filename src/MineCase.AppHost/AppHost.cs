@@ -7,7 +7,11 @@ var minecase = mongodb.AddDatabase("minecase");
 
 var silos = builder.AddProject<Projects.MineCase_Server>("minecase-server")
         .WithEndpoint(port: 30000, targetPort: 30000, isProxied: false)
-        .WithHttpEndpoint(targetPort: 8080)
+        .WithHttpEndpoint(targetPort: 8080, name: "orleans-dashboard")
+        .WithUrlForEndpoint("orleans-dashboard", (annotation) =>
+        {
+            annotation.DisplayText = "Orleans Dashboard";
+        })
         .WithReference(minecase)
         .WaitFor(mongodb);
 
