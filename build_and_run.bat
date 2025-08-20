@@ -1,11 +1,11 @@
 @echo off
-where mongo
+where mongosh
 IF %ERRORLEVEL% NEQ 0 (
     echo "mongo command is not available, please make sure mongodb is installed and added to the system path."
     exit /b 1
 )
 
-mongo --eval "db.stats()"
+mongosh --eval "db.stats()"
 IF %ERRORLEVEL% NEQ 0 (
     echo "mongodb not running"
     exit /b 1
