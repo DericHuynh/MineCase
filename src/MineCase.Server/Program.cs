@@ -114,6 +114,7 @@ internal static partial class Program
         appBuilder.UseOrleans(siloBuilder =>
         {
             siloBuilder.UseDashboard();
+            siloBuilder.AddActivityPropagation();
             siloBuilder.Configure<ClusterOptions>(options =>
             {
                 options.ClusterId = "dev";

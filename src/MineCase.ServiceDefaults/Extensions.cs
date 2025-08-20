@@ -69,16 +69,18 @@ public static class Extensions
                 metrics.AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
                     .AddRuntimeInstrumentation()
-                    .AddMeter("Microsoft.Orleans");
+                    .AddMeter("Microsoft.Orleans")
+                    .AddMeter("MineCase");
             })
             .WithTracing(tracing =>
             {
                 tracing.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(serviceName: builder.Environment.ApplicationName, serviceVersion: "0.1.0"));
                 tracing.AddSource(builder.Environment.ApplicationName)
                        .AddAspNetCoreInstrumentation()
-                       .AddSource("Microsoft.Orleans.Runtime")
+                       //.AddSource("Microsoft.Orleans.Runtime")
                        .AddSource("Microsoft.Orleans.Application")
-                       .AddSource("MongoDB.Driver.Core.Extensions.DiagnosticSources");
+                       .AddSource("MongoDB.Driver.Core.Extensions.DiagnosticSources")
+                       .AddSource("MineCase");
             });
 
         builder.AddOpenTelemetryExporters();

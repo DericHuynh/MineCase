@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,7 +43,6 @@ namespace MineCase.Server.Game
         protected override void InitializeComponents()
         {
             SetComponent(new PeriodicSaveStateComponent(TimeSpan.FromMinutes(1)));
-
             _fixedUpdate = new FixedUpdateComponent();
             _fixedUpdate.Tick += OnFixedUpdate;
             SetComponent(_fixedUpdate);

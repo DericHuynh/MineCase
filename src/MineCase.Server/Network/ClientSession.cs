@@ -8,6 +8,7 @@ using MineCase.Server.Network;
 using Orleans;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -19,6 +20,7 @@ namespace MineCase.Server.Network
 {
     internal sealed class ClientSession : IDisposable
     {
+        private static readonly ActivitySource _activitySource = new ActivitySource("MineCase", "1.0.0");
         private readonly TcpClient _tcpClient;
         private readonly ILogger _logger;
         private Stream _remoteStream;
@@ -44,7 +46,7 @@ namespace MineCase.Server.Network
             _packetCompress = packetCompress;
             _uncompressedPacketObjectPool = uncompressedPacketObjectPool;
             _outcomingPacketObserver = new OutcomingPacketObserver(this);
-            _outcomingPacketDispatcher = new ActionBlock<object>(SendOutcomingPacket);
+            _outcomingPacketDispatcher = new ActionBlock<object>(SendOutgoingPacket);
         }
 
         public async Task Startup(CancellationToken cancellationToken)
@@ -60,7 +62,7 @@ namespace MineCase.Server.Network
                     while (!cancellationToken.IsCancellationRequested &&
                         !_outcomingPacketDispatcher.Completion.IsCompleted)
                     {
-                        await DispatchIncomingPacket();
+                        await ForwardIncomingPacket();
                         // renew subscribe, 10 sec
                         if (DateTime.Now > expiredTime)
                         {
@@ -84,7 +86,7 @@ namespace MineCase.Server.Network
             _outcomingPacketDispatcher.Post(null);
         }
 
-        private async Task DispatchIncomingPacket()
+        private async Task ForwardIncomingPacket()
         {
             using var bufferScope = _bufferPool.CreateScope();
             UncompressedPacket packet;
@@ -98,24 +100,39 @@ namespace MineCase.Server.Network
                 packet = await UncompressedPacket.DeserializeAsync(_remoteStream, bufferScope);
             }
 
-            _logger.LogWarning("Incoming Packet: packetId = {packetId}, length = {length}, data = {data}", packet.PacketId, packet.Length, packet.Data);
+            using var activity = _activitySource.StartActivity(name: "Client Packet", ActivityKind.Server);
+
+            if (Activity.Current is not null && Activity.Current.IsAllDataRequested)
+            {
+                Activity.Current.AddTag("client_packet_id", packet.PacketId);
+                Activity.Current.AddTag("client_packet_length", packet.Length);
+                Activity.Current.AddTag("client_packet_data", string.Join(", ", packet.Data));
+            }
 
             await DispatchIncomingPacket(packet);
         }
 
-        private async Task SendOutcomingPacket(object packetOrCommand)
+        private async Task SendOutgoingPacket(object packetOrCommand)
         {
+            
             switch (packetOrCommand)
             {
                 case null:
-                    _logger.LogWarning("Null Packet for client {remote}", _tcpClient.Client.RemoteEndPoint.ToString());
+                    Activity.Current?.AddTag("packet_data", "null");
+                    _logger.LogDebug("Null Packet for client {remote}", _tcpClient.Client.RemoteEndPoint.ToString());
                     _tcpClient.Client.Shutdown(SocketShutdown.Send);
                     _outcomingPacketDispatcher.Complete();
                     break;
                 case UncompressedPacket packet:
                 {
-                    _logger.LogWarning("Packet for client {remote}, packetId = {packetId}, length = {length}, data = {data}", _tcpClient.Client.RemoteEndPoint.ToString(), packet.PacketId, packet.Length, packet.Data);
                     using var bufferScope = _bufferPool.CreateScope();
+
+                    if(Activity.Current is not null && Activity.Current.IsAllDataRequested)
+                    {
+                        Activity.Current?.AddTag("server_packet_id", packet.PacketId);
+                        Activity.Current?.AddTag("server_packet_length", packet.Length);
+                        Activity.Current?.AddTag("server_packet_data", string.Join(", ", packet.Data));
+                    }
 
                     if (_useCompression)
                     {
@@ -135,6 +152,10 @@ namespace MineCase.Server.Network
 
                     break;
                 }
+                default:
+                    Activity.Current?.AddTag("packet_data", "Unknown (Not null or Uncompressed packet)");
+                    break;
+
             }
         }
 
