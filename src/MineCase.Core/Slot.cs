@@ -5,18 +5,23 @@ using MineCase.Nbt;
 
 namespace MineCase
 {
+    [Orleans.GenerateSerializer]
     public struct Slot : IEquatable<Slot>
     {
         public static Slot Empty { get; } = new Slot { BlockId = -1 };
 
         public bool IsEmpty => BlockId == -1;
 
+        [Orleans.Id(0)]
         public short BlockId { get; set; }
 
+        [Orleans.Id(1)]
         public byte ItemCount { get; set; }
 
+        [Orleans.Id(2)]
         public short ItemDamage { get; set; }
 
+        [Orleans.Id(3)]
         public NbtFile NBT { get; set; }
 
         public bool CanStack(Slot slot)

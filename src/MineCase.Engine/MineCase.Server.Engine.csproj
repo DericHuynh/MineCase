@@ -44,5 +44,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\" />
+    <Folder Include="Data\" />
   </ItemGroup>
 </Project>

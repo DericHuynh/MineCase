@@ -7,10 +7,12 @@ using MineCase.Serialization;
 namespace MineCase.Protocol.Play
 {
     [Packet(0x0A)]
-    [GenerateSerializer]
+    [Orleans.GenerateSerializer]
+    [MineCase.Serialization.GenerateSerializer]
     public sealed class ServerboundCloseWindow : IPacket
     {
         [SerializeAs(DataType.Byte)]
+        [Orleans.Id(0)]
         public byte WindowId;
 
         public void Serialize(BinaryWriter bw)
@@ -25,10 +27,12 @@ namespace MineCase.Protocol.Play
     }
 
     [Packet(0x14)]
-    [GenerateSerializer]
+    [Orleans.GenerateSerializer]
+    [MineCase.Serialization.GenerateSerializer]
     public sealed class ClientboundCloseWindow : IPacket
     {
         [SerializeAs(DataType.Byte)]
+        [Orleans.Id(0)]
         public byte WindowId;
 
         public void Serialize(BinaryWriter bw)

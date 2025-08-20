@@ -7,10 +7,12 @@ using MineCase.Serialization;
 namespace MineCase.Protocol.Play
 {
     [Packet(0x03)]
-    [GenerateSerializer]
+    [Orleans.GenerateSerializer]
+    [MineCase.Serialization.GenerateSerializer]
     public sealed class ServerboundChatMessage : IPacket
     {
         [SerializeAs(DataType.String)]
+        [Orleans.Id(0)]
         public string Message;
 
         public void Serialize(BinaryWriter bw)
@@ -26,13 +28,16 @@ namespace MineCase.Protocol.Play
 
     // TODO
     [Packet(0x0F)]
-    [GenerateSerializer]
+    [Orleans.GenerateSerializer]
+    [MineCase.Serialization.GenerateSerializer]
     public sealed class ClientboundChatMessage : IPacket
     {
         [SerializeAs(DataType.Chat)]
+        [Orleans.Id(0)]
         public Chat JSONData;
 
         [SerializeAs(DataType.Byte)]
+        [Orleans.Id(1)]
         public byte Position; // 0: chat (chat box), 1: system message (chat box), 2: game info (above hotbar).
 
         public void Serialize(BinaryWriter bw)

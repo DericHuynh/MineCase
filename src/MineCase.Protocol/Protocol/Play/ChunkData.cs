@@ -60,7 +60,7 @@ namespace MineCase.Protocol.Play
             result.Size = br.ReadAsVarInt(out _);
             var dataReader = br.ReadAsSubReader((int)result.Size);
             var data = new List<ChunkSection>();
-            while (!dataReader.IsCosumed)
+            while (!dataReader.IsEmpty)
                 data.Add(ChunkSection.Deserialize(ref dataReader, isOverworld));
             result.Data = data.ToArray();
 
@@ -140,7 +140,7 @@ namespace MineCase.Protocol.Play
                 {
                     var paletteReader = br.ReadAsSubReader((int)result.PaletteLength);
                     var palette = new List<uint>();
-                    while (!paletteReader.IsCosumed)
+                    while (!paletteReader.IsEmpty)
                         palette.Add(paletteReader.ReadAsVarInt(out _));
                     result.Palette = palette.ToArray();
                 }

@@ -4,6 +4,7 @@ using MineCase.Protocol;
 using MineCase.Serialization;
 using MineCase.Server.Game;
 using MineCase.Server.Network;
+using MongoDB.Bson.Serialization.Attributes;
 using Orleans;
 using System;
 using System.Collections.Generic;

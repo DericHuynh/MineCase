@@ -33,6 +33,9 @@ namespace MineCase.Serialization
         Array
     }
 
+    /// <summary>
+    /// Im pretty sure this has no effect on the code and is meant to annotate the contract for the developer to implement serializing/deserialization
+    /// </summary>
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
     public sealed class SerializeAsAttribute : Attribute
     {

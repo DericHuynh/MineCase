@@ -13,10 +13,12 @@ namespace MineCase.Protocol.Play
     }
 
     [Packet(0x2A)]
-    [GenerateSerializer]
+    [Orleans.GenerateSerializer]
+    [MineCase.Serialization.GenerateSerializer]
     public sealed class ServerboundAnimation : IPacket
     {
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(0)]
         public Hand Hand;
 
         public void Serialize(BinaryWriter bw)

@@ -93,6 +93,7 @@ namespace MineCase
     /// <summary>
     /// One of the fields of the component.
     /// </summary>
+    [Orleans.GenerateSerializer]
     public class ChatClickEvent
     {
         private static readonly string[] _map = new string[4]
@@ -103,8 +104,10 @@ namespace MineCase
             "change_page"
         };
 
+        [Orleans.Id(0)]
         public ClickEventType Action { get; set; }
 
+        [Orleans.Id(1)]
         public JToken Value { get; set; }
 
         /// <summary>
@@ -136,6 +139,7 @@ namespace MineCase
     /// <summary>
     /// One of the fields of the component.
     /// </summary>
+    [Orleans.GenerateSerializer]
     public class ChatHoverEvent
     {
         private static readonly string[] _map = new string[3]
@@ -145,8 +149,10 @@ namespace MineCase
             "show_entity"
         };
 
+        [Orleans.Id(0)]
         public HoverEventType Action { get; set; }
 
+        [Orleans.Id(1)]
         public JToken Value { get; set; }
 
         /// <summary>
@@ -178,12 +184,16 @@ namespace MineCase
     /// <summary>
     /// A object in the ScoreComponent.
     /// </summary>
+    [Orleans.GenerateSerializer]
     public class ChatScore
     {
+        [Orleans.Id(0)]
         public string Name { get; set; }
 
+        [Orleans.Id(1)]
         public string Objective { get; set; }
 
+        [Orleans.Id(2)]
         public int? Value { get; set; }
 
         /// <summary>
@@ -228,6 +238,7 @@ namespace MineCase
     /// <summary>
     /// An abstract base class that contains the fields common to all components.
     /// </summary>
+    [Orleans.GenerateSerializer]
     public class ChatComponent
     {
         private static readonly string[] _map = new string[17]
@@ -237,24 +248,34 @@ namespace MineCase
             "aqua", "red", "light_purple", "yellow", "white", "reset"
         };
 
+        [Orleans.Id(0)]
         public bool? Bold { get; set; }
 
+        [Orleans.Id(1)]
         public bool? Itatic { get; set; }
 
+        [Orleans.Id(2)]
         public bool? Underlined { get; set; }
 
+        [Orleans.Id(3)]
         public bool? Strikethrough { get; set; }
 
+        [Orleans.Id(4)]
         public bool? Obfuscated { get; set; }
 
+        [Orleans.Id(5)]
         public string Insertion { get; set; }
 
+        [Orleans.Id(6)]
         public ColorType? Color { get; set; }
 
+        [Orleans.Id(7)]
         public ChatClickEvent ClickEvent { get; set; }
 
+        [Orleans.Id(8)]
         public ChatHoverEvent HoverEvent { get; set; }
 
+        [Orleans.Id(9)]
         public List<ChatComponent> Extra { get; set; }
 
         public void CheckKeyExist(object key, string name)
@@ -326,8 +347,10 @@ namespace MineCase
     /// <summary>
     /// String component, which  contains only text.
     /// </summary>
+    [Orleans.GenerateSerializer]
     public class StringComponent : ChatComponent
     {
+        [Orleans.Id(0)]
         public string Text { get; set; }
 
         /// <summary>
@@ -358,10 +381,13 @@ namespace MineCase
     /// <summary>
     /// Translation component. Translates text into the current language.
     /// </summary>
+    [Orleans.GenerateSerializer]
     public class TranslationComponent : ChatComponent
     {
+        [Orleans.Id(0)]
         public string Translate { get; set; }
 
+        [Orleans.Id(1)]
         public List<ChatComponent> With { get; set; }
 
         /// <summary>
@@ -407,6 +433,7 @@ namespace MineCase
     /// <summary>
     /// Keybind component. Displays the client's current keybind for the specified key.
     /// </summary>
+    [Orleans.GenerateSerializer]
     public class KeybindComponent : ChatComponent
     {
         private static readonly string[] _map = new string[33]
@@ -420,6 +447,7 @@ namespace MineCase
             "key.hotbar.5", "key.hotbar.6", "key.hotbar.7", "key.hotbar.8", "key.hotbar.9"
         };
 
+        [Orleans.Id(0)]
         public KeyBindType? Keybind { get; set; }
 
         /// <summary>
@@ -450,8 +478,10 @@ namespace MineCase
     /// <summary>
     /// Score component. Displays a score.
     /// </summary>
+    [Orleans.GenerateSerializer]
     public class ScoreComponent : ChatComponent
     {
+        [Orleans.Id(0)]
         public ChatScore Score { get; set; }
 
         /// <summary>
@@ -482,8 +512,10 @@ namespace MineCase
     /// <summary>
     /// Selector component. Displays the results of an entity selector.
     /// </summary>
+    [Orleans.GenerateSerializer]
     public class SelectorComponent : ChatComponent
     {
+        [Orleans.Id(0)]
         public string Selector { get; set; }
 
         /// <summary>
@@ -514,6 +546,7 @@ namespace MineCase
     /// <summary>
     /// Chat data, which has a top-level component, can convert to a JSON string conveniently.
     /// </summary>
+    [Orleans.GenerateSerializer]
     public class Chat
     {
         private static readonly Dictionary<string, int> _dict = new Dictionary<string, int>
@@ -538,6 +571,7 @@ namespace MineCase
         /// <summary>
         /// Gets or sets the top-level component of this object.
         /// </summary>
+        [Orleans.Id(0)]
         public ChatComponent Component { get; set; }
 
         /// <summary>

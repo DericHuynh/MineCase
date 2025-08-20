@@ -17,14 +17,19 @@ using Orleans.Streams;
 
 namespace MineCase.Server.Game
 {
+    [Orleans.GenerateSerializer]
     public sealed class SendChunkJob
     {
+        [Id(0)]
         public IWorld World { get; set; }
 
+        [Id(1)]
         public ChunkWorldPos ChunkPosition { get; set; }
 
+        [Id(2)]
         public IReadOnlyCollection<IClientboundPacketSink> Clients { get; set; }
 
+        [Id(3)]
         public IReadOnlyCollection<IUserChunkLoader> Loaders { get; set; }
     }
 

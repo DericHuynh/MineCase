@@ -7,15 +7,17 @@ using MineCase.Serialization;
 namespace MineCase.Protocol.Status
 {
     [Packet(0x01)]
-    [GenerateSerializer]
+    [Orleans.GenerateSerializer]
+    [MineCase.Serialization.GenerateSerializer]
     public sealed class Ping : IPacket
     {
         [SerializeAs(DataType.Long)]
+        [Orleans.Id(0)]
         public long Payload;
 
         public void Serialize(BinaryWriter bw)
         {
-            throw new NotImplementedException();
+            bw.WriteAsLong(Payload);
         }
 
         public void Deserialize(ref SpanReader br)
@@ -25,15 +27,17 @@ namespace MineCase.Protocol.Status
     }
 
     [Packet(0x01)]
-    [GenerateSerializer]
+    [Orleans.GenerateSerializer]
+    [MineCase.Serialization.GenerateSerializer]
     public sealed class Pong : IPacket
     {
         [SerializeAs(DataType.Long)]
+        [Orleans.Id(0)]
         public long Payload;
 
         public void Serialize(BinaryWriter bw)
         {
-            throw new NotImplementedException();
+            bw.WriteAsLong(Payload);
         }
 
         public void Deserialize(ref SpanReader br)

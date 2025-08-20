@@ -16,7 +16,7 @@ namespace MineCase.Serialization
     {
         private ReadOnlySpan<byte> _span;
 
-        public bool IsCosumed => _span.IsEmpty;
+        public bool IsEmpty => _span.IsEmpty;
 
         public SpanReader ReadAsSubReader(int length)
         {

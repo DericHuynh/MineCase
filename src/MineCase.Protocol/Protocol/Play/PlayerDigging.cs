@@ -29,16 +29,20 @@ namespace MineCase.Protocol.Play
     }
 
     [Packet(0x1A)]
-    [GenerateSerializer]
+    [Orleans.GenerateSerializer]
+    [MineCase.Serialization.GenerateSerializer]
     public sealed class PlayerDigging : IPacket
     {
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(0)]
         public PlayerDiggingStatus Status;
 
         [SerializeAs(DataType.Position)]
+        [Orleans.Id(1)]
         public Position Location;
 
         [SerializeAs(DataType.Byte)]
+        [Orleans.Id(2)]
         public PlayerDiggingFace Face;
 
         public void Serialize(BinaryWriter bw)

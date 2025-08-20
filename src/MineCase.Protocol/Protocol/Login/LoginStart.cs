@@ -7,10 +7,12 @@ using MineCase.Serialization;
 namespace MineCase.Protocol.Login
 {
     [Packet(0x00)]
-    [GenerateSerializer]
+    [Orleans.GenerateSerializer]
+    [MineCase.Serialization.GenerateSerializer]
     public sealed class LoginStart : IPacket
     {
         [SerializeAs(DataType.String)]
+        [Orleans.Id(0)]
         public string Name;
 
         public void Serialize(BinaryWriter bw)
@@ -25,10 +27,12 @@ namespace MineCase.Protocol.Login
     }
 
     [Packet(0x00)]
-    [GenerateSerializer]
+    [Orleans.GenerateSerializer]
+    [MineCase.Serialization.GenerateSerializer]
     public sealed class LoginDisconnect : IPacket
     {
         [SerializeAs(DataType.String)]
+        [Orleans.Id(0)]
         public string Reason;
 
         public void Serialize(BinaryWriter bw)
@@ -43,13 +47,16 @@ namespace MineCase.Protocol.Login
     }
 
     [Packet(0x02)]
-    [GenerateSerializer]
+    [Orleans.GenerateSerializer]
+    [MineCase.Serialization.GenerateSerializer]
     public sealed class LoginSuccess : IPacket
     {
         [SerializeAs(DataType.String)]
+        [Orleans.Id(0)]
         public string UUID;
 
         [SerializeAs(DataType.String)]
+        [Orleans.Id(1)]
         public string Username;
 
         public void Serialize(BinaryWriter bw)

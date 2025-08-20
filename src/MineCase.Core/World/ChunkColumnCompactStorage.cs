@@ -21,6 +21,7 @@ namespace MineCase.World
         public const int BlocksInChunk = BlocksInSection * SectionsPerChunk;
     }
 
+    [Orleans.GenerateSerializer]
     public sealed class ChunkColumnCompactStorage : IChunkColumnStorage
     {
         public uint SectionBitMask
@@ -73,10 +74,13 @@ namespace MineCase.World
             }
         }
 
+        [Orleans.Id(0)]
         public ChunkSectionCompactStorage[] Sections { get; } = new ChunkSectionCompactStorage[ChunkConstants.SectionsPerChunk];
 
+        [Orleans.Id(1)]
         public int[,] GroundHeight { get; } = new int[ChunkConstants.BlockEdgeWidthInSection, ChunkConstants.BlockEdgeWidthInSection];
 
+        [Orleans.Id(2)]
         public int[] Biomes { get; }
 
         public BlockState this[int x, int y, int z]
@@ -100,19 +104,23 @@ namespace MineCase.World
         }
     }
 
+    [Orleans.GenerateSerializer]
     public sealed class ChunkSectionCompactStorage
     {
         private const byte _bitsPerBlock = 14;
         public const ulong BlockMask = (1u << _bitsPerBlock) - 1;
-
+        [Orleans.Id(0)]
         private short _nonAirBlockCount = 4096; // FIXME: count block non air
 
         public byte BitsPerBlock => _bitsPerBlock;
 
+        [Orleans.Id(1)]
         public DataArray Data { get; }
 
+        [Orleans.Id(2)]
         public NibbleArray BlockLight { get; }
 
+        [Orleans.Id(3)]
         public NibbleArray SkyLight { get; }
 
         public short NonAirBlockCount { get => _nonAirBlockCount; }
@@ -132,8 +140,10 @@ namespace MineCase.World
             SkyLight = skyLight;
         }
 
+        [Orleans.GenerateSerializer]
         public sealed class DataArray
         {
+            [Orleans.Id(0)]
             public ulong[] Storage { get; }
 
             public BlockState this[int x, int y, int z]
@@ -190,8 +200,10 @@ namespace MineCase.World
             }
         }
 
+        [Orleans.GenerateSerializer]
         public sealed class NibbleArray
         {
+            [Orleans.Id(0)]
             public byte[] Storage { get; }
 
             public byte this[int x, int y, int z]

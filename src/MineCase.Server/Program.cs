@@ -1,21 +1,33 @@
-﻿using Autofac.Extensions.DependencyInjection;
+﻿using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
+using Microsoft.IO;
+using MineCase.Abstractions.Constants;
+using MineCase.Buffers;
+using MineCase.Protocol;
+using MineCase.Protocol.Play;
 using MineCase.Serialization.Serializers;
+using MineCase.Server.Network;
+using MineCase.Server.Settings;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
-using System.Threading.Tasks;
-using MineCase.Abstractions.Constants;
 using Orleans.Providers;
+using Orleans.Providers.MongoDB.Configuration;
+using Orleans.Serialization;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Reflection;
-using Autofac;
-using MineCase.Server.Settings;
-using Microsoft.IO;
+using System.Threading.Tasks;
 
 namespace MineCase.Server;
 
@@ -26,8 +38,13 @@ internal static partial class Program
         const bool createShardKey = false;
         Serializers.RegisterAll();
 
-        var hostBuilder = Host.CreateDefaultBuilder(args);
-        hostBuilder.UseServiceProviderFactory(x => new AutofacServiceProviderFactory(builder =>
+        var appBuilder = Host.CreateApplicationBuilder(args);
+        string dbname = appBuilder.Configuration.GetSection("PersistenceSettings")["DatabaseName"];
+        string mongoConnectionStr = appBuilder.Configuration.GetConnectionString("minecase");
+
+        appBuilder.AddServiceDefaults();
+
+        appBuilder.ConfigureContainer(new AutofacServiceProviderFactory(), builder =>
         {
             var assemblies = new List<Assembly>();
             assemblies
@@ -35,69 +52,83 @@ internal static partial class Program
                 .AddInterfaces()
                 .AddGrains();
             builder.RegisterAssemblyModules(assemblies.ToArray());
+        });
+
+        // Add both Silo and Gateway services to the same container
+        appBuilder.Services.AddOptions();
+        appBuilder.Services.AddSingleton<RecyclableMemoryStreamManager>();
+        appBuilder.Services.Configure<PersistenceOptions>(bOptions => bOptions.ConnectionString = mongoConnectionStr);
+
+        // Gateway specific services
+        appBuilder.Services.AddSingleton<ConnectionRouter>();
+        appBuilder.Services.AddSingleton<IPacketCompress, PacketCompress>();
+        appBuilder.Services.AddTransient<ClientSession>();
+        appBuilder.Services.AddHostedService<ConnectionRouter>();
+        appBuilder.Services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
+        appBuilder.Services.AddSingleton<ObjectPool<UncompressedPacket>>(s =>
+        {
+            var provider = s.GetRequiredService<ObjectPoolProvider>();
+            return provider.Create<UncompressedPacket>();
+        });
+        appBuilder.Services.AddSingleton<IBufferPool<byte>>(s => new BufferPool<byte>(ArrayPool<byte>.Shared));
+
+        //Configure MongoDB and Orleans Integrations
+        appBuilder.Services.AddMongoDBClient((serviceProvider) =>
+        {
+            //This is to configure OpenTelemetry for the Mongo database
+            var settings = MongoClientSettings.FromConnectionString(mongoConnectionStr);
+            var instrumentationOptions = new InstrumentationOptions 
+            { 
+                CaptureCommandText = true,
+                ShouldStartActivity = (@event) => !"collectionToIgnore".Equals(@event.GetCollectionName())
+            };
+            settings.ClusterConfigurator = cb => cb.Subscribe(new DiagnosticsActivityEventSubscriber(instrumentationOptions));
+            return settings;
+        });
+        appBuilder.Services.AddMongoDBReminders(options =>
+        {
+            options.DatabaseName = dbname;
+            options.CreateShardKeyForCosmos = createShardKey;
+        });
+        appBuilder.Services.AddMongoDBGatewayListProvider(c =>
+        {
+            c.DatabaseName = dbname;
+            c.CreateShardKeyForCosmos = createShardKey;
+        });
+        appBuilder.Services.AddMongoDBMembershipTable(c =>
+        {
+            c.DatabaseName = dbname;
+            c.CreateShardKeyForCosmos = createShardKey;
+        });
+        appBuilder.Services.AddMongoDBGrainStorageAsDefault(c => c.Configure(options =>
+        {
+            options.DatabaseName = dbname;
+            options.CreateShardKeyForCosmos = createShardKey;
         }));
-        hostBuilder.ConfigureAppConfiguration(builder =>
+        appBuilder.Services.AddMongoDBGrainStorage("PubSubStore", options =>
         {
-            builder.SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("config.json", false, false);
+            options.DatabaseName = dbname;
+            options.CreateShardKeyForCosmos = createShardKey;
         });
-        hostBuilder.ConfigureServices((context, services) =>
+
+        appBuilder.UseOrleans(siloBuilder =>
         {
-            services.AddOptions();
-            services.AddLogging();
-            services.AddSingleton<RecyclableMemoryStreamManager>();
-            services.Configure<PersistenceOptions>(context.Configuration.GetSection("persistenceOptions"));
-        });
-        //hostBuilder.ConfigureLogging(loggingBuilder => loggingBuilder.AddConsole());
-        hostBuilder.UseConsoleLifetime();
-        hostBuilder.UseOrleans((context, siloBuilder) =>
-        {
-            //Orleans.Hosting.ISiloBuilder builder;
             siloBuilder.UseDashboard();
             siloBuilder.Configure<ClusterOptions>(options =>
             {
                 options.ClusterId = "dev";
                 options.ServiceId = "MineCaseService";
             });
-            // SchedulingOptions: AllowCallChainReentrancy and PerformDeadlockDetection removed in Orleans 7+
             siloBuilder.ConfigureEndpoints(siloPort: 11111, gatewayPort: 30000);
-            siloBuilder.UseMongoDBClient(context.Configuration.GetSection("persistenceOptions")["connectionString"]);
 
-            // 3.x 写法
-            //siloBuilder.AddSimpleMessageStreamProvider("JobsProvider");
-            //siloBuilder.AddSimpleMessageStreamProvider("TransientProvider");
-            // 7.x 写法：
-            // https://learn.microsoft.com/en-us/dotnet/orleans/migration-guide
-            // BroadcastChannel 改动过大，先用 MemoryStreams 了
-            // siloBuilder.AddBroadcastChannel(StreamProviders.JobsProvider, options => options.FireAndForgetDelivery = false);
-            // siloBuilder.AddBroadcastChannel(StreamProviders.TransientProvider, options => options.FireAndForgetDelivery = false);
             siloBuilder.AddMemoryStreams<DefaultMemoryMessageBodySerializer>(StreamProviders.JobsProvider, c => c.ConfigurePartitioning());
             siloBuilder.AddMemoryStreams<DefaultMemoryMessageBodySerializer>(StreamProviders.TransientProvider, c => c.ConfigurePartitioning());
-
-            siloBuilder.UseMongoDBReminders(options =>
-            {
-                options.DatabaseName = context.Configuration.GetSection("persistenceOptions")["databaseName"];
-                options.CreateShardKeyForCosmos = createShardKey;
-            });
-            siloBuilder.UseMongoDBClustering(c =>
-            {
-                c.DatabaseName = context.Configuration.GetSection("persistenceOptions")["databaseName"];
-                c.CreateShardKeyForCosmos = createShardKey;
-            });
-            siloBuilder.AddMongoDBGrainStorageAsDefault(c => c.Configure(options =>
-            {
-                options.DatabaseName = context.Configuration.GetSection("persistenceOptions")["databaseName"];
-                options.CreateShardKeyForCosmos = createShardKey;
-            }));
-            siloBuilder.AddMongoDBGrainStorage("PubSubStore", options =>
-            {
-                options.DatabaseName = context.Configuration.GetSection("persistenceOptions")["databaseName"];
-                options.CreateShardKeyForCosmos = createShardKey;
-            });
         });
 
-        var host = hostBuilder.Build();
-        Serializers.RegisterAll(host.Services);
-        await host.RunAsync();
+        var app = appBuilder.Build();
+
+        Serializers.RegisterAll(app.Services);
+
+        await app.RunAsync();
     }
 }

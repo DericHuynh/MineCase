@@ -10,12 +10,14 @@ using MineCase.Nbt.Serialization;
 namespace MineCase.Nbt.Tags
 {
     /// <see cref="NbtTagType.Compound"/>
+    [Orleans.GenerateSerializer]
     public sealed class NbtCompound : NbtTag, IEnumerable<NbtTag>
     {
         public override NbtTagType TagType => NbtTagType.Compound;
 
         public override bool HasValue => false;
 
+        [Orleans.Id(0)]
         private readonly Dictionary<string, NbtTag> _childTags;
 
         /// <summary>

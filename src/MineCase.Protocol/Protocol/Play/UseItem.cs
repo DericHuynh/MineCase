@@ -7,10 +7,12 @@ using MineCase.Serialization;
 namespace MineCase.Protocol.Play
 {
     [Packet(0x2D)]
-    [GenerateSerializer]
+    [Orleans.GenerateSerializer]
+    [MineCase.Serialization.GenerateSerializer]
     public sealed class UseItem : IPacket
     {
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(0)]
         public Hand Hand;
 
         public void Serialize(BinaryWriter bw)

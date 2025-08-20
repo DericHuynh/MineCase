@@ -9,15 +9,20 @@ using MineCase.Serialization;
 
 namespace MineCase.Protocol
 {
+    [Orleans.GenerateSerializer]
+    [MineCase.Serialization.GenerateSerializer]
     public class UncompressedPacket
     {
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(0)]
         public uint Length;
 
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(1)]
         public uint PacketId;
 
         [SerializeAs(DataType.ByteArray)]
+        [Orleans.Id(2)]
         public ArraySegment<byte> Data;
 
         public async Task SerializeAsync(Stream stream)
@@ -51,15 +56,20 @@ namespace MineCase.Protocol
         }
     }
 
+    [Orleans.GenerateSerializer]
+    [MineCase.Serialization.GenerateSerializer]
     public class CompressedPacket
     {
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(0)]
         public uint PacketLength;
 
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(1)]
         public uint DataLength;
 
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(2)]
         public byte[] CompressedData;
 
         public async Task SerializeAsync(Stream stream)

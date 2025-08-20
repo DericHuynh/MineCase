@@ -96,16 +96,22 @@ namespace MineCase.Server.Game.Entities.Components
     }
 
     [Immutable]
+    [Orleans.GenerateSerializer]
     public class SpawnEntity : IEntityMessage
     {
+        [Id(0)]
         public IWorld World { get; set; }
 
+        [Id(1)]
         public uint EntityId { get; set; }
 
+        [Id(2)]
         public EntityWorldPos Position { get; set; }
 
+        [Id(3)]
         public float Pitch { get; set; }
 
+        [Id(4)]
         public float Yaw { get; set; }
     }
 

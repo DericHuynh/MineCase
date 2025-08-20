@@ -26,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Network\Handshaking\" />
+    <Folder Include="Network\Handshaking\" />
     <Folder Include="Play\" />
     <AdditionalFiles Include="..\..\build\stylecop.json" />
   </ItemGroup>

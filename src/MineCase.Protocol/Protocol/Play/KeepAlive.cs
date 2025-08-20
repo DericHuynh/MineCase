@@ -7,10 +7,12 @@ using MineCase.Serialization;
 namespace MineCase.Protocol.Play
 {
     [Packet(0x0F)]
-    [GenerateSerializer]
+    [Orleans.GenerateSerializer]
+    [MineCase.Serialization.GenerateSerializer]
     public sealed class ServerboundKeepAlive : IPacket
     {
         [SerializeAs(DataType.Long)]
+        [Orleans.Id(0)]
         public long KeepAliveId;
 
         public void Serialize(BinaryWriter bw)
@@ -25,10 +27,12 @@ namespace MineCase.Protocol.Play
     }
 
     [Packet(0x21)]
-    [GenerateSerializer]
+    [Orleans.GenerateSerializer]
+    [MineCase.Serialization.GenerateSerializer]
     public sealed class ClientboundKeepAlive : IPacket
     {
         [SerializeAs(DataType.Long)]
+        [Orleans.Id(0)]
         public long KeepAliveId;
 
         public void Serialize(BinaryWriter bw)

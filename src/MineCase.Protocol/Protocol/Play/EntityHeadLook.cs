@@ -7,13 +7,16 @@ using MineCase.Serialization;
 namespace MineCase.Protocol.Play
 {
     [Packet(0x3C)]
-    [GenerateSerializer]
+    [Orleans.GenerateSerializer]
+    [MineCase.Serialization.GenerateSerializer]
     public sealed class EntityHeadLook : IPacket
     {
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(0)]
         public uint EID;
 
         [SerializeAs(DataType.Angle)]
+        [Orleans.Id(1)]
         public Angle Yaw;
 
         public void Serialize(BinaryWriter bw)

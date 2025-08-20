@@ -149,7 +149,7 @@ namespace MineCase.Server.Network.Play
             }
 
             // Logger.LogInformation($"Got packet id: 0x{packet.PacketId:X2}.");
-            if (!br.IsCosumed)
+            if (!br.IsEmpty)
                 throw new InvalidDataException($"Packet data is not fully consumed, packet id: 0x{packet.PacketId:X2}.");
             return task;
         }

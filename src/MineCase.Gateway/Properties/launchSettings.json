@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "MineCase.Gateway": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}

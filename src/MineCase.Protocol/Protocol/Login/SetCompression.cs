@@ -7,10 +7,12 @@ using MineCase.Serialization;
 namespace MineCase.Protocol.Login
 {
     [Packet(Protocol.SetCompressionPacketId)]
-    [GenerateSerializer]
+    [Orleans.GenerateSerializer]
+    [MineCase.Serialization.GenerateSerializer]
     public sealed class SetCompression : IPacket
     {
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(0)]
         public uint Threshold;
 
         public void Serialize(BinaryWriter bw)
