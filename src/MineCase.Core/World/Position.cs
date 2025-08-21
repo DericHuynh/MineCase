@@ -308,13 +308,10 @@ namespace MineCase.World
         }
     }
 
-    [Orleans.GenerateSerializer]
     public struct ChunkWorldPos : IEquatable<ChunkWorldPos>
     {
-        [Orleans.Id(0)]
         public int X { get; set; }
 
-        [Orleans.Id(1)]
         public int Z { get; set; }
 
         public ChunkWorldPos(int x, int z)

@@ -7,28 +7,13 @@ using MineCase.Serialization;
 namespace MineCase.Protocol.Play
 {
     [Packet(0x41)]
-    [Orleans.GenerateSerializer]
-    [MineCase.Serialization.GenerateSerializer]
-    public sealed class UpdateViewPosition : IPacket
+    [GenerateSerializer]
+    public sealed partial class UpdateViewPosition : IPacket
     {
         [SerializeAs(DataType.VarInt)]
-        [Orleans.Id(0)]
         public int ChunkX;
 
         [SerializeAs(DataType.VarInt)]
-        [Orleans.Id(1)]
         public int ChunkZ;
-
-        public void Serialize(BinaryWriter bw)
-        {
-            bw.WriteAsInt(ChunkX);
-            bw.WriteAsInt(ChunkZ);
-        }
-
-        public void Deserialize(ref SpanReader br)
-        {
-            ChunkX = br.ReadAsInt();
-            ChunkZ = br.ReadAsInt();
-        }
     }
 }

@@ -26,14 +26,7 @@ namespace MineCase.Protocol.Play
 
         public void Deserialize(ref SpanReader br)
         {
-            WindowId = br.ReadAsByte();
-            WindowType = br.ReadAsString();
-            WindowTitle = br.ReadAsChat();
-            NumberOfSlots = br.ReadAsByte();
-            if (!br.IsEmpty)
-                EntityId = br.ReadAsByte();
-            else
-                EntityId = null;
+            throw new NotImplementedException();
         }
 
         public void Serialize(BinaryWriter bw)

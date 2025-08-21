@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MineCase.Server.Components;
-using MineCase.Server.Game;
 using MineCase.Server.Game.BlockEntities;
 using MineCase.Server.Game.Entities;
 using MineCase.Server.Game.Entities.Components;
@@ -55,7 +54,7 @@ namespace MineCase.Server.World
                 foreach (var entity in State.DiscoveryEntities)
                 {
                     if (entity.Equals(player)) continue;
-                    entity.Tell(message);
+                    entity.InvokeOneWay(g => g.Tell(message));
                 }
 
                 if (active && State.IsTickEmitterActive)
@@ -84,7 +83,7 @@ namespace MineCase.Server.World
             if (State.DiscoveryEntities.Add(entity))
             {
                 MarkDirty();
-                entity.Tell(BroadcastDiscovered.Default);
+                entity.InvokeOneWay(e => e.Tell(BroadcastDiscovered.Default));
             }
 
             return Task.CompletedTask;

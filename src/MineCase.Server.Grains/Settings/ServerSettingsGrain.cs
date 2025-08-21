@@ -21,7 +21,7 @@ namespace MineCase.Server.Settings
         }
 
         // read settings from file
-        public override async Task OnActivateAsync(System.Threading.CancellationToken cancellationToken)
+        public override async Task OnActivateAsync()
         {
             string settingsFile = await ReadSettingsAsString("server.json");
             try
@@ -32,8 +32,6 @@ namespace MineCase.Server.Settings
             {
                 _logger.LogError(default(EventId), e, e.Message);
             }
-
-            await base.OnActivateAsync(cancellationToken);
         }
 
         // get settings

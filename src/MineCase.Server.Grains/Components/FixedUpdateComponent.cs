@@ -12,7 +12,6 @@ namespace MineCase.Server.Components
 {
     public class FixedUpdateComponent : Component
     {
-        private static readonly ActivitySource _activitySource = new ActivitySource("MineCase", "1.0.0");
         private IDisposable _tickTimer;
         private Stopwatch _stopwatch;
         private long _worldAge;
@@ -34,7 +33,7 @@ namespace MineCase.Server.Components
             _actualAge = 0;
             _stopwatch = new Stopwatch();
             _stopwatch.Start();
-            _tickTimer = AttachedObject.RegisterGrainTimer(OnTick, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(1));
+            _tickTimer = AttachedObject.RegisterTimer(OnTick, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(1));
         }
 
         private async Task OnTick(object arg)
@@ -44,11 +43,9 @@ namespace MineCase.Server.Components
 
             if (updateTimes > 0)
             {
-                using var activity = _activitySource.StartActivity("OnTick");
                 var e = new GameTickArgs { DeltaTime = TimeSpan.FromMilliseconds(50) };
                 for (int i = 0; i < updateTimes; i++)
                 {
-                    activity.AddTag("DeltaTime", e.DeltaTime);
                     e.WorldAge = _worldAge;
                     e.TimeOfDay = _worldAge % 24000;
                     await Tick.InvokeSerial(this, e);

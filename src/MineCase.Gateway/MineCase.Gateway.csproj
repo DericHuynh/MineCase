@@ -1,22 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
+
   <ItemGroup>
     <None Remove="config.json" />
     <None Remove="OrleansConfiguration.dev.xml" />
     <None Remove="OrleansConfiguration.docker.xml" />
   </ItemGroup>
+
   <ItemGroup>
-    <Content Include="config.docker.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="config.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -27,33 +26,33 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  
   <ItemGroup>
     <None Remove="*.log;*.txt" />
   </ItemGroup>
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Orleans.Client" Version="9.1.2" />
-    <PackageReference Include="Microsoft.Orleans.Core" Version="9.1.2" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
-    <PackageReference Include="Orleans.Providers.MongoDB" Version="9.1.0" />
-    <PackageReference Include="Polly" Version="8.5.2" />
-    <PackageReference Include="sharpcompress" Version="0.39.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Orleans.Client" Version="3.2.0-rc2" />
+    <PackageReference Include="Orleans.MultiClient" Version="3.1.7" />
+    <PackageReference Include="Orleans.Providers.MongoDB" Version="3.1.7" />
+    <PackageReference Include="Polly" Version="7.2.0" />
+    <PackageReference Include="sharpcompress" Version="0.25.1" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-rc0001" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\MineCase.Core\MineCase.Core.csproj" />
     <ProjectReference Include="..\MineCase.Protocol\MineCase.Protocol.csproj" />
     <ProjectReference Include="..\MineCase.Server.Interfaces\MineCase.Server.Interfaces.csproj" />
   </ItemGroup>
+
   <ItemGroup>
-    <None Remove="..\.dockerignore" />
+    <None Update=".dockerignore">
+      <DependentUpon>Dockerfile</DependentUpon>
+    </None>
   </ItemGroup>
-  <ItemGroup>
-    <None Remove="..\.dockerignore" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="..\.dockerignore" />
-  </ItemGroup>
+
 </Project>

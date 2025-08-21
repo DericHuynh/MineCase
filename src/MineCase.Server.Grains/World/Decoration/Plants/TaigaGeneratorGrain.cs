@@ -27,8 +27,10 @@ namespace MineCase.Server.World.Decoration.Plants
             _logger = loggerFactory.CreateLogger<TaigaGeneratorGrain>();
         }
 
-        public override Task OnActivateAsync(System.Threading.CancellationToken cancellationToken)
+        public async override Task OnActivateAsync()
         {
+            await base.OnActivateAsync();
+
             _minTreeHeight = _generatorSettings.TreeHeight;
             _vines = _generatorSettings.TreeVine;
             _treeType = _generatorSettings.PlantType;
@@ -37,8 +39,6 @@ namespace MineCase.Server.World.Decoration.Plants
                 _wood = BlockStates.SpruceLog();
                 _leaves = BlockStates.SpruceLeaves(SpruceLeavesDistanceType.Distance1, SpruceLeavesPersistentType.False);
             }
-
-            return base.OnActivateAsync(cancellationToken);
         }
 
         public async override Task GenerateSingle(IWorld world, ChunkWorldPos chunkWorldPos, BlockWorldPos pos)

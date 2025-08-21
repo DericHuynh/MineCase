@@ -15,7 +15,6 @@ using MineCase.Server.Components;
 using MineCase.Server.Game.Entities;
 using MineCase.Server.Game.Entities.Components;
 using MineCase.World;
-using Orleans;
 using Orleans.Concurrency;
 
 namespace MineCase.Server.Network.Play
@@ -149,7 +148,7 @@ namespace MineCase.Server.Network.Play
             }
 
             // Logger.LogInformation($"Got packet id: 0x{packet.PacketId:X2}.");
-            if (!br.IsEmpty)
+            if (!br.IsCosumed)
                 throw new InvalidDataException($"Packet data is not fully consumed, packet id: 0x{packet.PacketId:X2}.");
             return task;
         }

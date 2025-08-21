@@ -13,12 +13,12 @@ namespace MineCase.Server.World
 
         protected ChunkWorldPos ChunkWorldPos { get; private set; }
 
-        public override Task OnActivateAsync(System.Threading.CancellationToken cancellationToken)
+        public override Task OnActivateAsync()
         {
             var keys = this.GetWorldAndChunkWorldPos();
             World = GrainFactory.GetGrain<IWorld>(keys.WorldKey);
             ChunkWorldPos = keys.ChunkWorldPos;
-            return base.OnActivateAsync(cancellationToken);
+            return base.OnActivateAsync();
         }
     }
 }

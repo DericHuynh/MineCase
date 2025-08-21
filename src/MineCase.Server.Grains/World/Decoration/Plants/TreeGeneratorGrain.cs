@@ -27,10 +27,28 @@ namespace MineCase.Server.World.Decoration.Plants
             _logger = loggerFactory.CreateLogger<TreeGeneratorGrain>();
         }
 
-        public override Task OnActivateAsync(System.Threading.CancellationToken cancellationToken)
+        public async override Task OnActivateAsync()
         {
-            // You may add activation logic here if needed
-            return base.OnActivateAsync(cancellationToken);
+            await base.OnActivateAsync();
+
+            _minTreeHeight = _generatorSettings.TreeHeight;
+            _vines = _generatorSettings.TreeVine;
+            _treeType = _generatorSettings.PlantType;
+            if (_generatorSettings.PlantType == PlantsType.Oak)
+            {
+                _wood = BlockStates.OakLog();
+                _leaves = BlockStates.OakLeaves(OakLeavesDistanceType.Distance1, OakLeavesPersistentType.False);
+            }
+            else if (_generatorSettings.PlantType == PlantsType.Spruce)
+            {
+                _wood = BlockStates.SpruceLog();
+                _leaves = BlockStates.SpruceLeaves(SpruceLeavesDistanceType.Distance1, SpruceLeavesPersistentType.False);
+            }
+            else if (_generatorSettings.PlantType == PlantsType.Birch)
+            {
+                _wood = BlockStates.BirchLog();
+                _leaves = BlockStates.BirchLeaves(BirchLeavesDistanceType.Distance1, BirchLeavesPersistentType.False);
+            }
         }
 
         public override async Task GenerateSingle(IWorld world, ChunkWorldPos chunkWorldPos, BlockWorldPos pos)
@@ -196,21 +214,6 @@ namespace MineCase.Server.World.Decoration.Plants
                     }
                 }
             }
-        }
-
-        public void SetMinTreeHeight(int minTreeHeight)
-        {
-            _minTreeHeight = minTreeHeight;
-        }
-
-        public void SetVines(bool vines)
-        {
-            _vines = vines;
-        }
-
-        public void SetTreeType(PlantsType treeType)
-        {
-            _treeType = treeType;
         }
     }
 }

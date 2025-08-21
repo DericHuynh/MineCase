@@ -19,7 +19,7 @@ namespace MineCase.Server.Game.Windows
 
         protected override Chat Title { get; } = new Chat("Inventory");
 
-        public override Task OnActivateAsync(System.Threading.CancellationToken cancellationToken)
+        public override Task OnActivateAsync()
         {
             SlotAreas.Add(new CraftingSlotArea(2, this, GrainFactory));
             SlotAreas.Add(new ArmorSlotArea(this, GrainFactory));
@@ -27,7 +27,7 @@ namespace MineCase.Server.Game.Windows
             SlotAreas.Add(new HotbarSlotArea(this, GrainFactory));
             SlotAreas.Add(new OffhandSlotArea(this, GrainFactory));
 
-            return base.OnActivateAsync(cancellationToken);
+            return base.OnActivateAsync();
         }
 
         public override Task<Slot> DistributeStack(IPlayer player, Slot item)

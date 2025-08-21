@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MineCase.Abstractions.Constants;
 using MineCase.Protocol;
 using MineCase.Server.Network;
 using MineCase.Server.Network.Play;
@@ -12,24 +11,18 @@ using MineCase.Server.World;
 using MineCase.World;
 using Orleans;
 using Orleans.Concurrency;
-using Orleans.Runtime;
 using Orleans.Streams;
 
 namespace MineCase.Server.Game
 {
-    [Orleans.GenerateSerializer]
     public sealed class SendChunkJob
     {
-        [Id(0)]
         public IWorld World { get; set; }
 
-        [Id(1)]
         public ChunkWorldPos ChunkPosition { get; set; }
 
-        [Id(2)]
         public IReadOnlyCollection<IClientboundPacketSink> Clients { get; set; }
 
-        [Id(3)]
         public IReadOnlyCollection<IUserChunkLoader> Loaders { get; set; }
     }
 
@@ -48,11 +41,9 @@ namespace MineCase.Server.Game
             _packetPackager = packetPackager;
         }
 
-        public override async Task OnActivateAsync(System.Threading.CancellationToken cancellationToken)
+        public override async Task OnActivateAsync()
         {
-            var streamProvider = this.GetStreamProvider(StreamProviders.JobsProvider);
-            var streamIdObject = StreamId.Create(StreamProviders.Namespaces.ChunkSender, this.GetPrimaryKey());
-            var stream = streamProvider.GetStream<SendChunkJob>(streamIdObject);
+            var stream = GetStreamProvider(StreamProviders.JobsProvider).GetStream<SendChunkJob>(this.GetPrimaryKey(), StreamProviders.Namespaces.ChunkSender);
             await stream.SubscribeAsync(OnNextAsync);
         }
 

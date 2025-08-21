@@ -23,9 +23,10 @@ namespace MineCase.Server.World.Decoration.Plants
             _logger = loggerFactory.CreateLogger<FlowersGeneratorGrain>();
         }
 
-        public override Task OnActivateAsync(System.Threading.CancellationToken cancellationToken)
+        public async override Task OnActivateAsync()
         {
-            return base.OnActivateAsync(cancellationToken);
+            await base.OnActivateAsync();
+            _flowerType = _generatorSettings.PlantType;
         }
 
         public override async Task GenerateSingle(IWorld world, ChunkWorldPos chunkWorldPos, BlockWorldPos pos)

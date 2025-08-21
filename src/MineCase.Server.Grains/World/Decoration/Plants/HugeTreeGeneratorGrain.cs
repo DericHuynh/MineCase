@@ -19,11 +19,11 @@ namespace MineCase.Server.World.Decoration.Plants
             _logger = loggerFactory.CreateLogger<HugeTreeGeneratorGrain>();
         }
 
-        public override Task OnActivateAsync(System.Threading.CancellationToken cancellationToken)
+        public async override Task OnActivateAsync()
         {
+            await base.OnActivateAsync();
             _baseHeight = _generatorSettings.TreeHeight;
             _extraRandomHeight = _generatorSettings.ExtraHeight;
-            return base.OnActivateAsync(cancellationToken);
         }
 
         protected int GetHeight(Random rand)

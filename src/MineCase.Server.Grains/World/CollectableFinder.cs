@@ -27,14 +27,20 @@ namespace MineCase.Server.World
             (0, 0), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)
         };
 
-        private List<(Cuboid Box, ICollectableFinder Finder)> _neighborFinders = new ();
+        private List<(Cuboid Box, ICollectableFinder Finder)> _neighborFinders;
 
         private StateHolder State => GetValue(StateComponent<StateHolder>.StateProperty);
 
-        public override Task OnActivateAsync(System.Threading.CancellationToken cancellationToken)
+        public override async Task OnActivateAsync()
         {
-            // ...existing activation logic if any...
-            return base.OnActivateAsync(cancellationToken);
+            await base.OnActivateAsync();
+            _neighborFinders = new List<(Cuboid Box, ICollectableFinder Finder)>();
+            foreach (var crossCoord in CrossCoords)
+            {
+                var newPos = new ChunkWorldPos(ChunkWorldPos.X + crossCoord.X, ChunkWorldPos.Z + crossCoord.Z);
+                var shape = new Cuboid(new Point3d(newPos.X * 16, newPos.Z * 16, 0), new Size(16, 16, 256));
+                _neighborFinders.Add((shape, GrainFactory.GetPartitionGrain<ICollectableFinder>(World, newPos)));
+            }
         }
 
         protected override void InitializePreLoadComponent()
@@ -70,7 +76,7 @@ namespace MineCase.Server.World
                                                                             .SelectMany(o => o));
             result.Remove(entity);
             if (result.Count != 0)
-                await entity.Tell(new CollisionWith { Entities = result });
+                entity.InvokeOneWay(e => e.Tell(new CollisionWith { Entities = result }));
         }
 
         public async Task SpawnPickup(Vector3 position, Immutable<Slot[]> slots)

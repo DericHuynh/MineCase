@@ -31,7 +31,7 @@ namespace MineCase.Server.Game
             return Task.FromResult(_recipeMatcher.FindRecipe(craftingGrid.Value));
         }
 
-        public override async Task OnActivateAsync(System.Threading.CancellationToken cancellationToken)
+        public override async Task OnActivateAsync()
         {
             var file = _fileProvider.GetFileInfo(_recipesFileName);
 
@@ -39,8 +39,6 @@ namespace MineCase.Server.Game
             using (var sr = new StreamReader(file.CreateReadStream()))
                 await recipeLoader.LoadRecipes(sr);
             _recipeMatcher = new CraftingRecipeMatcher(recipeLoader.Recipes);
-
-            await base.OnActivateAsync(cancellationToken);
         }
     }
 }

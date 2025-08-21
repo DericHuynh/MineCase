@@ -18,7 +18,7 @@ namespace MineCase.Server.World.Decoration.Biomes
     [StatelessWorker]
     public class BiomeTaigaDecoratorGrain : BiomeDecoratorGrain, IBiomeTaigaDecorator
     {
-        public override Task OnActivateAsync(System.Threading.CancellationToken cancellationToken)
+        public override Task OnActivateAsync()
         {
             if (this.GetPrimaryKeyLong() == (long)BiomeId.Taiga)
             {
@@ -56,7 +56,7 @@ namespace MineCase.Server.World.Decoration.Biomes
             MonsterList.Add(MobType.Zombie);
             MonsterList.Add(MobType.Spider);
 
-            return base.OnActivateAsync(cancellationToken);
+            return Task.CompletedTask;
         }
 
         public async override Task Decorate(IWorld world, ChunkWorldPos chunkWorldPos, GeneratorSettings settings)

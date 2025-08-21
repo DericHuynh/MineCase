@@ -20,34 +20,16 @@ namespace MineCase.Protocol.Play
     }
 
     [Packet(0x1B)]
-    [Orleans.GenerateSerializer]
-    [MineCase.Serialization.GenerateSerializer]
-    public sealed class EntityAction : IPacket
+    [GenerateSerializer]
+    public sealed partial class EntityAction : IPacket
     {
         [SerializeAs(DataType.VarInt)]
-        [Orleans.Id(0)]
         public uint EntityId;
 
         [SerializeAs(DataType.VarInt)]
-        [Orleans.Id(1)]
         public ActionId ActionId;
 
         [SerializeAs(DataType.VarInt)]
-        [Orleans.Id(2)]
         public uint JumpBoost;
-
-        public void Serialize(BinaryWriter bw)
-        {
-            bw.WriteAsVarInt(EntityId, out _);
-            bw.WriteAsVarInt((uint)ActionId, out _);
-            bw.WriteAsVarInt(JumpBoost, out _);
-        }
-
-        public void Deserialize(ref SpanReader br)
-        {
-            EntityId = br.ReadAsVarInt(out _);
-            ActionId = (ActionId)br.ReadAsVarInt(out _);
-            JumpBoost = br.ReadAsVarInt(out _);
-        }
     }
 }

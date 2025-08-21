@@ -21,10 +21,9 @@ namespace MineCase.Server.World.Decoration.Plants
             _logger = loggerFactory.CreateLogger<AbstractTreeGeneratorGrain>();
         }
 
-        public override Task OnActivateAsync(System.Threading.CancellationToken cancellationToken)
+        public async override Task OnActivateAsync()
         {
-            // ...existing activation logic if any...
-            return base.OnActivateAsync(cancellationToken);
+            await base.OnActivateAsync();
         }
 
         public static bool IsSoil(BlockState state)

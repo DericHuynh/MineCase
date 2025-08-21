@@ -10,8 +10,6 @@
 
 - 2 . Download and install a `MongoDB` from this [page](https://www.mongodb.com/download-center?jmp=nav#community).
 
-- 2.1 . Download and install `MongoDB Shell` from this [page](https://www.mongodb.com/try/download/shell).
-
 - 3 . Download a `MineCase` archive from the [github page](https://github.com/dotnetGame/MineCase/archive/master.zip)  (or **clone:**)
 
   ```bash

@@ -30,12 +30,12 @@ namespace MineCase.Server.Game.Entities
             SetComponent(new SyncMobStateComponent());
         }
 
-        public override Task OnActivateAsync(System.Threading.CancellationToken cancellationToken)
+        public async override Task OnActivateAsync()
         {
+            await base.OnActivateAsync();
             this.SetLocalValue(HealthComponent.MaxHealthProperty, 20);
             this.SetLocalValue(HealthComponent.HealthProperty, GetValue(HealthComponent.MaxHealthProperty));
             this.SetLocalValue(EntityOnGroundComponent.IsOnGroundProperty, true);
-            return base.OnActivateAsync(cancellationToken);
         }
     }
 }

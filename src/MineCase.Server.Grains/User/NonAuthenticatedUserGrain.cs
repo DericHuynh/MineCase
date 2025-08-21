@@ -4,7 +4,6 @@ using System.Text;
 using System.Threading.Tasks;
 using MineCase.Server.Persistence;
 using MineCase.Server.Persistence.Components;
-using MongoDB.Bson.Serialization.Attributes;
 using Orleans;
 using Orleans.Concurrency;
 
@@ -43,14 +42,10 @@ namespace MineCase.Server.User
             return Task.CompletedTask;
         }
 
-        [Orleans.GenerateSerializer]
         internal class StateHolder
         {
-            [Id(0)]
-            [BsonGuidRepresentation(MongoDB.Bson.GuidRepresentation.CSharpLegacy)]
             public Guid UUID { get; set; }
 
-            [Id(1)]
             public uint ProtocolVersion { get; set; }
 
             public StateHolder()

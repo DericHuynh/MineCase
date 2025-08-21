@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,9 +31,9 @@ namespace MineCase.Server.Game
 
         private ILogger _logger;
 
-        public override async Task OnActivateAsync(System.Threading.CancellationToken cancellationToken)
+        public override async Task OnActivateAsync()
         {
-            await base.OnActivateAsync(cancellationToken);
+            await base.OnActivateAsync();
             _logger = ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger<GameSession>();
             _world = await GrainFactory.GetGrain<IWorldAccessor>(0).GetWorld(this.GetPrimaryKeyString());
             await _fixedUpdate.Start(_world);
@@ -43,6 +42,7 @@ namespace MineCase.Server.Game
         protected override void InitializeComponents()
         {
             SetComponent(new PeriodicSaveStateComponent(TimeSpan.FromMinutes(1)));
+
             _fixedUpdate = new FixedUpdateComponent();
             _fixedUpdate.Tick += OnFixedUpdate;
             SetComponent(_fixedUpdate);

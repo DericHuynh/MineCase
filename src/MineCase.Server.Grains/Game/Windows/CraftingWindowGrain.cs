@@ -12,13 +12,13 @@ namespace MineCase.Server.Game.Windows
 
         protected override Chat Title { get; } = new Chat("Crafting Table");
 
-        public override Task OnActivateAsync(System.Threading.CancellationToken cancellationToken)
+        public override Task OnActivateAsync()
         {
             SlotAreas.Add(new CraftingSlotArea(3, this, GrainFactory));
             SlotAreas.Add(new InventorySlotArea(this, GrainFactory));
             SlotAreas.Add(new HotbarSlotArea(this, GrainFactory));
 
-            return base.OnActivateAsync(cancellationToken);
+            return base.OnActivateAsync();
         }
     }
 }

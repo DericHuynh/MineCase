@@ -7,42 +7,18 @@ using MineCase.Serialization;
 namespace MineCase.Protocol.Play
 {
     [Packet(0x0A)]
-    [Orleans.GenerateSerializer]
-    [MineCase.Serialization.GenerateSerializer]
-    public sealed class ServerboundCloseWindow : IPacket
+    [GenerateSerializer]
+    public sealed partial class ServerboundCloseWindow : IPacket
     {
         [SerializeAs(DataType.Byte)]
-        [Orleans.Id(0)]
         public byte WindowId;
-
-        public void Serialize(BinaryWriter bw)
-        {
-            bw.WriteAsByte(WindowId);
-        }
-
-        public void Deserialize(ref SpanReader br)
-        {
-            WindowId = br.ReadAsByte();
-        }
     }
 
     [Packet(0x14)]
-    [Orleans.GenerateSerializer]
-    [MineCase.Serialization.GenerateSerializer]
-    public sealed class ClientboundCloseWindow : IPacket
+    [GenerateSerializer]
+    public sealed partial class ClientboundCloseWindow : IPacket
     {
         [SerializeAs(DataType.Byte)]
-        [Orleans.Id(0)]
         public byte WindowId;
-
-        public void Serialize(BinaryWriter bw)
-        {
-            bw.WriteAsByte(WindowId);
-        }
-
-        public void Deserialize(ref SpanReader br)
-        {
-            WindowId = br.ReadAsByte();
-        }
     }
 }

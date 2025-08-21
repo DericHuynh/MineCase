@@ -205,10 +205,10 @@ namespace MineCase.Server.User
 
         public Task ForwardPacket(UncompressedPacket packet)
         {
-            _player.Tell(new ServerboundPacketMessage
+            _player.InvokeOneWay(p => p.Tell(new ServerboundPacketMessage
             {
                 Packet = packet
-            });
+            }));
             return Task.CompletedTask;
         }
 

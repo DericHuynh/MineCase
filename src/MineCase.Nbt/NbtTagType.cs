@@ -8,10 +8,8 @@ namespace MineCase.Nbt
     /// 表示 <see cref="NbtTagType"/> 所关联的 <see cref="Tags.NbtTag"/> 类型.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field)]
-    [Orleans.GenerateSerializer]
     internal class TagClassAttribute : Attribute
     {
-        [Orleans.Id(0)]
         internal Type TagClassType { get; }
 
         internal TagClassAttribute(Type type)

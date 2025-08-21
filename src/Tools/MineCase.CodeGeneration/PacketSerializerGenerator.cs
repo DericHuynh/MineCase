@@ -14,12 +14,7 @@ namespace MineCase.CodeGeneration
     [Generator]
     public class PacketSerializerGenerator : ISourceGenerator
     {
-        public void Initialize(InitializationContext context)
-        {
-            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
-        }
-
-        public void Execute(SourceGeneratorContext context)
+        public void Execute(GeneratorExecutionContext context)
         {
             if (!(context.SyntaxReceiver is SyntaxReceiver receiver))
                 return;
@@ -53,7 +48,7 @@ using MineCase.Serialization;
 
 " + codeWriter.ToString(), Encoding.UTF8);
 
-            File.WriteAllText(@"D:\packet.g.cs", source.ToString());
+            // File.WriteAllText(@"D:\packet.g.cs", source.ToString());
             context.AddSource("packet.g.cs", source);
         }
 
@@ -77,12 +72,10 @@ using MineCase.Serialization;
                                  Arguments = attr.NamedArguments
                              };
 
-                #nullable enable
                 object? GetNamedArgument(ImmutableArray<KeyValuePair<string, TypedConstant>> args, string name)
                 {
                     return args.FirstOrDefault(x => x.Key == name).Value.Value;
                 }
-                #nullable disable
 
                 string GetArrayLengthMember(ImmutableArray<KeyValuePair<string, TypedConstant>> args)
                 {
@@ -207,6 +200,10 @@ using MineCase.Serialization;
             return string.Empty;
         }
 
+        public void Initialize(GeneratorInitializationContext context)
+        {
+            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
+        }
 
         private class SyntaxReceiver : ISyntaxReceiver
         {

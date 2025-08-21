@@ -33,10 +33,10 @@ namespace MineCase.Server.Game.Windows
 
         private HashSet<IPlayer> _players;
 
-        public override Task OnActivateAsync(System.Threading.CancellationToken cancellationToken)
+        public override Task OnActivateAsync()
         {
             _players = new HashSet<IPlayer>();
-            return base.OnActivateAsync(cancellationToken);
+            return base.OnActivateAsync();
         }
 
         public Task<uint> GetSlotCount()

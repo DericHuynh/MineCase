@@ -51,9 +51,8 @@ namespace MineCase.Server.Game.Entities.Components
                                           select p.Ask(AskPlayerDescription.Default));
             await AttachedObject.GetComponent<ClientboundPacketComponent>().GetGenerator()
                 .PlayerListItemAddPlayer(desc);
-
-            // await AttachedObject.GetComponent<ChunkEventBroadcastComponent>().GetGenerator()
-            //    .PlayerListItemAddPlayer(desc);
+            await AttachedObject.GetComponent<ChunkEventBroadcastComponent>().GetGenerator()
+                .PlayerListItemAddPlayer(desc);
         }
     }
 }

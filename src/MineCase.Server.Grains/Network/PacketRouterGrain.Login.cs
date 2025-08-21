@@ -36,7 +36,7 @@ namespace MineCase.Server.Network
                     throw new InvalidDataException($"Unrecognizable packet id: 0x{packet.PacketId:X2}.");
             }
 
-            if (!br.IsEmpty)
+            if (!br.IsCosumed)
                 throw new InvalidDataException($"Packet data is not fully consumed.");
             return task;
         }

@@ -4,7 +4,6 @@ using MineCase.Protocol;
 using MineCase.Serialization;
 using MineCase.Server.Game;
 using MineCase.Server.Network;
-using MongoDB.Bson.Serialization.Attributes;
 using Orleans;
 using System;
 using System.Collections.Generic;
@@ -17,11 +16,11 @@ using System.Threading.Tasks.Dataflow;
 
 namespace MineCase.Gateway.Network
 {
-    internal sealed class ClientSession : IDisposable
+    class ClientSession : IDisposable
     {
         private readonly TcpClient _tcpClient;
         private Stream _remoteStream;
-        private readonly IClusterClient _grainFactory;
+        private readonly IOrleansClient _grainFactory;
         private volatile bool _useCompression = false;
         private readonly Guid _sessionId;
         private readonly OutcomingPacketObserver _outcomingPacketObserver;
@@ -33,7 +32,7 @@ namespace MineCase.Gateway.Network
 
         private uint _compressThreshold;
 
-        public ClientSession(TcpClient tcpClient, IClusterClient grainFactory, IBufferPool<byte> bufferPool, ObjectPool<UncompressedPacket> uncompressedPacketObjectPool, IPacketCompress packetCompress)
+        public ClientSession(TcpClient tcpClient, IOrleansClient grainFactory, IBufferPool<byte> bufferPool, ObjectPool<UncompressedPacket> uncompressedPacketObjectPool, IPacketCompress packetCompress)
         {
             _sessionId = Guid.NewGuid();
             _tcpClient = tcpClient;
@@ -47,10 +46,10 @@ namespace MineCase.Gateway.Network
 
         public async Task Startup(CancellationToken cancellationToken)
         {
-            await using (_remoteStream = _tcpClient.GetStream())
+            using (_remoteStream = _tcpClient.GetStream())
             {
                 // subscribe observer to get packet from server
-                _clientboundPacketObserverRef = _grainFactory.CreateObjectReference<IClientboundPacketObserver>(_outcomingPacketObserver);
+                _clientboundPacketObserverRef = await _grainFactory.CreateObjectReference<IClientboundPacketObserver>(_outcomingPacketObserver);
                 await _grainFactory.GetGrain<IClientboundPacketSink>(_sessionId).Subscribe(_clientboundPacketObserverRef);
                 try
                 {
@@ -84,32 +83,34 @@ namespace MineCase.Gateway.Network
 
         private async Task DispatchIncomingPacket()
         {
-            using var bufferScope = _bufferPool.CreateScope();
-            UncompressedPacket packet;
-            if (_useCompression)
+            using (var bufferScope = _bufferPool.CreateScope())
             {
-                var compressedPacket = await CompressedPacket.DeserializeAsync(_remoteStream, null);
-                packet = _packetCompress.Decompress(compressedPacket, _compressThreshold);
-            }
-            else
-            {
-                packet = await UncompressedPacket.DeserializeAsync(_remoteStream, bufferScope);
-            }
+                UncompressedPacket packet;
+                if (_useCompression)
+                {
+                    var compressedPacket = await CompressedPacket.DeserializeAsync(_remoteStream, null);
+                    packet = _packetCompress.Decompress(compressedPacket, _compressThreshold);
+                }
+                else
+                {
+                    packet = await UncompressedPacket.DeserializeAsync(_remoteStream, bufferScope);
+                }
 
-            await DispatchIncomingPacket(packet);
+                await DispatchIncomingPacket(packet);
+            }
         }
 
         private async Task SendOutcomingPacket(object packetOrCommand)
         {
-            switch (packetOrCommand)
+            if (packetOrCommand == null)
             {
-                case null:
-                    _tcpClient.Client.Shutdown(SocketShutdown.Send);
-                    _outcomingPacketDispatcher.Complete();
-                    break;
-                case UncompressedPacket packet:
+                _tcpClient.Client.Shutdown(SocketShutdown.Send);
+                _outcomingPacketDispatcher.Complete();
+            }
+            else if (packetOrCommand is UncompressedPacket packet)
+            {
+                using (var bufferScope = _bufferPool.CreateScope())
                 {
-                    using var bufferScope = _bufferPool.CreateScope();
                     if (_useCompression)
                     {
                         var newPacket = _packetCompress.Compress(packet, _compressThreshold);
@@ -125,8 +126,6 @@ namespace MineCase.Gateway.Network
                         _compressThreshold = GetCompressionThreshold(packet);
                         _useCompression = true;
                     }
-
-                    break;
                 }
             }
         }
@@ -156,30 +155,39 @@ namespace MineCase.Gateway.Network
             }
         }
 
-        private class OutcomingPacketObserver(ClientSession session) : IClientboundPacketObserver
+        class OutcomingPacketObserver : IClientboundPacketObserver
         {
+            private readonly ClientSession _session;
+
+            public OutcomingPacketObserver(ClientSession session)
+            {
+                _session = session;
+            }
+
             public void OnClosed()
             {
-                session.OnClosed();
+                _session.OnClosed();
             }
 
             public void ReceivePacket(UncompressedPacket packet)
             {
-                session.DispatchOutcomingPacket(packet);
+                _session.DispatchOutcomingPacket(packet);
             }
         }
 
         #region IDisposable Support
-        private bool _disposedValue = false; // 要检测冗余调用
+        private bool disposedValue = false; // 要检测冗余调用
 
-        private void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
-            if (_disposedValue) return;
-            if (disposing)
+            if (!disposedValue)
             {
-                _tcpClient.Dispose();
+                if (disposing)
+                {
+                    _tcpClient.Dispose();
+                }
+                disposedValue = true;
             }
-            _disposedValue = true;
         }
         public void Dispose()
         {
