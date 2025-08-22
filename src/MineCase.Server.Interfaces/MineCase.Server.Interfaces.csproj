@@ -38,6 +38,8 @@
 
     <AdditionalFiles Include="..\..\build\stylecop.json" />
 
+    <Folder Include="Network\Handshaking\" />
+
     <Folder Include="Play\" />
   </ItemGroup>
 
