@@ -5,15 +5,12 @@
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
-       
-
     </PropertyGroup>
     <PropertyGroup>
         <Description>Library for working with NBT</Description>
         <PackageTags>minecraft;nbt</PackageTags>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="DotNext"/>
+        <PackageReference Include="DotNext" />
     </ItemGroup>
 </Project>

@@ -1,189 +1,209 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Text;
 
 namespace MineCase.CodeGeneration
 {
-    [Generator]
-    public class PacketSerializerGenerator : ISourceGenerator
+    [Generator(LanguageNames.CSharp)]
+    public class PacketSerializerGenerator : IIncrementalGenerator
     {
-        public void Execute(GeneratorExecutionContext context)
+        public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            if (!(context.SyntaxReceiver is SyntaxReceiver receiver))
-                return;
+            // 1. Find class declarations that have attributes
+            var classDeclarations = context.SyntaxProvider
+                .CreateSyntaxProvider(
+                    predicate: static (node, _) => IsClassWithSerializerAttribute(node),
+                    transform: static (ctx, _) => GetClassAndFieldInfo(ctx))
+                .Where(static info => info.HasValue)
+                .Collect();
 
-            var codeWriter = new StringBuilder();
-
-            var compilation = context.Compilation;
-            var clsAttributeSymbol = compilation.GetTypeByMetadataName("MineCase.Serialization.GenerateSerializerAttribute");
-            var fieldAttributeSymbol = compilation.GetTypeByMetadataName("MineCase.Serialization.SerializeAsAttribute");
-
-            foreach (var cls in receiver.CandidateClasses)
+            // 2. Register the source output for the generator
+            context.RegisterSourceOutput(classDeclarations, (ctx, classInfos) =>
             {
-                var model = compilation.GetSemanticModel(cls.SyntaxTree);
-                var clsSymbol = model.GetDeclaredSymbol(cls) as ITypeSymbol;
-                var clsAttribute = clsSymbol.GetAttributes().FirstOrDefault(x => x.AttributeClass.Equals(clsAttributeSymbol, SymbolEqualityComparer.Default));
-                if (clsAttribute != null)
+                foreach (var classInfo in classInfos!)
                 {
-                    var methods = clsAttribute.NamedArguments.FirstOrDefault(x => x.Key == "Methods").Value.Value;
-                    var mdValue = methods == null ? GenerateSerializerMethods.Both : (GenerateSerializerMethods)(int)methods;
+                    var info = classInfo.Value;
+                    var codeWriter = new StringBuilder();
 
-                    ProcessClass(cls, clsSymbol, mdValue, codeWriter, compilation, fieldAttributeSymbol);
+                    var result = GeneratePacketCode(info.parentClassSymbol, info.fields);
+                    ctx.AddSource(result.FileName,
+                        SourceText.From(result.SourceCode, Encoding.UTF8));
                 }
-            }
-
-            var source = SourceText.From(
-                @"using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using MineCase.Serialization;
-
-" + codeWriter.ToString(), Encoding.UTF8);
-
-            // File.WriteAllText(@"D:\packet.g.cs", source.ToString());
-            context.AddSource("packet.g.cs", source);
+            });
         }
 
-        private void ProcessClass(ClassDeclarationSyntax cls, ITypeSymbol clsSymbol, GenerateSerializerMethods mdValue, StringBuilder codeWriter, Compilation compilation, INamedTypeSymbol fieldAttributeSymbol)
+        private static bool IsClassWithSerializerAttribute(SyntaxNode node)
         {
-            codeWriter.AppendLine($"namespace {clsSymbol.ContainingNamespace.ToDisplayString()}");
-            codeWriter.AppendLine("{");
-            codeWriter.Ident(1).AppendLine($"public partial class {cls.Identifier}{cls.TypeParameterList?.ToString()}");
-            codeWriter.Ident(1).AppendLine("{");
+            return node is ClassDeclarationSyntax cls && cls.AttributeLists.Count > 0;
+        }
+
+        private static (INamedTypeSymbol parentClassSymbol, ImmutableArray<(IFieldSymbol fieldSymbol, AttributeData attribute)> fields, bool HasValue)? GetClassAndFieldInfo(GeneratorSyntaxContext context)
+        {
+            var cls = (ClassDeclarationSyntax)context.Node;
+            var clsSymbol = context.SemanticModel.GetDeclaredSymbol(cls) as INamedTypeSymbol;
+            if (clsSymbol == null) return null;
+
+            var clsAttributeSymbol = context.SemanticModel.Compilation.GetTypeByMetadataName("MineCase.Serialization.GenerateSerializerAttribute");
+            if (clsAttributeSymbol == null) return null;
+
+            var clsAttribute = clsSymbol.GetAttributes()
+                .FirstOrDefault(attr => attr.AttributeClass?.Equals(clsAttributeSymbol, SymbolEqualityComparer.Default) ?? false);
+
+            if (clsAttribute == null) return null;
+
+            var fieldAttributeSymbol = context.SemanticModel.Compilation.GetTypeByMetadataName("MineCase.Serialization.SerializeAsAttribute");
+            if (fieldAttributeSymbol == null) return null;
+
+            // Get all members and filter for fields with the SerializeAsAttribute
+            var fields = clsSymbol.GetMembers().OfType<IFieldSymbol>()
+                .Select(field => (field, attribute: field.GetAttributes()
+                    .FirstOrDefault(attr => attr.AttributeClass?.Equals(fieldAttributeSymbol, SymbolEqualityComparer.Default) ?? false)))
+                .Where(tuple => tuple.attribute is not null)
+                .ToImmutableArray();
+
+            return (clsSymbol, fields, true);
+        }
+
+        private static GenerationResult GeneratePacketCode(INamedTypeSymbol parentClass,
+            ImmutableArray<(IFieldSymbol fieldSymbol, AttributeData attribute)> fields)
+        {
+            var packetInfo = parentClass.GetAttributes()
+                .First(attr => attr.AttributeClass?.Name == "GenerateSerializerAttribute");
+
+            // Get the 'Methods' property from the attribute
+            var methods = packetInfo.NamedArguments.FirstOrDefault(x => x.Key == "Methods").Value.Value;
+            var mdValue = methods == null ? GenerateSerializerMethods.Both : (GenerateSerializerMethods)(int)methods;
+
+            var sb = new StringBuilder();
+            sb.AppendLine($"using System.IO;");
+            sb.AppendLine($"using MineCase.Serialization;");
+            sb.AppendLine($"");
+            sb.AppendLine($"namespace {parentClass.ContainingNamespace.ToDisplayString()}");
+            sb.AppendLine("{");
+
+            // Correctly get the full type name, including generic parameters and constraints
+            var typeParameterList = ((ClassDeclarationSyntax)parentClass.DeclaringSyntaxReferences[0].GetSyntax()).TypeParameterList;
+            var whereClause = typeParameterList?.ToString();
+
+            // Use the full name including generic parameters
+            sb.AppendLine($"    public partial class {parentClass.Name}{typeParameterList?.ToString()}");
+            sb.AppendLine("    {");
 
             try
             {
-                var fields = from fSymbol in clsSymbol.GetMembers().OfType<IFieldSymbol>()
-                             let attr = fSymbol.GetAttributes().FirstOrDefault(x => x.AttributeClass.Equals(fieldAttributeSymbol, SymbolEqualityComparer.Default))
-                             where attr != null
-                             let dataType = (DataType)(int)attr.ConstructorArguments[0].Value
-                             select new
-                             {
-                                 Symbol = fSymbol,
-                                 DataType = dataType,
-                                 Arguments = attr.NamedArguments
-                             };
-
-                object? GetNamedArgument(ImmutableArray<KeyValuePair<string, TypedConstant>> args, string name)
-                {
-                    return args.FirstOrDefault(x => x.Key == name).Value.Value;
-                }
-
-                string GetArrayLengthMember(ImmutableArray<KeyValuePair<string, TypedConstant>> args)
-                {
-                    var arg = (string)GetNamedArgument(args, "ArrayLengthMember");
-                    if (arg != null)
-                        return "(int)" + arg;
-                    return string.Empty;
-                }
-
                 // 1. Serializer
                 if (mdValue == GenerateSerializerMethods.Serialize || mdValue == GenerateSerializerMethods.Both)
                 {
-                    codeWriter.Ident(2).AppendLine("public void Serialize(BinaryWriter bw)");
-                    codeWriter.Ident(2).AppendLine("{");
+                    sb.AppendLine("        public void Serialize(BinaryWriter bw)");
+                    sb.AppendLine("        {");
 
                     foreach (var field in fields)
                     {
-                        var code = field.DataType switch
+                        var code = field.attribute.ConstructorArguments[0].Value switch
                         {
-                            DataType.Angle => $"WriteAsAngle({field.Symbol.Name})",
-                            DataType.Array => $"WriteAsArray({field.Symbol.Name})",
-                            DataType.Boolean => $"WriteAsBoolean({field.Symbol.Name})",
-                            DataType.Byte => $"WriteAsByte({OptionalEnumCastFrom(field.Symbol.Type, "byte")}{field.Symbol.Name})",
-                            DataType.ByteArray => $"WriteAsByteArray({field.Symbol.Name})",
-                            DataType.Chat => $"WriteAsChat({field.Symbol.Name})",
-                            DataType.Double => $"WriteAsDouble({field.Symbol.Name})",
-                            DataType.EntityMetadata => throw new NotSupportedException(),
-                            DataType.Float => $"WriteAsFloat({field.Symbol.Name})",
-                            DataType.Int => $"WriteAsInt({OptionalEnumCastFrom(field.Symbol.Type, "int")}{field.Symbol.Name})",
-                            DataType.IntArray => $"WriteAsIntArray({field.Symbol.Name})",
-                            DataType.Long => $"WriteAsLong({OptionalEnumCastFrom(field.Symbol.Type, "long")}{field.Symbol.Name})",
-                            DataType.NbtArray => $"WriteAsNbtArray({field.Symbol.Name})",
-                            DataType.NBTTag => $"WriteAsNBTTag({field.Symbol.Name})",
-                            DataType.Position => $"WriteAsPosition({field.Symbol.Name})",
-                            DataType.Short => $"WriteAsShort({OptionalEnumCastFrom(field.Symbol.Type, "short")}{field.Symbol.Name})",
-                            DataType.Slot => $"WriteAsSlot({field.Symbol.Name})",
-                            DataType.SlotArray => $"WriteAsSlotArray({field.Symbol.Name})",
-                            DataType.String => $"WriteAsString({field.Symbol.Name})",
-                            DataType.UnsignedByte => $"WriteAsUnsignedByte({OptionalEnumCastFrom(field.Symbol.Type, "byte")}{field.Symbol.Name})",
-                            DataType.UnsignedShort => $"WriteAsUnsignedShort({OptionalEnumCastFrom(field.Symbol.Type, "ushort")}{field.Symbol.Name})",
-                            DataType.UUID => $"WriteAsUUID({field.Symbol.Name})",
-                            DataType.VarInt => $"WriteAsVarInt({OptionalEnumCastFrom(field.Symbol.Type, "uint")}{field.Symbol.Name}, out _)",
-                            DataType.VarIntArray => $"WriteAsVarIntArray({field.Symbol.Name})",
-                            DataType.VarLong => $"WriteAsVarLong({OptionalEnumCastFrom(field.Symbol.Type, "ulong")}{field.Symbol.Name}, out _)",
+                            (int)DataType.Angle => $"WriteAsAngle({field.fieldSymbol.Name})",
+                            (int)DataType.Array => $"WriteAsArray({field.fieldSymbol.Name})",
+                            (int)DataType.Boolean => $"WriteAsBoolean({field.fieldSymbol.Name})",
+                            (int)DataType.Byte => $"WriteAsByte({OptionalEnumCastFrom(field.fieldSymbol.Type, "byte")}{field.fieldSymbol.Name})",
+                            (int)DataType.ByteArray => $"WriteAsByteArray({field.fieldSymbol.Name})",
+                            (int)DataType.Chat => $"WriteAsChat({field.fieldSymbol.Name})",
+                            (int)DataType.Double => $"WriteAsDouble({field.fieldSymbol.Name})",
+                            (int)DataType.EntityMetadata => throw new NotSupportedException(),
+                            (int)DataType.Float => $"WriteAsFloat({field.fieldSymbol.Name})",
+                            (int)DataType.Int => $"WriteAsInt({OptionalEnumCastFrom(field.fieldSymbol.Type, "int")}{field.fieldSymbol.Name})",
+                            (int)DataType.IntArray => $"WriteAsIntArray({field.fieldSymbol.Name})",
+                            (int)DataType.Long => $"WriteAsLong({OptionalEnumCastFrom(field.fieldSymbol.Type, "long")}{field.fieldSymbol.Name})",
+                            (int)DataType.NbtArray => $"WriteAsNbtArray({field.fieldSymbol.Name})",
+                            (int)DataType.NBTTag => $"WriteAsNBTTag({field.fieldSymbol.Name})",
+                            (int)DataType.Position => $"WriteAsPosition({field.fieldSymbol.Name})",
+                            (int)DataType.Short => $"WriteAsShort({OptionalEnumCastFrom(field.fieldSymbol.Type, "short")}{field.fieldSymbol.Name})",
+                            (int)DataType.Slot => $"WriteAsSlot({field.fieldSymbol.Name})",
+                            (int)DataType.SlotArray => $"WriteAsSlotArray({field.fieldSymbol.Name})",
+                            (int)DataType.String => $"WriteAsString({field.fieldSymbol.Name})",
+                            (int)DataType.UnsignedByte => $"WriteAsUnsignedByte({OptionalEnumCastFrom(field.fieldSymbol.Type, "byte")}{field.fieldSymbol.Name})",
+                            (int)DataType.UnsignedShort => $"WriteAsUnsignedShort({OptionalEnumCastFrom(field.fieldSymbol.Type, "ushort")}{field.fieldSymbol.Name})",
+                            (int)DataType.UUID => $"WriteAsUUID({field.fieldSymbol.Name})",
+                            (int)DataType.VarInt => $"WriteAsVarInt({OptionalEnumCastFrom(field.fieldSymbol.Type, "uint")}{field.fieldSymbol.Name}, out _)",
+                            (int)DataType.VarIntArray => $"WriteAsVarIntArray({field.fieldSymbol.Name})",
+                            (int)DataType.VarLong => $"WriteAsVarLong({OptionalEnumCastFrom(field.fieldSymbol.Type, "ulong")}{field.fieldSymbol.Name})",
                             _ => ""
                         };
-
-                        codeWriter.Ident(3).AppendLine($"bw.{code};");
+                        sb.AppendLine($"            bw.{code};");
                     }
-
-                    codeWriter.Ident(2).AppendLine("}");
+                    sb.AppendLine("        }");
                 }
 
                 if (mdValue == GenerateSerializerMethods.Both)
-                    codeWriter.AppendLine();
+                    sb.AppendLine();
 
                 // 2. Deserializer
                 if (mdValue == GenerateSerializerMethods.Deserialize || mdValue == GenerateSerializerMethods.Both)
                 {
-                    codeWriter.Ident(2).AppendLine("public void Deserialize(ref SpanReader br)");
-                    codeWriter.Ident(2).AppendLine("{");
+                    sb.AppendLine("        public void Deserialize(ref SpanReader br)");
+                    sb.AppendLine("        {");
 
                     foreach (var field in fields)
                     {
-                        var code = field.DataType switch
+                        var code = field.attribute.ConstructorArguments[0].Value switch
                         {
-                            DataType.Angle => $"ReadAsAngle()",
-                            DataType.Array => $"ReadAsArray<{((IArrayTypeSymbol)field.Symbol.Type).ElementType.ToDisplayString()}>({GetArrayLengthMember(field.Arguments)})",
-                            DataType.Boolean => $"ReadAsBoolean()",
-                            DataType.Byte => $"ReadAsByte()",
-                            DataType.ByteArray => $"ReadAsByteArray({GetArrayLengthMember(field.Arguments)})",
-                            DataType.Chat => $"ReadAsChat()",
-                            DataType.Double => $"ReadAsDouble()",
-                            DataType.EntityMetadata => throw new NotSupportedException(),
-                            DataType.Float => $"ReadAsFloat()",
-                            DataType.Int => $"ReadAsInt()",
-                            DataType.IntArray => $"ReadAsIntArray({GetArrayLengthMember(field.Arguments)})",
-                            DataType.Long => $"ReadAsLong()",
-                            DataType.NbtArray => $"ReadAsNbtArray({GetArrayLengthMember(field.Arguments)})",
-                            DataType.NBTTag => $"ReadAsNBTTag()",
-                            DataType.Position => $"ReadAsPosition()",
-                            DataType.Short => $"ReadAsShort()",
-                            DataType.Slot => $"ReadAsSlot()",
-                            DataType.SlotArray => $"ReadAsSlotArray({GetArrayLengthMember(field.Arguments)})",
-                            DataType.String => $"ReadAsString()",
-                            DataType.UnsignedByte => $"ReadAsUnsignedByte()",
-                            DataType.UnsignedShort => $"ReadAsUnsignedShort()",
-                            DataType.UUID => $"ReadAsUUID()",
-                            DataType.VarInt => $"ReadAsVarInt(out _)",
-                            DataType.VarIntArray => $"ReadAsVarIntArray({GetArrayLengthMember(field.Arguments)})",
-                            DataType.VarLong => $"ReadAsVarLong(out _)",
+                            (int)DataType.Angle => $"ReadAsAngle()",
+                            (int)DataType.Array => $"ReadAsArray<{((IArrayTypeSymbol)field.fieldSymbol.Type).ElementType.ToDisplayString()}>({GetArrayLengthMember(field.attribute.NamedArguments)})",
+                            (int)DataType.Boolean => $"ReadAsBoolean()",
+                            (int)DataType.Byte => $"ReadAsByte()",
+                            (int)DataType.ByteArray => $"ReadAsByteArray({GetArrayLengthMember(field.attribute.NamedArguments)})",
+                            (int)DataType.Chat => $"ReadAsChat()",
+                            (int)DataType.Double => $"ReadAsDouble()",
+                            (int)DataType.EntityMetadata => throw new NotSupportedException(),
+                            (int)DataType.Float => $"ReadAsFloat()",
+                            (int)DataType.Int => $"ReadAsInt()",
+                            (int)DataType.IntArray => $"ReadAsIntArray({GetArrayLengthMember(field.attribute.NamedArguments)})",
+                            (int)DataType.Long => $"ReadAsLong()",
+                            (int)DataType.NbtArray => $"ReadAsNbtArray({GetArrayLengthMember(field.attribute.NamedArguments)})",
+                            (int)DataType.NBTTag => $"ReadAsNBTTag()",
+                            (int)DataType.Position => $"ReadAsPosition()",
+                            (int)DataType.Short => $"ReadAsShort()",
+                            (int)DataType.Slot => $"ReadAsSlot()",
+                            (int)DataType.SlotArray => $"ReadAsSlotArray({GetArrayLengthMember(field.attribute.NamedArguments)})",
+                            (int)DataType.String => $"ReadAsString()",
+                            (int)DataType.UnsignedByte => $"ReadAsUnsignedByte()",
+                            (int)DataType.UnsignedShort => $"ReadAsUnsignedShort()",
+                            (int)DataType.UUID => $"ReadAsUUID()",
+                            (int)DataType.VarInt => $"ReadAsVarInt(out _)",
+                            (int)DataType.VarIntArray => $"ReadAsVarIntArray({GetArrayLengthMember(field.attribute.NamedArguments)})",
+                            (int)DataType.VarLong => $"ReadAsVarLong()",
                             _ => ""
                         };
-
-                        codeWriter.Ident(3).AppendLine($"{field.Symbol.Name} = {OptionalEnumCastTo(field.Symbol.Type)}br.{code};");
+                        sb.AppendLine($"            {field.fieldSymbol.Name} = {OptionalEnumCastTo(field.fieldSymbol.Type)}br.{code};");
                     }
-
-                    codeWriter.Ident(2).AppendLine("}");
+                    sb.AppendLine("        }");
                 }
             }
             catch (Exception ex)
             {
-                codeWriter.AppendLine(ex.ToString());
+                sb.AppendLine("// Error generating code: " + ex.ToString());
             }
 
-            codeWriter.Ident(1).AppendLine("}");
-            codeWriter.AppendLine("}");
-            codeWriter.AppendLine();
+            sb.AppendLine("    }");
+            sb.AppendLine("}");
+
+            return new GenerationResult()
+            {
+                SourceCode = sb.ToString(),
+                FileName = $"{parentClass.Name}_Serializer.g.cs"
+            };
+        }
+
+        private static string GetArrayLengthMember(ImmutableArray<KeyValuePair<string, TypedConstant>> args)
+        {
+            var arg = args.FirstOrDefault(x => x.Key == "ArrayLengthMember").Value;
+            if (arg.IsNull) return string.Empty;
+            return $"(int){arg.Value}";
         }
 
         private static string OptionalEnumCastFrom(ITypeSymbol type, string desiredType)
@@ -200,25 +220,10 @@ using MineCase.Serialization;
             return string.Empty;
         }
 
-        public void Initialize(GeneratorInitializationContext context)
-        {
-            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
-        }
-
-        private class SyntaxReceiver : ISyntaxReceiver
-        {
-            public List<ClassDeclarationSyntax> CandidateClasses { get; } = new List<ClassDeclarationSyntax>();
-
-            public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
-            {
-                if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax
-                    && classDeclarationSyntax.AttributeLists.Count > 0)
-                {
-                    CandidateClasses.Add(classDeclarationSyntax);
-                }
-            }
-        }
-
+        /// <summary>
+        /// Order matters here, since it also has to be mapped from the consuming project.
+        /// TODO: Create a common MineCase.CodeGeneration.Attributes project
+        /// </summary>
         private enum GenerateSerializerMethods
         {
             Serialize = 0,
@@ -226,6 +231,10 @@ using MineCase.Serialization;
             Both = 2
         }
 
+        /// <summary>
+        /// Order matters here, since it also has to be mapped from the consuming project.
+        /// TODO: Create a common MineCase.CodeGeneration.Attributes project
+        /// </summary>
         private enum DataType
         {
             Boolean,
@@ -254,15 +263,11 @@ using MineCase.Serialization;
             SlotArray,
             Array
         }
-    }
 
-    static class CodeWriterExtensions
-    {
-        public static StringBuilder Ident(this StringBuilder sb, int count)
+        class GenerationResult
         {
-            for (int i = 0; i < count; i++)
-                sb.Append("    ");
-            return sb;
+            public string SourceCode { get; set; }
+            public string FileName { get; set; }
         }
     }
 }

@@ -37,9 +37,8 @@ public class PacketGenerator : IIncrementalGenerator
         return node is ClassDeclarationSyntax cls && cls.AttributeLists.Count > 0;
     }
 
-    private static (INamedTypeSymbol parentClassSymbol,
-        ImmutableArray<(INamedTypeSymbol nestedClass, AttributeData subInfoAttribute)> nestedClasses)? GetPacketInfo(
-            GeneratorSyntaxContext context)
+    private static (INamedTypeSymbol parentClassSymbol, ImmutableArray<(INamedTypeSymbol nestedClass, AttributeData subInfoAttribute)> nestedClasses)? 
+        GetPacketInfo(GeneratorSyntaxContext context)
     {
         var classSymbol =
             context.SemanticModel.GetDeclaredSymbol((ClassDeclarationSyntax)context.Node) as INamedTypeSymbol;
