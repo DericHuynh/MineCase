@@ -22,7 +22,18 @@ public static class Extensions
     {
         builder.Services.ConfigureOpenTelemetryServices(builder.Environment.ApplicationName);
 
+        builder.Services.AddServiceDiscovery();
+
         builder.Services.AddStartupHealthCheck();
+
+        builder.Services.ConfigureHttpClientDefaults(http =>
+        {
+            // Turn on resilience by default
+            http.AddStandardResilienceHandler();
+
+            // Turn on service discovery by default
+            http.AddServiceDiscovery();
+        });
 
         return builder;
     }
@@ -36,8 +47,16 @@ public static class Extensions
 
         builder.ConfigureServices(services =>
         {
+            services.AddServiceDiscovery();
             services.ConfigureOpenTelemetryServices(applicationName);
-            services.AddStartupHealthCheck();
+            services.ConfigureHttpClientDefaults(http =>
+            {
+                // Turn on resilience by default
+                http.AddStandardResilienceHandler();
+
+                // Turn on service discovery by default
+                http.AddServiceDiscovery();
+            });
         });
 
         return builder;

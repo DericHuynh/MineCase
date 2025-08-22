@@ -13,6 +13,8 @@ using Orleans.Configuration;
 using Orleans.ApplicationParts;
 using Orleans.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Hosting;
+using MineCase.Server;
 
 namespace MineCase.Gateway
 {
@@ -21,6 +23,7 @@ namespace MineCase.Gateway
         static async Task Main(string[] args)
         {
             var hostBuilder = new HostBuilder()
+                .ConfigureWebHostDefaults(config => { config.UseStartup<Startup>(); })
                 .ConfigureAppConfiguration(ConfigureAppConfiguration)
                 .ConfigureServices(ConfigureServices)
                 .ConfigureLogging(ConfigureLogging)

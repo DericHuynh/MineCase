@@ -28,6 +28,7 @@ namespace MineCase.Gateway
             services.AddTransient<ClientSession>();
             services.AddHostedService<ConnectionRouter>();
             services.ConfigureOpenTelemetryServices("MineCase.Gateway");
+            services.AddStartupHealthCheck();
             services.AddOrleansMultiClient(builder =>
             {
                 builder.AddClient(options =>

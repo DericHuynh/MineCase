@@ -1,22 +1,34 @@
-﻿using System.Threading.Tasks;
-using Autofac.Extensions.DependencyInjection;
+﻿using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using MineCase.Serialization.Serializers;
 using Orleans;
 using Orleans.ApplicationParts;
 using Orleans.Configuration;
 using Orleans.Hosting;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace MineCase.Server
 {
     partial class Program
     {
+        public static int GetAvailablePort()
+        {
+            using var listener = new TcpListener(IPAddress.Loopback, 0);
+            listener.Start();
+            var port = ((IPEndPoint)listener.LocalEndpoint).Port;
+            return port;
+        }
+
         static async Task Main(string[] args)
         {
             var createShardKey = false;
             Serializers.RegisterAll();
 
             var hostBuilder = new HostBuilder()
+                .ConfigureWebHostDefaults(conf => { conf.UseStartup<Startup>(); })
                 .UseServiceProviderFactory(x => new AutofacServiceProviderFactory(ConfigureAutofac))
                 .ConfigureAppConfiguration(ConfigureAppConfiguration)
                 .ConfigureServices(ConfigureServices)
@@ -34,7 +46,7 @@ namespace MineCase.Server
                         options.AllowCallChainReentrancy = true;
                         options.PerformDeadlockDetection = true;
                     })
-                    .ConfigureEndpoints(siloPort: 11111, gatewayPort: 30000)
+                    .ConfigureEndpoints(siloPort: GetAvailablePort(), gatewayPort: GetAvailablePort())
                     .UseMongoDBClient(context.Configuration.GetSection("persistenceOptions")["connectionString"])
                     .AddSimpleMessageStreamProvider("JobsProvider")
                     .AddSimpleMessageStreamProvider("TransientProvider")
@@ -49,8 +61,8 @@ namespace MineCase.Server
                         c.CreateShardKeyForCosmos = createShardKey;
                         // c.UseJsonFormat = true;
                     })
+                    .UseDashboard(config => { config.HostSelf = false; })
                     .ConfigureApplicationParts(ConfigureApplicationParts)
-                    .UseDashboard(options => { })
                     .AddMongoDBGrainStorageAsDefault(c => c.Configure(options =>
                     {
                         options.DatabaseName = context.Configuration.GetSection("persistenceOptions")["databaseName"];

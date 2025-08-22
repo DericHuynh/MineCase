@@ -15,7 +15,7 @@ namespace MineCase.Server.Health_Checks
     {
         public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(new HealthCheckResult(HealthStatus.Healthy));
+            return Task.FromResult(new HealthCheckResult(HealthStatus.Healthy, description: "Basic Health Grain received."));
         }
     }
 }

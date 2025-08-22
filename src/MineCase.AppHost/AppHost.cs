@@ -5,19 +5,27 @@ var mongodb = builder.AddMongoDB("mongodb")
                      .WithContainerName("mongodb-container")
                      .WithDbGate();
 
-var minecaseDb = mongodb.AddDatabase("mongodb-minecase");
+var minecaseDb = mongodb.AddDatabase("minecase"); // Database name dont change
 
 var silos = builder.AddProject<Projects.MineCase_Server>("minecase-server")
-                   .WithHttpEndpoint(targetPort: 8080, name:"orleans-dashboard")
+                   .WithHttpEndpoint(name: "orleans-dashboard")
                    .WithUrlForEndpoint("orleans-dashboard", (annotation) =>
                    {
                        annotation.DisplayText = "Orleans Dashboard";
+                       annotation.Url = "/dashboard";
                    })
                    .WithEnvironment("persistenceOptions:connectionString", minecaseDb)
+                   .WithReplicas(3)
                    .WaitFor(mongodb);
 
 var gateway = builder.AddProject<Projects.MineCase_Gateway>("minecase-gateway")
                      .WithEnvironment("persistenceOptions:connectionString", minecaseDb)
                      .WaitFor(silos);
+
+var healthchecksUi = builder.AddHealthChecksUI("healthchecks-ui")
+                     .WithReference(silos)
+                     .WithReference(gateway)
+                     .WithReference(mongodb)
+                     .WithExternalHttpEndpoints();
 
 builder.Build().Run();

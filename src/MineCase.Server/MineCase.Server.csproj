@@ -11,6 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
+    <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="9.0.0" />
     <PackageReference Include="Autofac" Version="5.1.2" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.8" />
