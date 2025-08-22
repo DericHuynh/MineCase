@@ -9,7 +9,7 @@ using MineCase.Algorithm;
 using MineCase.Block;
 using Xunit;
 
-namespace MineCase.UnitTest
+namespace MineCase.UnitTest.Recipes
 {
     public class CraftingRecipeTest
     {

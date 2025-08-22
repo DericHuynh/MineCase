@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineCase.Server.Interfaces"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineCase.Server.Grains", "MineCase.Server.Grains\MineCase.Server.Grains.csproj", "{3F83DE42-121D-4E7A-AB27-825AD8179D3C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineCase.UnitTest", "..\tests\UnitTest\MineCase.UnitTest.csproj", "{35618D69-85F0-4C38-8224-04A2D75825B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineCase.UnitTests", "..\tests\MineCase.UnitTests\MineCase.UnitTests.csproj", "{35618D69-85F0-4C38-8224-04A2D75825B6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineCase.Nbt", "MineCase.Nbt\MineCase.Nbt.csproj", "{199335D6-9726-42E1-94F2-7D95932D4DDC}"
 EndProject
@@ -38,7 +38,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{7DC8CDBD-0
 		..\data\furnace.txt = ..\data\furnace.txt
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineCase.Server.Engine", "MineCase.Engine\MineCase.Server.Engine.csproj", "{76AFDAE6-75F7-4E68-86CD-DE19CA47246B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineCase.Server.Engine", "MineCase.Server.Engine\MineCase.Server.Engine.csproj", "{76AFDAE6-75F7-4E68-86CD-DE19CA47246B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{1077810B-83FF-405E-94BD-95AFC284A416}"
 EndProject
@@ -52,7 +52,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{3E9DA133
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineCase.CodeGeneration", "Tools\MineCase.CodeGeneration\MineCase.CodeGeneration.csproj", "{06CF9DBB-D9F2-4242-BC81-48E8EBE749AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineCase.Library", "Minecase.Library\MineCase.Library.csproj", "{39D42761-EB25-49C3-9D96-0738E5179688}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineCase.Library", "MineCase.Library\MineCase.Library.csproj", "{39D42761-EB25-49C3-9D96-0738E5179688}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Aspire", "Aspire", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
@@ -61,6 +61,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineCase.ServiceDefaults", "MineCase.ServiceDefaults\MineCase.ServiceDefaults.csproj", "{2C0D92EF-C57F-7A39-1BDA-64A9E3728EFD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gateway", "Gateway", "{585EE262-5337-4631-96C6-6EB1245B2B71}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineCase.IntegrationTests", "..\tests\MineCase.IntegrationTests\MineCase.IntegrationTests.csproj", "{DD028220-07E6-92C2-007B-0F68273AE515}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -190,6 +192,14 @@ Global
 		{2C0D92EF-C57F-7A39-1BDA-64A9E3728EFD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2C0D92EF-C57F-7A39-1BDA-64A9E3728EFD}.TravisCI|Any CPU.ActiveCfg = Debug|Any CPU
 		{2C0D92EF-C57F-7A39-1BDA-64A9E3728EFD}.TravisCI|Any CPU.Build.0 = Debug|Any CPU
+		{DD028220-07E6-92C2-007B-0F68273AE515}.Appveyor|Any CPU.ActiveCfg = Release|Any CPU
+		{DD028220-07E6-92C2-007B-0F68273AE515}.Appveyor|Any CPU.Build.0 = Release|Any CPU
+		{DD028220-07E6-92C2-007B-0F68273AE515}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD028220-07E6-92C2-007B-0F68273AE515}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD028220-07E6-92C2-007B-0F68273AE515}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD028220-07E6-92C2-007B-0F68273AE515}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD028220-07E6-92C2-007B-0F68273AE515}.TravisCI|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD028220-07E6-92C2-007B-0F68273AE515}.TravisCI|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -210,6 +220,7 @@ Global
 		{39D42761-EB25-49C3-9D96-0738E5179688} = {CB620063-55E2-4694-B1E0-E99BB032BF03}
 		{B6B0B501-6E15-4E68-9A16-8A2E64BAA956} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{2C0D92EF-C57F-7A39-1BDA-64A9E3728EFD} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{DD028220-07E6-92C2-007B-0F68273AE515} = {D53C0015-5761-4018-A50A-63C919C00D35}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7AB995C3-E961-463C-8A55-3149C51761B5}

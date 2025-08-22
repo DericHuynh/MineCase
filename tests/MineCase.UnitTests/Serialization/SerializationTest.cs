@@ -12,11 +12,11 @@ using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using Xunit;
 
-namespace MineCase.UnitTest
+namespace MineCase.UnitTest.Serialization
 {
     public class SerializationTest
     {
-        public DependencyProperty<Slot> SlotProperty = DependencyProperty.Register<Slot>("Slot", typeof(SerializationTest), new PropertyMetadata<Slot>(Slot.Empty));
+        public DependencyProperty<Slot> SlotProperty = DependencyProperty.Register("Slot", typeof(SerializationTest), new PropertyMetadata<Slot>(Slot.Empty));
         public DependencyProperty<Shape> ShapeProperty = DependencyProperty.Register<Shape>("Shape", typeof(SerializationTest));
         public DependencyProperty<Cuboid> CuboidProperty = DependencyProperty.Register<Cuboid>("Cuboid", typeof(SerializationTest));
         public DependencyProperty<StateHolder> StateProperty = DependencyProperty.Register<StateHolder>("State", typeof(SerializationTest));

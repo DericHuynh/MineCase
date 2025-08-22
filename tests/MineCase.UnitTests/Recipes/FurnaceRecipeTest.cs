@@ -10,7 +10,7 @@ using MineCase.Block;
 using MineCase.Item;
 using Xunit;
 
-namespace MineCase.UnitTest
+namespace MineCase.UnitTest.Recipes
 {
     public class FurnaceRecipeTest
     {

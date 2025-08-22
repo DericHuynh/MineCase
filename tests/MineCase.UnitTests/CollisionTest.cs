@@ -10,7 +10,7 @@ namespace MineCase.UnitTest
     public class CollisionTest
     {
         [Fact]
-        public void TestCollsion()
+        public void TestCollision()
         {
             var shape1 = new Cuboid(new Point3d(0f, 0f, 0f), new Size(1f, 1f, 2f));
             var shape2 = new Cuboid(new Point3d(0.9f, 0.9f, 1f), new Size(1f, 1f, 1f));
@@ -24,7 +24,7 @@ namespace MineCase.UnitTest
         }
 
         [Fact]
-        public void TestNotCollsion()
+        public void TestNotCollision()
         {
             var shape1 = new Cuboid(new Point3d(0f, 0f, 0f), new Size(1f, 1f, 2f));
             var shape2 = new Cuboid(new Point3d(2f, 2f, 1f), new Size(1f, 1f, 1f));
@@ -38,7 +38,7 @@ namespace MineCase.UnitTest
         }
 
         [Fact]
-        public void TestBoundaryCollsion()
+        public void TestBoundaryCollision()
         {
             var shape1 = new Cuboid(new Point3d(0f, 0f, 0f), new Size(1f, 1f, 2f));
             var shape2 = new Cuboid(new Point3d(1f, 0f, 0f), new Size(1f, 1f, 1f));

@@ -22,7 +22,7 @@ public static class Extensions
     {
         builder.Services.ConfigureOpenTelemetryServices(builder.Environment.ApplicationName);
 
-        builder.Services.AddDefaultHealthChecks();
+        builder.Services.AddStartupHealthCheck();
 
         return builder;
     }
@@ -37,7 +37,7 @@ public static class Extensions
         builder.ConfigureServices(services =>
         {
             services.ConfigureOpenTelemetryServices(applicationName);
-            services.AddDefaultHealthChecks();
+            services.AddStartupHealthCheck();
         });
 
         return builder;
@@ -82,7 +82,7 @@ public static class Extensions
         return logging;
     }
 
-    public static IServiceCollection AddDefaultHealthChecks(this IServiceCollection services)
+    public static IServiceCollection AddStartupHealthCheck(this IServiceCollection services)
     {
         services.AddHealthChecks()
                 // Add a default liveness check to ensure app is responsive
