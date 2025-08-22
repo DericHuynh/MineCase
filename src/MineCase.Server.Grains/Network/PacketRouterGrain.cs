@@ -42,6 +42,8 @@ namespace MineCase.Server.Network
                     return DispatchStatusPackets(packet);
                 case SessionState.Login:
                     return DispatchLoginPackets(packet);
+                case SessionState.Configuration:
+                    return DispatchConfigurationPackets(packet);
                 case SessionState.Play:
                     return _user.ForwardPacket(packet);
                 case SessionState.Closed:
@@ -61,6 +63,13 @@ namespace MineCase.Server.Network
             _logger.LogInformation("State Changed to {state}", _state);
             await GrainFactory.GetGrain<IClientboundPacketSink>(this.GetPrimaryKey()).Close();
             DeactivateOnIdle();
+        }
+
+        public Task Configuration()
+        {
+            _state = SessionState.Configuration;
+            _logger.LogInformation("State Changed to {state}", _state);
+            return Task.CompletedTask;
         }
 
         public Task Play()
@@ -103,6 +112,9 @@ namespace MineCase.Server.Network
 
             /// <summary> Clients ping and get server motd before login.</summary>
             Status,
+
+            /// <summary> Seems to be Client configuration before joining server. </summary>
+            Configuration,
 
             /// <summary> login stage.</summary>
             Login,

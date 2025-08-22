@@ -118,7 +118,7 @@ namespace MineCase.Server.Network.Login
         private async Task SendLoginSuccess(string userName, Guid uuid)
         {
             var sink = GrainFactory.GetGrain<IClientboundPacketSink>(this.GetPrimaryKey());
-            await GrainFactory.GetGrain<IPacketRouter>(this.GetPrimaryKey()).Play();
+            await GrainFactory.GetGrain<IPacketRouter>(this.GetPrimaryKey()).Configuration();
             await sink.SendPacket(new LoginSuccess
             {
                 Username = userName,

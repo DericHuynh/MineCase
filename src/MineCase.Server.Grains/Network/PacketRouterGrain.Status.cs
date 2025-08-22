@@ -29,7 +29,7 @@ namespace MineCase.Server.Network
                 case 0x01:
                     return DispatchPacket(PacketDeserializer.Deserialize<Ping>(ref br));
                 default:
-                    throw new InvalidDataException($"Unrecognizable packet id: 0x{packet.PacketId:X2}.");
+                    throw new InvalidDataException($"Status State - Unrecognizable packet id: 0x{packet.PacketId:X2}.");
             }
         }
 

@@ -33,7 +33,7 @@ namespace MineCase.Server.Network
                     task = DispatchPacket(PacketDeserializer.Deserialize<EncryptionResponse>(ref br));
                     break;
                 default:
-                    throw new InvalidDataException($"Unrecognizable packet id: 0x{packet.PacketId:X2}.");
+                    throw new InvalidDataException($"Login State - Unrecognizable packet id: 0x{packet.PacketId:X2}.");
             }
 
             if (!br.IsCosumed)

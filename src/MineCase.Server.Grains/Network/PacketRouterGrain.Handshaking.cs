@@ -25,7 +25,7 @@ namespace MineCase.Server.Network
                 case 0x00:
                     return DispatchPacket(PacketDeserializer.Deserialize<Handshake>(ref br));
                 default:
-                    throw new InvalidDataException($"Unrecognizable packet id: 0x{packet.PacketId:X2}.");
+                    throw new InvalidDataException($"Handshaking State - Unrecognizable packet id: 0x{packet.PacketId:X2}.");
             }
         }
 
