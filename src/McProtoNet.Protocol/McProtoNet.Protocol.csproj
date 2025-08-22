@@ -1,11 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+        <TargetFrameworks>net9.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>13</LangVersion>
         <NoWarn>CS8618;CS1591;CS8601</NoWarn>
+		<CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)GeneratedFiles</CompilerGeneratedFilesOutputPath>
+		<ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
     <PropertyGroup>
         <Description>A library that supports multiversion</Description>
@@ -14,25 +16,28 @@
         <NoWarn>$(NoWarn);CS0535</NoWarn>
     </PropertyGroup>
     <ItemGroup>
-        <InternalsVisibleTo Include="McProtoNet.Benchmark"/>
-        <InternalsVisibleTo Include="McProtoNet.Tests"/>
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\McProtoNet.Abstractions\McProtoNet.Abstractions.csproj"/>
-        <ProjectReference Include="..\McProtoNet.Serialization\McProtoNet.Serialization.csproj"/>
-        <ProjectReference Include="..\McProtoNet\McProtoNet.csproj"/>
+        <InternalsVisibleTo Include="McProtoNet.Benchmark" />
+        <InternalsVisibleTo Include="McProtoNet.Tests" />
     </ItemGroup>
 
     <ItemGroup>
-
+      <Using Include="McProtoNet.Abstractions" />
+      <Using Include="McProtoNet.CodeGeneration.Attributes" />
+      <Using Include="McProtoNet.NBT" />
+      <Using Include="McProtoNet.Protocol" />
+      <Using Include="McProtoNet.Serialization" />
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Packets\Play\"/>
+        <Folder Include="Packets\Play\" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\McProtoNet.SourceGenerator\McProtoNet.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+      <ProjectReference Include="..\McProtoNet.Abstractions\McProtoNet.Abstractions.csproj" />
+      <ProjectReference Include="..\McProtoNet.NBT\McProtoNet.NBT.csproj" />
+      <ProjectReference Include="..\McProtoNet.Serialization\McProtoNet.Serialization.csproj" />
+      <ProjectReference Include="..\McProtoNet.SourceGenerator\McProtoNet.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+      <ProjectReference Include="..\McProtoNet\McProtoNet.csproj" />
     </ItemGroup>
 
 

@@ -1,4 +1,6 @@
+using McProtoNet.CodeGeneration.Attributes;
 using McProtoNet.Serialization;
+using McProtoNet.Protocol;
 
 namespace McProtoNet.Protocol.Packets.Login.Serverbound;
 
