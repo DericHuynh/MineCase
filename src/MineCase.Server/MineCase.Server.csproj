@@ -75,6 +75,7 @@
   <ItemGroup>
     <ProjectReference Include="..\MineCase.Serialization\MineCase.Serialization.csproj" />
     <ProjectReference Include="..\MineCase.Server.Grains\MineCase.Server.Grains.csproj" />
+    <ProjectReference Include="..\MineCase.ServiceDefaults\MineCase.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

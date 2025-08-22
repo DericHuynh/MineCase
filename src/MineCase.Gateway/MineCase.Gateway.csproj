@@ -47,6 +47,7 @@
     <ProjectReference Include="..\MineCase.Core\MineCase.Core.csproj" />
     <ProjectReference Include="..\MineCase.Protocol\MineCase.Protocol.csproj" />
     <ProjectReference Include="..\MineCase.Server.Interfaces\MineCase.Server.Interfaces.csproj" />
+    <ProjectReference Include="..\MineCase.ServiceDefaults\MineCase.ServiceDefaults.csproj" />
   </ItemGroup>
 
   <ItemGroup>

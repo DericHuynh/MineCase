@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MineCase.Engine;
 using MineCase.Protocol;
@@ -21,6 +23,7 @@ namespace MineCase.Server.Network.Play
 {
     internal class ServerboundPacketComponent : Component<PlayerGrain>, IHandle<ServerboundPacketMessage>
     {
+        private static readonly ActivitySource Source = new ActivitySource("MineCase", "1.0.0");
         private readonly Queue<UncompressedPacket> _deferredPacket = new Queue<UncompressedPacket>();
 
         public ServerboundPacketComponent(string name = "serverboundPacket")
@@ -56,6 +59,7 @@ namespace MineCase.Server.Network.Play
         {
             var br = new SpanReader(packet.Data);
             Task task;
+
             switch (packet.PacketId)
             {
                 // Teleport Confirm
@@ -149,7 +153,11 @@ namespace MineCase.Server.Network.Play
 
             // Logger.LogInformation($"Got packet id: 0x{packet.PacketId:X2}.");
             if (!br.IsCosumed)
+            {
+                Logger.LogError("Packet data is not fully consumed, packet id: 0x{id}", packet.PacketId);
                 throw new InvalidDataException($"Packet data is not fully consumed, packet id: 0x{packet.PacketId:X2}.");
+            }
+
             return task;
         }
 

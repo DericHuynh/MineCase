@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using MineCase.Protocol;
 using MineCase.Protocol.Handshaking;
+using MineCase.Server.Settings;
 using MineCase.Server.User;
 using Orleans;
 using Orleans.Concurrency;
@@ -17,13 +19,21 @@ namespace MineCase.Server.Network
     [Reentrant]
     internal partial class PacketRouterGrain : Grain, IPacketRouter
     {
-        private SessionState _state;
+        private SessionState _state = SessionState.Handshaking;
         private uint _protocolVersion;
         private string _userName;
         private IUser _user;
+        private readonly ILogger _logger;
+
+        public PacketRouterGrain(ILoggerFactory loggerFactory)
+        {
+            _logger = loggerFactory.CreateLogger<PacketRouterGrain>();
+        }
 
         public Task SendPacket(UncompressedPacket packet)
         {
+            _logger.LogInformation("Packet: id = {id}, length = {length}; Data = {data}", packet.PacketId, packet.Length, string.Join(", ", packet.Data));
+
             switch (_state)
             {
                 case SessionState.Handshaking:
@@ -48,6 +58,7 @@ namespace MineCase.Server.Network
             if (_user != null)
                 await _user.Kick();
             _state = SessionState.Closed;
+            _logger.LogInformation("State Changed to {state}", _state);
             await GrainFactory.GetGrain<IClientboundPacketSink>(this.GetPrimaryKey()).Close();
             DeactivateOnIdle();
         }
@@ -55,6 +66,7 @@ namespace MineCase.Server.Network
         public Task Play()
         {
             _state = SessionState.Play;
+            _logger.LogInformation("State Changed to {state}", _state);
             return Task.CompletedTask;
         }
 

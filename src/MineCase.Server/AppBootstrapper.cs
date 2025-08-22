@@ -24,12 +24,14 @@ namespace MineCase.Server
             services.AddLogging();
             services.AddSingleton<RecyclableMemoryStreamManager>();
             services.Configure<PersistenceOptions>(context.Configuration.GetSection("persistenceOptions"));
+            services.ConfigureOpenTelemetryServices("MineCase.Server");
         }
 
         private static void ConfigureAppConfiguration(IConfigurationBuilder configurationBuilder)
         {
             configurationBuilder.SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("config.json", false, false);
+                .AddJsonFile("config.json", false, false)
+                .AddEnvironmentVariables();
         }
 
         private static void ConfigureAutofac(ContainerBuilder builder)
@@ -44,7 +46,7 @@ namespace MineCase.Server
 
         private static void ConfigureLogging(ILoggingBuilder loggingBuilder)
         {
-            loggingBuilder.AddConsole();
+            loggingBuilder.ConfigureOpenTelemetryLogging();
         }
     }
 }

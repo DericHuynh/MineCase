@@ -27,6 +27,7 @@ namespace MineCase.Gateway
             services.AddSingleton<IPacketCompress, PacketCompress>();
             services.AddTransient<ClientSession>();
             services.AddHostedService<ConnectionRouter>();
+            services.ConfigureOpenTelemetryServices("MineCase.Gateway");
             services.AddOrleansMultiClient(builder =>
             {
                 builder.AddClient(options =>
@@ -63,12 +64,13 @@ namespace MineCase.Gateway
         private static void ConfigureAppConfiguration(HostBuilderContext context, IConfigurationBuilder builder)
         {
             builder.SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("config.json", false, false);
+                .AddJsonFile("config.json", false, false)
+                .AddEnvironmentVariables();
         }
 
         private static void ConfigureLogging(ILoggingBuilder loggingBuilder)
         {
-            loggingBuilder.AddConsole();
+            loggingBuilder.ConfigureOpenTelemetryLogging();
         }
 
         private static Assembly[] SelectAssemblies()
