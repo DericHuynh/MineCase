@@ -17,7 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net46'">
-    <PackageReference Include="Microsoft.TargetingPack.NETFramework.v4.6" Version="1.0.1" ExcludeAssets="All" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.TargetingPack.NETFramework.v4.6" ExcludeAssets="All" PrivateAssets="All" />
 
     <Reference Include="System.Runtime" />
   </ItemGroup>
@@ -39,10 +39,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta004" PrivateAssets="All" />
-    <PackageReference Include="Unity.TargetingPack.Modules.2017.2.0f3" Version="1.0.0" />
-    <PackageReference Include="Autofac" Version="4.6.2" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+    <PackageReference Include="StyleCop.Analyzers" PrivateAssets="All" />
+    <PackageReference Include="Unity.TargetingPack.Modules.2017.2.0f3" />
+    <PackageReference Include="Autofac" />
+    <PackageReference Include="System.ValueTuple" />
   </ItemGroup>
 
   <ItemGroup>

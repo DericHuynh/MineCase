@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -32,16 +32,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.8" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.8" />
-    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="9.0.8" />
-    <PackageReference Include="Microsoft.Orleans.Client" Version="3.3.0" />
-    <PackageReference Include="Orleans.MultiClient" Version="3.1.7" />
-    <PackageReference Include="Orleans.Providers.MongoDB" Version="3.1.7" />
-    <PackageReference Include="Polly" Version="7.2.0" />
-    <PackageReference Include="sharpcompress" Version="0.40.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+    <PackageReference Include="Microsoft.Extensions.ObjectPool" />
+    <PackageReference Include="Microsoft.Orleans.Client" />
+    <PackageReference Include="Orleans.MultiClient" />
+    <PackageReference Include="Orleans.Providers.MongoDB" />
+    <PackageReference Include="Polly" />
+    <PackageReference Include="sharpcompress" />
+    <PackageReference Include="SixLabors.ImageSharp" />
   </ItemGroup>
 
   <ItemGroup>
