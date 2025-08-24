@@ -32,6 +32,7 @@ namespace MineCase.Server
         {
             configurationBuilder.SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("config.json", false, false)
+                .AddJsonFile("server.json", false, false)
                 .AddEnvironmentVariables();
         }
 

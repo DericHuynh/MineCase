@@ -1,49 +1,51 @@
 //Minecraft server properties
 //ed Jun 28 22:27:08 CST 2017
 {
+  "ServerSettings": {
     //server
-    "motd": "A Minecase Server",
-    "server-ip": "0.0.0.0",
-    "server-port": 25565,
-    "max-tick-time": 60000,
-    "online-mode": false,
-    "enable-rcon": false,
-    "network-compression-threshold": 256,
-    "resource-pack": "",
-    "resource-pack-hash": "",
-    "snooper-enabled": true,
-    "enable-query": false,
+    "Motd": "A Minecase Server",
+    "ServerIp": "0.0.0.0",
+    "ServerPort": 25565,
+    "MaxTickTime": 60000,
+    "OnlineMode": false,
+    "EnableRcon": false,
+    "NetworkCompressionThreshold": 256,
+    "ResourcePack": "",
+    "ResourcePackHash": "",
+    "SnooperEnabled": true,
+    "EnableQuery": false,
 
     //spawn
-    "spawn-protection": 16,
-    "spawn-monsters": true,
-    "spawn-npcs": true,
-    "spawn-animals": true,
+    "SpawnProtection": 16,
+    "SpawnMonsters": true,
+    "SpawnNpcs": true,
+    "SpawnAnimals": true,
 
     //world
-    "max-world-size": 29999984,
-    "allow-nether": true,
-    "generate-structures": true,
-    "generator-settings": "",
-    "max-build-height": 256,
-    "level-seed": "MineCaseSeed",
-    "level-type": "DEFAULT",
-    "enable-command-block": false,
-    "hardcore": false,
+    "MaxWorldSize": 29999984,
+    "AllowNether": true,
+    "GenerateStructures": true,
+    "GeneratorSettings": "",
+    "MaxBuildHeight": 256,
+    "LevelSeed": "MineCaseSeed",
+    "LevelType": "DEFAULT",
+    "EnableCommandBlock": false,
+    "Hardcore": false,
 
     //user
-    "max-players": 20,
-    "view-distance": 10,
-    "allow-flight": false,
+    "MaxPlayers": 20,
+    "ViewDistance": 10,
+    "AllowFlight": false,
     //"level-name": "world",
-    "player-idle-timeout": 0,
-    "difficulty": 1,
-    "force-gamemode": false,
-    "gamemode": 0,
-    "pvp": true,
-    "announce-player-achievements": true,
+    "PlayerIdleTimeout": 0,
+    "Difficulty": 1,
+    "ForceGamemode": false,
+    "Gamemode": 0,
+    "Pvp": true,
+    "AnnouncePlayerAchievements": true,
 
     //op
-    "white-list": false,
-    "op-permission-level": 4
+    "WhiteList": false,
+    "OpPermissionLevel": 4
+  }
 }
