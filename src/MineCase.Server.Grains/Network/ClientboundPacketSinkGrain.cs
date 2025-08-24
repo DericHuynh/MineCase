@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using MineCase.Protocol;
 using MineCase.Protocol.Handshaking;
 using Orleans;
@@ -15,10 +16,12 @@ namespace MineCase.Server.Network
     {
         private Grains.GrainObserverManager<IClientboundPacketObserver> _subsManager;
         private readonly IPacketPackager _packetPackager;
+        private readonly ILogger<ClientboundPacketSinkGrain> _logger;
 
-        public ClientboundPacketSinkGrain(IPacketPackager packetPackager)
+        public ClientboundPacketSinkGrain(ILoggerFactory loggerFactory, IPacketPackager packetPackager)
         {
             _packetPackager = packetPackager;
+            _logger = loggerFactory.CreateLogger<ClientboundPacketSinkGrain>();
         }
 
         public override Task OnActivateAsync()
@@ -55,6 +58,7 @@ namespace MineCase.Server.Network
                 PacketId = packetId,
                 Data = new ArraySegment<byte>(data.Value)
             };
+            _logger.LogDebug("Server Packet: id = {id}, data = {data}", packetId, string.Join(", ", packet.Data));
             if (_subsManager.Count == 0)
                 DeactivateOnIdle();
             else

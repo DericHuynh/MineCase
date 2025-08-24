@@ -32,19 +32,22 @@ namespace MineCase.Server.Network
 
         public Task SendPacket(UncompressedPacket packet)
         {
-            _logger.LogInformation("Packet: id = {id}, length = {length}; Data = {data}", packet.PacketId, packet.Length, string.Join(", ", packet.Data));
-
             switch (_state)
             {
                 case SessionState.Handshaking:
+                    _logger.LogDebug("Handshaking Packet: id = {id}, length = {length}; Data = {data}", packet.PacketId, packet.Length, string.Join(", ", packet.Data));
                     return DispatchHandshakingPackets(packet);
                 case SessionState.Status:
+                    _logger.LogDebug("Status Packet: id = {id}, length = {length}; Data = {data}", packet.PacketId, packet.Length, string.Join(", ", packet.Data));
                     return DispatchStatusPackets(packet);
                 case SessionState.Login:
+                    _logger.LogDebug("Login Packet: id = {id}, length = {length}; Data = {data}", packet.PacketId, packet.Length, string.Join(", ", packet.Data));
                     return DispatchLoginPackets(packet);
                 case SessionState.Configuration:
+                    _logger.LogDebug("Configuration Packet: id = {id}, length = {length}; Data = {data}", packet.PacketId, packet.Length, string.Join(", ", packet.Data));
                     return DispatchConfigurationPackets(packet);
                 case SessionState.Play:
+                    _logger.LogDebug("Play Packet: id = {id}, length = {length}; Data = {data}", packet.PacketId, packet.Length, string.Join(", ", packet.Data));
                     return _user.ForwardPacket(packet);
                 case SessionState.Closed:
                     break;
@@ -60,7 +63,7 @@ namespace MineCase.Server.Network
             if (_user != null)
                 await _user.Kick();
             _state = SessionState.Closed;
-            _logger.LogInformation("State Changed to {state}", _state);
+            _logger.LogDebug("State Changed to {state}", _state);
             await GrainFactory.GetGrain<IClientboundPacketSink>(this.GetPrimaryKey()).Close();
             DeactivateOnIdle();
         }
@@ -68,14 +71,14 @@ namespace MineCase.Server.Network
         public Task Configuration()
         {
             _state = SessionState.Configuration;
-            _logger.LogInformation("State Changed to {state}", _state);
+            _logger.LogDebug("State Changed to {state}", _state);
             return Task.CompletedTask;
         }
 
         public Task Play()
         {
             _state = SessionState.Play;
-            _logger.LogInformation("State Changed to {state}", _state);
+            _logger.LogDebug("State Changed to {state}", _state);
             return Task.CompletedTask;
         }
 
