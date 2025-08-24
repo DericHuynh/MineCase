@@ -16,7 +16,7 @@ namespace MineCase.Server.Persistence
         {
             var url = new MongoUrl(options.Value.ConnectionString);
             var client = new MongoClient(url);
-            _db = client.GetDatabase(url.DatabaseName);
+            _db = client.GetDatabase(options.Value.DatabaseName);
         }
 
         public IMongoCollection<DependencyObjectState> GetEntityStateCollection(string name)

@@ -1,6 +1,6 @@
 ﻿{
   "persistenceOptions": {
     "connectionString": "mongodb://localhost:27017/minecase",
-    "databaseName": "minecase"
+    "databaseName": "test"
   }
 }

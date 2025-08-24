@@ -9,6 +9,8 @@ namespace MineCase.Server.Settings
     {
         public string ConnectionString { get; set; }
 
+        public string DatabaseName { get; set; }
+
         PersistenceOptions IOptions<PersistenceOptions>.Value => this;
     }
 }
