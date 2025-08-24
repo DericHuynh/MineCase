@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,6 +33,9 @@ namespace MineCase.Server.Network
 
         public Task SendPacket(UncompressedPacket packet)
         {
+            Activity.Current?.SetTag("SessionState", Enum.GetName(typeof(SessionState), _state));
+            Activity.Current?.SetTag("PacketId", $"0x{packet.PacketId:X2}");
+
             switch (_state)
             {
                 case SessionState.Handshaking:
@@ -60,6 +64,8 @@ namespace MineCase.Server.Network
 
         public async Task Close()
         {
+            using var close_activity = ActivitySources.NetworkActivitySource.StartActivity("Close PacketRouter", ActivityKind.Client, parentId: Activity.Current?.ParentId);
+
             if (_user != null)
                 await _user.Kick();
             _state = SessionState.Closed;

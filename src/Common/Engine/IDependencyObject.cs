@@ -21,6 +21,7 @@ namespace MineCase.Engine
 
     public interface IDependencyObject : IGrain
     {
+        [OneWay]
         Task Tell(IEntityMessage message);
 
         Task<TResponse> Ask<TResponse>(IEntityMessage<TResponse> message);

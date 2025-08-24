@@ -69,7 +69,8 @@ public static class Extensions
                 .WithMetrics(metrics =>
                 {
                     metrics.AddAspNetCoreInstrumentation()
-                           .AddRuntimeInstrumentation();
+                           .AddRuntimeInstrumentation()
+                           .AddMeter("Microsoft.Orleans");
                 })
                 .WithTracing(tracing =>
                 {
@@ -83,7 +84,9 @@ public static class Extensions
                             // Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
                             //.AddGrpcClientInstrumentation()
                             .AddHttpClientInstrumentation()
-                            .AddSource("MineCase");
+                            .AddSource("Microsoft.Orleans.Application")
+                            .AddSource("MineCase.Network")
+                            .AddSource("MineCase.GameTick");
                 })
                 .UseOtlpExporter();
         return services;

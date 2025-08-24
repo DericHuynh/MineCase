@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 using MineCase.Protocol.Status;
@@ -14,7 +15,27 @@ namespace MineCase.Server.Network.Status
     {
         public async Task DispatchPacket(Guid sessionId, Ping packet)
         {
-            await GrainFactory.GetGrain<IClientboundPacketSink>(sessionId).SendPacket(new Pong { Payload = packet.Payload });
+            using var ping_activity = ActivitySources.NetworkActivitySource.StartActivity("Ping", ActivityKind.Client, parentId: Activity.Current?.ParentId);
+            if (Activity.Current is not null && Activity.Current.IsAllDataRequested)
+            {
+                Activity.Current.DisplayName = "Handle " + nameof(Ping);
+                Activity.Current.AddTag("Payload", packet.Payload);
+            }
+
+            using var pong_activity = ActivitySources.NetworkActivitySource.StartActivity("Send Pong", ActivityKind.Client, parentId: Activity.Current?.ParentId);
+            Pong pongPacket = new Pong
+            {
+                Payload = packet.Payload
+            };
+
+            if (Activity.Current is not null && Activity.Current.IsAllDataRequested)
+            {
+                Activity.Current.DisplayName = "Send " + nameof(Pong);
+                Activity.Current.AddTag("Payload", pongPacket.Payload);
+            }
+
+            await GrainFactory.GetGrain<IClientboundPacketSink>(sessionId).SendPacket(pongPacket);
+
             GrainFactory.GetGrain<IPacketRouter>(sessionId).Close().Ignore();
         }
     }

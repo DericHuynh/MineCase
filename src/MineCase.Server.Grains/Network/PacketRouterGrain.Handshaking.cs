@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,6 +32,13 @@ namespace MineCase.Server.Network
 
         private Task DispatchPacket(Handshake packet)
         {
+            using var activity = ActivitySources.NetworkActivitySource.StartActivity("Handle Handshake", ActivityKind.Server, parentId: Activity.Current?.ParentId);
+            Activity.Current?.SetTag("ClientPacketType", nameof(Handshake));
+            Activity.Current?.SetTag("ClientProtocolVersion", packet.ProtocolVersion);
+            Activity.Current?.SetTag("ClientServerAddress", packet.ServerAddress);
+            Activity.Current?.SetTag("ClientServerPort", packet.ServerPort);
+            Activity.Current?.SetTag("ClientNextState", packet.NextState);
+
             if (packet.NextState == 1)
                 _state = SessionState.Status;
             else if (packet.NextState == 2)

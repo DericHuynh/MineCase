@@ -107,7 +107,6 @@ namespace MineCase.Gateway
                     configure.ClusterId = "dev";
                     configure.ServiceId = "MineCaseService";
                 });
-                c.AddActivityPropagation();
                 c.UseMongoDBClient(webHostBuilder.Configuration.GetSection("persistenceOptions")["connectionString"]);
                 c.UseMongoDBClustering(options =>
                 {

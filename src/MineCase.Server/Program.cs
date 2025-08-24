@@ -98,6 +98,7 @@ namespace MineCase.Server
             hostBuilder.UseOrleans((siloBuilder) =>
             {
                 //siloBuilder.UseDashboard();
+                siloBuilder.AddActivityPropagation();
                 siloBuilder.Configure<ClusterOptions>(options =>
                 {
                     options.ClusterId = "dev";

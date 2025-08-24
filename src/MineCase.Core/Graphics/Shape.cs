@@ -9,6 +9,7 @@ namespace MineCase.Graphics
         Cuboid = 0
     }
 
+    [Orleans.GenerateSerializer]
     [Serializable]
     public abstract class Shape
     {

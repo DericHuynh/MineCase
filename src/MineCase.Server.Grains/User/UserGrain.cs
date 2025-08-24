@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -116,9 +117,12 @@ namespace MineCase.Server.User
 
         public async Task Kick()
         {
+            using var close_activity = ActivitySources.NetworkActivitySource.StartActivity("Kick User", ActivityKind.Client, parentId: Activity.Current?.ParentId);
+
             if (_player != null)
             {
                 State.SpawnPosition = await _player.GetPosition();
+                Activity.Current?.AddTag("SpawnPosition", $"{State.SpawnPosition.Value.X}, {State.SpawnPosition.Value.Y}, {State.SpawnPosition.Value.Z}");
                 MarkDirty();
                 await _player.Tell(DestroyEntity.Default);
             }
