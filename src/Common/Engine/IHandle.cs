@@ -6,42 +6,32 @@ using System.Threading.Tasks;
 namespace MineCase.Engine
 {
     /// <summary>
-    /// 实体消息处理接口
+    /// Entity message processing interface.
     /// </summary>
-    /// <typeparam name="TMessage">消息类型</typeparam>
+    /// <typeparam name="TMessage">Message type.</typeparam>
     public interface IHandle<TMessage>
         where TMessage : IEntityMessage
     {
         /// <summary>
-        /// 处理消息
+        /// Process message.
         /// </summary>
-        /// <param name="message">消息</param>
-#if ECS_SERVER
-        Task
-#else
-        void
-#endif
-            Handle(TMessage message);
+        /// <param name="message">Message.</param>
+        Task Handle(TMessage message);
     }
 
     /// <summary>
-    /// 实体消息处理接口
+    /// Entity message processing interface with response.
     /// </summary>
-    /// <typeparam name="TMessage">消息类型</typeparam>
-    /// <typeparam name="TResponse">返回类型</typeparam>
+    /// <typeparam name="TMessage">Message type.</typeparam>
+    /// <typeparam name="TResponse">Return type.</typeparam>
     public interface IHandle<TMessage, TResponse>
         where TMessage : IEntityMessage<TResponse>
     {
         /// <summary>
-        /// 处理消息
+        /// Process message and get a response.
         /// </summary>
-        /// <param name="message">消息</param>
-        /// <returns>回复</returns>
-#if ECS_SERVER
-        Task<TResponse>
-#else
-        TResponse
-#endif
-            Handle(TMessage message);
+        /// <param name="message">Message.</param>
+        /// <returns>Reply.</returns>
+        Task<TResponse> Handle(TMessage message);
     }
 }

@@ -8,24 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using MineCase.Engine.Data;
 using MineCase.Library;
-
-#if ECS_SERVER
 using Orleans;
-#endif
 
 namespace MineCase.Engine
 {
     /// <summary>
     /// 依赖对象
     /// </summary>
-    public abstract partial class DependencyObject
-        :
-#if ECS_SERVER
-        Grain,
-#else
-        SmartBehaviour,
-#endif
-        IDependencyObject
+    public abstract partial class DependencyObject : Grain, IDependencyObject
     {
         private Dictionary<string, IComponentIntern> _components;
         private Dictionary<IComponentIntern, int> _indexes;
@@ -47,12 +37,7 @@ namespace MineCase.Engine
         /// </summary>
         /// <typeparam name="T">组件类型</typeparam>
         /// <returns>组件</returns>
-#if ECS_SERVER
-        public
-#else
-        public new
-#endif
-            T GetComponent<T>()
+        public T GetComponent<T>()
             where T : Component
         {
             foreach (var component in _components)
@@ -64,21 +49,10 @@ namespace MineCase.Engine
             return null;
         }
 
-#if !ECS_SERVER
         /// <summary>
-        /// 获取 Unity 组件
+        /// Set Component
         /// </summary>
-        /// <typeparam name="T">组件类型</typeparam>
-        /// <returns>组件</returns>
-        public T GetUnityComponent<T>()
-            where T : UnityEngine.Component =>
-            base.GetComponent<T>();
-#endif
-
-        /// <summary>
-        /// 设置组件
-        /// </summary>
-        /// <param name="component">组件</param>
+        /// <param name="component">Component</param>
         public void SetComponent(Component component)
         {
             var name = component.Name;
@@ -360,123 +334,60 @@ namespace MineCase.Engine
         }
 
         /// <inheritdoc />
-        public
-#if ECS_SERVER
-        Task
-#else
-        void
-#endif
-            Tell(IEntityMessage message)
+        public Task Tell(IEntityMessage message)
         {
-#if ECS_SERVER
-            return
-#endif
-            Tell(message, message.GetType());
+            return Tell(message, message.GetType());
         }
 
         /// <summary>
-        /// 告知
+        /// TODO.
         /// </summary>
-        /// <typeparam name="T">消息类型</typeparam>
-        /// <param name="message">消息</param>
-        public
-#if ECS_SERVER
-        Task
-#else
-        void
-#endif
-            Tell<T>(T message)
+        /// <typeparam name="T">Message Type.</typeparam>
+        /// <param name="message">Message.</param>
+        public Task Tell<T>(T message)
             where T : IEntityMessage
         {
-#if ECS_SERVER
-            return
-#endif
-            Tell(message, typeof(T));
+            return Tell(message, typeof(T));
         }
 
-        private
-#if ECS_SERVER
-        async Task
-#else
-        void
-#endif
-            Tell(IEntityMessage message, Type messageType)
+        private async Task Tell(IEntityMessage message, Type messageType)
         {
-            var invoker =
-#if ECS_SERVER
-                (Func<IComponentIntern, IEntityMessage, Task>
-#else
-                (Action<IComponentIntern, IEntityMessage>
-#endif
-)GetOrAddMessageCaller(messageType);
+            var invoker = (Func<IComponentIntern, IEntityMessage, Task>)GetOrAddMessageCaller(messageType);
             if (_messageHandlers.TryGetValue(messageType, out var handlers))
             {
                 foreach (var handler in from h in handlers
                                         orderby h.GetMessageOrder(message), _indexes[h]
                                         select h)
                 {
-#if ECS_SERVER
-                await
-#endif
-                    invoker(handler, message);
+                await invoker(handler, message);
                 }
             }
 
-#if ECS_SERVER
             await ClearOperationQueue();
-#endif
         }
 
         /// <inheritdoc />
-        public
-#if ECS_SERVER
-        async Task<TResponse>
-#else
-        TResponse
-#endif
-            Ask<TResponse>(IEntityMessage<TResponse> message)
+        public async Task<TResponse> Ask<TResponse>(IEntityMessage<TResponse> message)
         {
-            var response =
-#if ECS_SERVER
-            await
-#endif
-                TryAsk(message);
+            var response = await TryAsk(message);
             if (!response.Succeeded)
                 throw new ReceiverNotFoundException();
             return response.Response;
         }
 
         /// <inheritdoc />
-        public
-#if ECS_SERVER
-        async Task<AskResult<TResponse>>
-#else
-        AskResult<TResponse>
-#endif
-            TryAsk<TResponse>(IEntityMessage<TResponse> message)
+        public async Task<AskResult<TResponse>> TryAsk<TResponse>(IEntityMessage<TResponse> message)
         {
             var messageType = message.GetType();
-            var invoker =
-#if ECS_SERVER
-                (Func<IComponentIntern, IEntityMessage<TResponse>, Task<TResponse>>
-#else
-                (Func<IComponentIntern, IEntityMessage<TResponse>, TResponse>
-#endif
-)GetOrAddMessageCaller(messageType);
+            var invoker = (Func<IComponentIntern, IEntityMessage<TResponse>, Task<TResponse>>)GetOrAddMessageCaller(messageType);
             if (_messageHandlers.TryGetValue(messageType, out var handlers))
             {
                 foreach (var handler in from h in handlers
                                         orderby h.GetMessageOrder(message), _indexes[h]
                                         select h)
                 {
-                    var response =
-#if ECS_SERVER
-            await
-#endif
-                    invoker(handler, message);
-#if ECS_SERVER
+                    var response = await invoker(handler, message);
                     await ClearOperationQueue();
-#endif
                     return new AskResult<TResponse> { Succeeded = true, Response = response };
                 }
             }

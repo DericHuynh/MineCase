@@ -18,8 +18,8 @@ namespace MineCase.Server.World
     [Reentrant]
     internal class WorldGrain : PersistableDependencyObject, IWorld
     {
-        private GeneratorSettings _genSettings; // 生成设置
-        private string _seed; // 世界种子
+        private GeneratorSettings _genSettings; // Generation settings
+        private string _seed; // World Seed
 
         private StateHolder State => GetValue(StateComponent<StateHolder>.StateProperty);
 

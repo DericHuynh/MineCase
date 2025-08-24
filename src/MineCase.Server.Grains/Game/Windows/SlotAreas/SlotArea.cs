@@ -150,7 +150,6 @@ namespace MineCase.Server.Game.Windows.SlotAreas
             var hotbarSlot = await inventory.GetSlot(player, hotbarIndex);
             var slot = await GetSlot(player, slotIndex);
 
-            // 交换
             await inventory.SetSlot(player, hotbarIndex, slot);
             await SetSlot(player, slotIndex, hotbarSlot);
         }
@@ -237,13 +236,13 @@ namespace MineCase.Server.Game.Windows.SlotAreas
 
             if (draggedSlot.IsEmpty || !draggedSlot.CanStack(slot))
             {
-                // 交换
+                // Change slot
                 await SetSlot(player, slotIndex, draggedSlot);
                 await player.Tell(new SetDraggedSlot { Slot = slot });
             }
             else if (TryStackSlot(ref draggedSlot, ref slot))
             {
-                // 堆叠到最大
+                // Stack slot items to maximum
                 await SetSlot(player, slotIndex, slot);
                 await player.Tell(new SetDraggedSlot { Slot = draggedSlot });
             }

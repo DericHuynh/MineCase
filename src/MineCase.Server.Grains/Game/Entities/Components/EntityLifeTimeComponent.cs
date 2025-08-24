@@ -10,7 +10,7 @@ namespace MineCase.Server.Game.Entities.Components
 {
     internal class EntityLifeTimeComponent : Component<EntityGrain>, IHandle<SpawnEntity>, IHandle<DestroyEntity>
     {
-        public EntityLifeTimeComponent(string name = "entityLiftTime")
+        public EntityLifeTimeComponent(string name = "entityLifeTime")
             : base(name)
         {
         }
