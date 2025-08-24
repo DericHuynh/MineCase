@@ -23,10 +23,15 @@ using Orleans.Concurrency;
 
 namespace MineCase.Server.World
 {
+    [Reentrant]
     [PersistTableName("chunkColumn")]
     internal class ChunkColumnGrain : AddressByPartitionGrain, IChunkColumn
     {
         private StateHolder State => GetValue(StateComponent<StateHolder>.StateProperty);
+
+        private Task _generationTask;
+
+        private Task _populationTask;
 
         protected override void InitializePreLoadComponent()
         {
@@ -81,6 +86,8 @@ namespace MineCase.Server.World
             }
         }
 
+        // Why is this the "Safe" version, and the other "Unsafe"?
+        // Safe checks nearby chunks while Unsafe checks only this chunk, but even if it only checked this chunk it should be safe???
         public async Task<ChunkColumnCompactStorage> GetState()
         {
             await EnsureAroundChunkPopulated();
@@ -188,18 +195,40 @@ namespace MineCase.Server.World
             MarkDirty();
         }
 
-        public async Task EnsureChunkGenerated()
+        public Task EnsureChunkGenerated()
         {
-            if (!State.Generated)
+            // Fast path: If already generated, return a completed task immediately.
+            if (State.Generated)
             {
+                return Task.CompletedTask;
+            }
+
+            // If generation is not complete, check if it's already in progress.
+            // This is the key part of the async lazy initialization pattern.
+            if (_generationTask != null)
+            {
+                // Another call is already generating, just await its completion.
+                return _generationTask;
+            }
+
+            // We are the first, so start the generation task.
+            return _generationTask = GenerateChunk();
+        }
+
+        private async Task GenerateChunk()
+        {
+            try
+            {
+                // This check is now inside the locked-down execution path, but
+                // it's good practice for clarity and to handle potential edge cases.
+                if (State.Generated) return;
+
                 var serverSetting = GrainFactory.GetGrain<IServerSettings>(0);
                 string worldType = (await serverSetting.GetSettings()).LevelType;
                 if (worldType == "DEFAULT" || worldType == "default")
                 {
                     var generator = GrainFactory.GetGrain<IChunkGeneratorOverworld>(await World.GetSeed());
-                    GeneratorSettings settings = new GeneratorSettings
-                    {
-                    };
+                    GeneratorSettings settings = new GeneratorSettings { };
                     State.Storage = await generator.Generate(World, ChunkWorldPos.X, ChunkWorldPos.Z, settings);
                 }
                 else if (worldType == "FLAT" || worldType == "flat")
@@ -209,12 +238,8 @@ namespace MineCase.Server.World
                     {
                         FlatBlockId = new BlockState?[]
                         {
-                            BlockStates.Bedrock(),
-                            BlockStates.Stone(),
-                            BlockStates.Stone(),
-                            BlockStates.Dirt(),
-                            BlockStates.Dirt(),
-                            BlockStates.GrassBlock()
+                            BlockStates.Bedrock(), BlockStates.Stone(), BlockStates.Stone(),
+                            BlockStates.Dirt(), BlockStates.Dirt(), BlockStates.GrassBlock()
                         }
                     };
                     State.Storage = await generator.Generate(World, ChunkWorldPos.X, ChunkWorldPos.Z, settings);
@@ -222,9 +247,7 @@ namespace MineCase.Server.World
                 else
                 {
                     var generator = GrainFactory.GetGrain<IChunkGeneratorOverworld>(await World.GetSeed());
-                    GeneratorSettings settings = new GeneratorSettings
-                    {
-                    };
+                    GeneratorSettings settings = new GeneratorSettings { };
                     State.Storage = await generator.Generate(World, ChunkWorldPos.X, ChunkWorldPos.Z, settings);
                 }
 
@@ -237,41 +260,63 @@ namespace MineCase.Server.World
                 }
 
                 State.Generated = true;
-
                 await WriteStateAsync();
+            }
+            finally
+            {
+                // Crucially, clear the task so if it failed, it can be retried.
+                _generationTask = null;
             }
         }
 
         public async Task EnsureChunkPopulated()
         {
+            // Must be generated before it can be populated.
             await EnsureChunkGenerated();
 
-            if (!State.Populated)
+            // Fast path: If already populated, we're done.
+            if (State.Populated)
             {
+                return;
+            }
+
+            // Check if population is already in progress.
+            if (_populationTask != null)
+            {
+                await _populationTask;
+                return;
+            }
+
+            // Start the population task.
+            _populationTask = PopulateChunk();
+            await _populationTask;
+        }
+
+        private async Task PopulateChunk()
+        {
+            try
+            {
+                if (State.Populated) return;
+
                 var serverSetting = GrainFactory.GetGrain<IServerSettings>(0);
                 string worldType = (await serverSetting.GetSettings()).LevelType;
-                if (worldType == "DEFAULT" || worldType == "default")
+                if (worldType.Equals("default", StringComparison.InvariantCultureIgnoreCase))
                 {
                     var generator = GrainFactory.GetGrain<IChunkGeneratorOverworld>(await World.GetSeed());
-                    GeneratorSettings settings = new GeneratorSettings { };
-                    await generator.Populate(World, ChunkWorldPos.X, ChunkWorldPos.Z, settings);
+                    await generator.Populate(World, ChunkWorldPos.X, ChunkWorldPos.Z, new GeneratorSettings());
                 }
-                else if (worldType == "FLAT" || worldType == "flat")
+                else if (worldType.Equals("flat", StringComparison.InvariantCultureIgnoreCase))
                 {
+                    // Flat worlds typically have no population step, but we call it for consistency.
                     var generator = GrainFactory.GetGrain<IChunkGeneratorFlat>(await World.GetSeed());
-                    GeneratorSettings settings = new GeneratorSettings
+                    await generator.Populate(World, ChunkWorldPos.X, ChunkWorldPos.Z, new GeneratorSettings
                     {
                         FlatBlockId = new BlockState?[]
-                        {
-                            BlockStates.Bedrock(),
-                            BlockStates.Stone(),
-                            BlockStates.Stone(),
-                            BlockStates.Dirt(),
-                            BlockStates.Dirt(),
-                            BlockStates.GrassBlock()
-                        }
-                    };
-                    await generator.Populate(World, ChunkWorldPos.X, ChunkWorldPos.Z, settings);
+                       {
+                            BlockStates.Bedrock(), BlockStates.Stone(), BlockStates.Stone(),
+                            BlockStates.Dirt(), BlockStates.Dirt(), BlockStates.GrassBlock()
+                       }
+                    });
                 }
                 else
                 {
@@ -279,18 +324,25 @@ namespace MineCase.Server.World
                 }
 
                 State.Populated = true;
-
                 await WriteStateAsync();
+            }
+            finally
+            {
+                // Clear the task to allow retries on failure.
+                _populationTask = null;
             }
         }
 
         private async Task EnsureAroundChunkPopulated()
         {
+            // Our own population logic is now safe.
             await EnsureChunkPopulated();
 
             (var worldKey, var chunkPos) = this.GetWorldAndChunkWorldPos();
             var world = GrainFactory.GetGrain<IWorld>(worldKey);
 
+            // This part is now safe because the chunks being called have the same protection.
+            var tasks = new List<Task>();
             int range = 1;
             for (int xOffset = -range; xOffset <= range; ++xOffset)
             {
@@ -299,9 +351,11 @@ namespace MineCase.Server.World
                     if (xOffset == 0 && zOffset == 0) continue;
                     var curChunkPos = new ChunkWorldPos(chunkPos.X + xOffset, chunkPos.Z + zOffset);
                     var chunkColumnKey = world.MakeAddressByPartitionKey(curChunkPos);
-                    await GrainFactory.GetGrain<IChunkColumn>(chunkColumnKey).EnsureChunkPopulated();
+                    tasks.Add(GrainFactory.GetGrain<IChunkColumn>(chunkColumnKey).EnsureChunkPopulated());
                 }
             }
+
+            await Task.WhenAll(tasks);
         }
 
         protected ClientPlayPacketGenerator GetBroadcastGenerator()
