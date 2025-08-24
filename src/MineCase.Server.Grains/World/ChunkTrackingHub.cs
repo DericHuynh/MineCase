@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MineCase.Protocol;
 using MineCase.Server.Game;
 using MineCase.Server.Game.Entities;
+using MineCase.Server.Game.Entities.EntityMetadata;
 using MineCase.Server.Network;
 using MineCase.Server.Network.Play;
 using MineCase.Server.Persistence;
