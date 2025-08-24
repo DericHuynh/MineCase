@@ -10,7 +10,6 @@ using Orleans.Concurrency;
 
 namespace MineCase.Server.Health_Checks
 {
-    [StatelessWorker(1)]
     internal class BasicHealthCheckGrain : Grain, IBasicHealthCheckGrain
     {
         public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
