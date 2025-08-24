@@ -10,10 +10,13 @@ using MineCase.Item;
 
 namespace MineCase
 {
+    [Orleans.GenerateSerializer]
     public class FurnaceRecipeLoader
     {
+        [Orleans.Id(0)]
         public List<FurnaceRecipe> Recipes { get; } = new List<FurnaceRecipe>();
 
+        [Orleans.Id(1)]
         public List<FurnaceFuel> Fuels { get; } = new List<FurnaceFuel>();
 
         public async Task LoadRecipes(StreamReader streamReader)

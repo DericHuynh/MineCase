@@ -17,13 +17,16 @@ using MineCase.Server.Components;
 using MineCase.Server.Game.Entities;
 using MineCase.Server.Game.Entities.Components;
 using MineCase.World;
+using Orleans;
 using Orleans.Concurrency;
 
 namespace MineCase.Server.Network.Play
 {
+    [Orleans.GenerateSerializer]
     internal class ServerboundPacketComponent : Component<PlayerGrain>, IHandle<ServerboundPacketMessage>
     {
         private static readonly ActivitySource Source = new ActivitySource("MineCase", "1.0.0");
+        [Id(0)]
         private readonly Queue<UncompressedPacket> _deferredPacket = new Queue<UncompressedPacket>();
 
         public ServerboundPacketComponent(string name = "serverboundPacket")
@@ -186,6 +189,7 @@ namespace MineCase.Server.Network.Play
             return Task.CompletedTask;
         }
 
+        [Id(1)]
         private KeepAliveComponent _keepAliveComponent;
 
         private Task DispatchPacket(ServerboundKeepAlive packet)

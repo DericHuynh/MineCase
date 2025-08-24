@@ -7,6 +7,7 @@ using MineCase.Serialization;
 namespace MineCase.Protocol.Status
 {
     [Packet(0x00)]
+    [Orleans.GenerateSerializer]
     [GenerateSerializer]
     public sealed partial class Request : IPacket
     {
@@ -14,10 +15,12 @@ namespace MineCase.Protocol.Status
     }
 
     [Packet(0x00)]
+    [Orleans.GenerateSerializer]
     [GenerateSerializer]
     public sealed partial class Response : IPacket
     {
         [SerializeAs(DataType.String)]
+        [Orleans.Id(0)]
         public string JsonResponse;
     }
 }

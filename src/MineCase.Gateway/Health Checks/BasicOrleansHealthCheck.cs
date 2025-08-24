@@ -7,13 +7,12 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using MineCase.Server.Health_Checks;
 using Orleans;
-using Orleans.MultiClient;
 
 namespace MineCase.Gateway.Health_Checks
 {
     public class BasicOrleansHealthCheck : OrleansHealthCheckBase
     {
-        public BasicOrleansHealthCheck(IOrleansClient client)
+        public BasicOrleansHealthCheck(IClusterClient client)
             : base(client)
         {
         }

@@ -46,8 +46,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{5FE43A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineCase.Serialization", "src\MineCase.Serialization\MineCase.Serialization.csproj", "{AA85C7DA-31CB-499B-A74F-CF4FDC8EF669}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{3E9DA133-F1BC-4EB1-A574-361AFEF0ABB8}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineCase.CodeGeneration", "src\MineCase.CodeGeneration\MineCase.CodeGeneration.csproj", "{06CF9DBB-D9F2-4242-BC81-48E8EBE749AC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineCase.Library", "src\MineCase.Library\MineCase.Library.csproj", "{39D42761-EB25-49C3-9D96-0738E5179688}"
@@ -61,6 +59,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gateway", "Gateway", "{585EE262-5337-4631-96C6-6EB1245B2B71}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineCase.UnitTests", "tests\MineCase.UnitTests\MineCase.UnitTests.csproj", "{3491E2FB-127F-D2C6-804B-49BD65C86B13}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution", "solution", "{DCC39659-C608-42CA-A456-15C0F4FA95E2}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Packages.props = Directory.Packages.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

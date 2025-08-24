@@ -12,19 +12,24 @@ using MongoDB.Bson.Serialization.Serializers;
 
 namespace MineCase.Engine.Serialization
 {
+    [Orleans.GenerateSerializer]
     public class DependencyObjectState
     {
         [BsonId]
+        [Orleans.Id(0)]
         public string GrainKeyString { get; set; }
 
+        [Orleans.Id(1)]
         public IDependencyValueStorage ValueStorage { get; set; }
     }
 
     /// <summary>
     /// DependencyObject 状态序列化器
     /// </summary>
+    [Orleans.GenerateSerializer]
     public class DependencyObjectStateSerializer : ClassSerializerBase<DependencyObjectState>, IBsonDocumentSerializer
     {
+        [Orleans.Id(0)]
         private readonly IBsonSerializer<DependencyValueStorage> _valueStorageSerializer = new DependencyValueStorage.DependencyValueStorageSerializer();
 
         protected override void SerializeValue(BsonSerializationContext context, BsonSerializationArgs args, DependencyObjectState value)

@@ -24,11 +24,11 @@ namespace MineCase.Server.Network
             _logger = loggerFactory.CreateLogger<ClientboundPacketSinkGrain>();
         }
 
-        public override Task OnActivateAsync()
+        public override Task OnActivateAsync(CancellationToken cancellationToken)
         {
             _subsManager = new Grains.GrainObserverManager<IClientboundPacketObserver>();
             _subsManager.ExpirationDuration = new TimeSpan(0, 0, 20);
-            return base.OnActivateAsync();
+            return base.OnActivateAsync(cancellationToken);
         }
 
         // Clients call this to subscribe.

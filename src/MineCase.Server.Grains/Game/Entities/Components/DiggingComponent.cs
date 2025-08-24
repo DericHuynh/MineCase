@@ -13,11 +13,13 @@ using MineCase.World;
 
 namespace MineCase.Server.Game.Entities.Components
 {
+    [Orleans.GenerateSerializer]
     internal class DiggingComponent : Component<EntityGrain>
     {
         public const float MaxDiggingRadius = 6;
-
+        [Orleans.Id(0)]
         private long _diggingStartTick;
+        [Orleans.Id(1)]
         private (BlockWorldPos, BlockState)? _diggingBlock;
 
         public DiggingComponent(string name = "digging")

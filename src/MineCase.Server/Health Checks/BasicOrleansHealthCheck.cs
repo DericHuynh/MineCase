@@ -16,12 +16,11 @@ namespace MineCase.Server.Health_Checks
         {
         }
 
-        protected override async Task<HealthCheckResult> CheckHealthGrainAsync(HealthCheckContext context, CancellationToken cancellationToken)
+        protected override async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken)
         {
             try
             {
-                return await _client.GetGrain<IBasicHealthCheckGrain>(Guid.Empty)
-                    .CheckHealthAsync(context, cancellationToken);
+                return await _client.GetGrain<IBasicHealthCheckGrain>(Guid.Empty).CheckHealthAsync(context, cancellationToken);
             }
             catch (Exception e)
             {

@@ -72,14 +72,17 @@ namespace MineCase.Engine.Data
             return new LocalEffectiveValue<T>(value);
         }
 
+        [Orleans.GenerateSerializer]
         internal class LocalEffectiveValue<T> : IEffectiveValue<T>
         {
             /// <inheritdoc/>
+            [Orleans.Id(0)]
             public EventHandler<IEffectiveValueChangedEventArgs> ValueChanged { get; set; }
 
             /// <inheritdoc/>
             public bool CanSetValue => true;
 
+            [Orleans.Id(1)]
             private T _value;
 
             /// <inheritdoc/>

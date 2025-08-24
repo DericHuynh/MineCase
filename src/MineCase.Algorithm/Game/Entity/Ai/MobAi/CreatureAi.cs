@@ -9,8 +9,10 @@ using Stateless;
 
 namespace MineCase.Algorithm.Game.Entity.Ai.MobAi
 {
+    [Orleans.GenerateSerializer]
     public abstract class CreatureAi
     {
+        [Orleans.Id(0)]
         private readonly StateMachine<CreatureState, CreatureEvent> _stateMachine;
 
         public CreatureState State => _stateMachine.State;

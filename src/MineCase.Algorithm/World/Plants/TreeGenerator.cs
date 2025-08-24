@@ -8,16 +8,18 @@ using Orleans;
 
 namespace MineCase.Algorithm.World.Plants
 {
+    [Orleans.GenerateSerializer]
     public class TreeGenerator : AbstractTreeGenerator
     {
+        [Id(0)]
         private int _minTreeHeight;
-
+        [Id(1)]
         private bool _vines;
-
+        [Id(2)]
         private BlockState _wood;
-
+        [Id(3)]
         private BlockState _leaves;
-
+        [Id(4)]
         private PlantsType _treeType;
 
         public TreeGenerator(int treeHeight, bool vines, PlantsType treeType)

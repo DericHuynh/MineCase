@@ -27,9 +27,9 @@ namespace MineCase.Server.World.Decoration.Plants
             _logger = loggerFactory.CreateLogger<Taiga2GeneratorGrain>();
         }
 
-        public async override Task OnActivateAsync()
+        public async override Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            await base.OnActivateAsync();
+            await base.OnActivateAsync(cancellationToken);
 
             _minTreeHeight = _generatorSettings.TreeHeight;
             _vines = _generatorSettings.TreeVine;

@@ -8,8 +8,10 @@ namespace MineCase.Engine.Data
     /// <summary>
     /// 依赖值存储 - CRUD
     /// </summary>
+    [Orleans.GenerateSerializer]
     internal partial class DependencyValueStorage : IDependencyValueStorage
     {
+        [Orleans.Id(0)]
         private readonly Dictionary<DependencyProperty, SortedList<float, IEffectiveValue>> _dict;
 
         public IEnumerable<DependencyProperty> Keys
@@ -25,6 +27,7 @@ namespace MineCase.Engine.Data
             }
         }
 
+        [Orleans.Id(1)]
         public bool IsDirty { get; set; }
 
         public event EventHandler<CurrentValueChangedEventArgs> CurrentValueChanged;
@@ -202,31 +205,37 @@ namespace MineCase.Engine.Data
     /// <summary>
     /// 当前值变更
     /// </summary>
+    [Orleans.GenerateSerializer]
     public class CurrentValueChangedEventArgs : EventArgs
     {
         /// <summary>
         /// 获取依赖属性
         /// </summary>
+        [Orleans.Id(0)]
         public DependencyProperty Property { get; }
 
         /// <summary>
         /// 获取原始值
         /// </summary>
+        [Orleans.Id(1)]
         public object OldValue { get; }
 
         /// <summary>
         /// 获取新值
         /// </summary>
+        [Orleans.Id(2)]
         public object NewValue { get; }
 
         /// <summary>
         /// 获取是否有原始值
         /// </summary>
+        [Orleans.Id(3)]
         public bool HasOldValue { get; }
 
         /// <summary>
         /// 获取是否有新值
         /// </summary>
+        [Orleans.Id(4)]
         public bool HasNewValue { get; }
 
         /// <summary>

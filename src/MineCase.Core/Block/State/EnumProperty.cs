@@ -4,9 +4,11 @@ using System.Text;
 
 namespace MineCase.Block.State
 {
+    [Orleans.GenerateSerializer]
     public class EnumProperty<T> : StateProperty<T>
         where T : System.Enum
     {
+        [Orleans.Id(0)]
         private Dictionary<T, int> _map;
 
         public EnumProperty()

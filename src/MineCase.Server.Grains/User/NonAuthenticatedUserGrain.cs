@@ -42,10 +42,13 @@ namespace MineCase.Server.User
             return Task.CompletedTask;
         }
 
+        [Orleans.GenerateSerializer]
         internal class StateHolder
         {
+            [Id(0)]
             public Guid UUID { get; set; }
 
+            [Id(1)]
             public uint ProtocolVersion { get; set; }
 
             public StateHolder()

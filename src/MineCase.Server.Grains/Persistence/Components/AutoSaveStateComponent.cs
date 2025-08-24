@@ -8,8 +8,10 @@ using MineCase.World;
 
 namespace MineCase.Server.Persistence.Components
 {
+    [Orleans.GenerateSerializer]
     internal class AutoSaveStateComponent : Component
     {
+        [Orleans.Id(0)]
         private readonly int _periodTime;
 
         public const int PerMinute = 20 * 60;

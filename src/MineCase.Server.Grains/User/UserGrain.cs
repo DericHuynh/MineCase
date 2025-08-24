@@ -205,10 +205,10 @@ namespace MineCase.Server.User
 
         public Task ForwardPacket(UncompressedPacket packet)
         {
-            _player.InvokeOneWay(p => p.Tell(new ServerboundPacketMessage
+            _player.Tell(new ServerboundPacketMessage
             {
                 Packet = packet
-            }));
+            });
             return Task.CompletedTask;
         }
 
@@ -238,16 +238,22 @@ namespace MineCase.Server.User
             return _player.Tell(new PlayerListRemove { Players = players });
         }
 
+        [Orleans.GenerateSerializer]
         internal class StateHolder
         {
+            [Id(0)]
             public string Name { get; set; }
 
+            [Id(1)]
             public IWorld World { get; set; }
 
+            [Id(2)]
             public Slot[] Slots { get; set; }
 
+            [Id(3)]
             public GameMode GameMode { get; set; }
 
+            [Id(4)]
             public EntityWorldPos? SpawnPosition { get; set; }
 
             public StateHolder()

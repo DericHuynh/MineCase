@@ -10,14 +10,16 @@ using Orleans;
 
 namespace MineCase.Algorithm.World.Plants
 {
+    [Orleans.GenerateSerializer]
     public class TaigaGenerator : AbstractTreeGenerator
     {
+        [Id(0)]
         private int _minTreeHeight;
-
+        [Id(1)]
         private bool _vines;
-
+        [Id(2)]
         private BlockState _wood;
-
+        [Id(3)]
         private BlockState _leaves;
 
         public TaigaGenerator(int treeHeight, bool vines, PlantsType treeType)

@@ -5,11 +5,14 @@ using System.Text;
 
 namespace MineCase.Graphics
 {
+    [Orleans.GenerateSerializer]
     [Serializable]
     public struct Circle
     {
+        [Orleans.Id(0)]
         public Point2d Center { get; set; }
 
+        [Orleans.Id(1)]
         public float Radius { get; set; }
 
         public Circle(float x, float z, float radius)

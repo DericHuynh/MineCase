@@ -13,36 +13,38 @@ namespace MineCase.Server.Settings
     [StatelessWorker]
     internal class ServerSettingsGrain : Grain, IServerSettings
     {
-        private ServerSettings _settings;
+        private readonly IConfiguration _configuration;
         private readonly ILogger _logger;
+        private ServerSettings _serverSettings;
 
         public ServerSettingsGrain(ILoggerFactory loggerFactory, IConfiguration configuration)
         {
             _logger = loggerFactory.CreateLogger<ServerSettingsGrain>();
-            _settings = configuration.GetSection("ServerSettings").Get<ServerSettings>();
+            _configuration = configuration;
         }
 
         // read settings from file. EDIT: This shouldnt be needed since the server.json is loaded from the Host DI IConfiguration instead (why were we doing file IO in a grain?)
-        // public override async Task OnActivateAsync()
-        // {
-        //    string settingsFile = await ReadSettingsAsString("server.json");
-        //    try
-        //    {
-        //        _settings = JsonConvert.DeserializeObject<ServerSettings>(settingsFile);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        _logger.LogError(default(EventId), e, e.Message);
-        //    }
-        // }
+        public override Task OnActivateAsync(CancellationToken cancellationToken)
+        {
+            _serverSettings = _configuration.GetSection("ServerSettings").Get<ServerSettings>();
+
+            if (_serverSettings is null)
+                return Task.FromException(new ArgumentNullException(nameof(_serverSettings)));
+            return Task.CompletedTask;
+        }
 
         // get settings
-        public Task<ServerSettings> GetSettings() => Task.FromResult(_settings);
+        public Task<ServerSettings> GetSettings()
+        {
+            if (_serverSettings is null)
+                return Task.FromException<ServerSettings>(new ArgumentNullException(nameof(_serverSettings)));
+            return Task.FromResult(_serverSettings);
+        }
 
         // set settings
         public Task SetSettings(ServerSettings settings)
         {
-            _settings = settings;
+            _serverSettings = settings;
             return Task.CompletedTask;
         }
     }

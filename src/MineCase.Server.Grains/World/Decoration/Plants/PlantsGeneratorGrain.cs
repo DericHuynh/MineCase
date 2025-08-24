@@ -40,7 +40,7 @@ namespace MineCase.Server.World.Decoration.Plants
             _logger = loggerFactory.CreateLogger<AbstractTreeGeneratorGrain>();
         }
 
-        public override Task OnActivateAsync()
+        public override Task OnActivateAsync(CancellationToken cancellationToken)
         {
             try
             {

@@ -7,19 +7,24 @@ using MineCase.Serialization;
 namespace MineCase.Protocol.Play
 {
     [Packet(0x3B)]
+    [Orleans.GenerateSerializer]
     [GenerateSerializer]
     public sealed partial class Respawn : IPacket
     {
         [SerializeAs(DataType.Int)]
+        [Orleans.Id(0)]
         public int Dimension;
 
         [SerializeAs(DataType.Long)]
+        [Orleans.Id(1)]
         public long HashedSeed;
 
         [SerializeAs(DataType.Byte)]
+        [Orleans.Id(2)]
         public byte Gamemode;
 
         [SerializeAs(DataType.String)]
+        [Orleans.Id(3)]
         public string LevelType;
     }
 }

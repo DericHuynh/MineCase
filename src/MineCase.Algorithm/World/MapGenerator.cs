@@ -7,21 +7,29 @@ using MineCase.World;
 
 namespace MineCase.Algorithm.World
 {
+    [Orleans.GenerateSerializer]
     public class MapGenerationInfo
     {
+        [Orleans.Id(0)]
         public int Seed { get; set; }
     }
 
     /// <summary>
     /// 该类一般用于实现大型的世界结构.
     /// </summary>
+    [Orleans.GenerateSerializer]
     public abstract class MapGenerator
     {
         /** The number of Chunks to gen-check in any given direction. */
+        [Orleans.Id(0)]
         protected int _range;
+
         /** The RNG used by the MapGen classes. */
+        [Orleans.Id(1)]
         protected Random _rand;
+
         /** This world object. */
+        [Orleans.Id(2)]
         protected MapGenerationInfo _info;
 
         public MapGenerator(MapGenerationInfo info, int range = 8)

@@ -6,10 +6,13 @@ using Orleans;
 
 namespace MineCase.Algorithm.World.Mine
 {
+    [Orleans.GenerateSerializer]
     public class MinableGenerator
     {
+        [Id(0)]
         public BlockState OreBlock { get; set; }
 
+        [Id(1)]
         public int NumberOfBlocks { get; set; } // 每一坨矿物的数量
 
         public MinableGenerator(BlockState state, int blockCount)

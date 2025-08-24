@@ -6,17 +6,23 @@ using MineCase.World;
 
 namespace MineCase
 {
+    [Orleans.GenerateSerializer]
     public class BlockStateChange
     {
+        [Orleans.Id(0)]
         public BlockWorldPos Position { get; set; }
 
+        [Orleans.Id(1)]
         public BlockState State { get; set; }
 
+        [Orleans.Id(2)]
         public List<BlockState> Condition { get; set; }
     }
 
+    [Orleans.GenerateSerializer]
     public class BatchBlockChange
     {
+        [Orleans.Id(0)]
         protected List<BlockStateChange> blockChanges;
 
         public BatchBlockChange()

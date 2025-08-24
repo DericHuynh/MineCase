@@ -4,8 +4,10 @@ using System.Text;
 
 namespace MineCase.Block.State
 {
+    [Orleans.GenerateSerializer]
     public class IntegerProperty : StateProperty<int>
     {
+        [Orleans.Id(0)]
         private int _max;
 
         public IntegerProperty(string name, int maxNumber)

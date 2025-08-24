@@ -8,15 +8,19 @@ using MineCase.Serialization;
 namespace MineCase.Protocol.Play
 {
     [Packet(0x12)]
+    [Orleans.GenerateSerializer]
     public sealed class DeclareCommands : IPacket
     {
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(0)]
         public uint Count;
 
         [SerializeAs(DataType.Array)]
+        [Orleans.Id(1)]
         public Node[] Nodes;
 
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(2)]
         public uint RootIndex;
 
         // TODO : complete serialization and deserialization

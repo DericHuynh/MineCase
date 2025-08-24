@@ -9,8 +9,10 @@ using MineCase.Protocol;
 
 namespace MineCase.Server.Network
 {
+    [Orleans.GenerateSerializer]
     internal class PacketPackager : IPacketPackager
     {
+        [Orleans.Id(0)]
         private readonly RecyclableMemoryStreamManager _memoryStreamMgr;
 
         public PacketPackager(RecyclableMemoryStreamManager memoryStreamMgr)

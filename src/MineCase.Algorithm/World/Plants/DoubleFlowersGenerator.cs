@@ -8,9 +8,12 @@ using Orleans;
 
 namespace MineCase.Algorithm.World.Plants
 {
+    [Orleans.GenerateSerializer]
     public class DoubleFlowersGenerator : PlantsGenerator
     {
+        [Id(0)]
         private PlantsType _flowerType;
+        [Id(1)]
         private int _flowersMaxNum;
 
         public DoubleFlowersGenerator(PlantsType type, int maxNum = 16)

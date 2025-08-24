@@ -21,6 +21,7 @@ using Orleans;
 
 namespace MineCase.Server.Game.Entities.Components
 {
+    [Orleans.GenerateSerializer]
     internal class EntityAiComponent : Component<MobGrain>
     {
         public static readonly DependencyProperty<CreatureState> CreatureStateProperty =
@@ -30,7 +31,9 @@ namespace MineCase.Server.Game.Entities.Components
 
         public CreatureState CreatureState => AttachedObject.GetValue(CreatureStateProperty);
 
+        [Id(0)]
         private Random random;
+        [Id(1)]
         private CreatureAi _ai;
 
         public EntityAiComponent(string name = "entityAi")

@@ -15,14 +15,19 @@ using Orleans.Streams;
 
 namespace MineCase.Server.Game
 {
+    [Orleans.GenerateSerializer]
     public sealed class SendChunkJob
     {
+        [Id(0)]
         public IWorld World { get; set; }
 
+        [Id(1)]
         public ChunkWorldPos ChunkPosition { get; set; }
 
+        [Id(2)]
         public IReadOnlyCollection<IClientboundPacketSink> Clients { get; set; }
 
+        [Id(3)]
         public IReadOnlyCollection<IUserChunkLoader> Loaders { get; set; }
     }
 
@@ -41,9 +46,9 @@ namespace MineCase.Server.Game
             _packetPackager = packetPackager;
         }
 
-        public override async Task OnActivateAsync()
+        public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            var stream = GetStreamProvider(StreamProviders.JobsProvider).GetStream<SendChunkJob>(this.GetPrimaryKey(), StreamProviders.Namespaces.ChunkSender);
+            var stream = this.GetStreamProvider(StreamProviders.JobsProvider).GetStream<SendChunkJob>(StreamProviders.Namespaces.ChunkSender, this.GetPrimaryKey());
             await stream.SubscribeAsync(OnNextAsync);
         }
 

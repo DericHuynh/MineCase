@@ -1,9 +1,12 @@
 ﻿namespace MineCase.Block
 {
+    [Orleans.GenerateSerializer]
     public class SoundType
     {
+        [Orleans.Id(0)]
         public float Volume { get; set; }
 
+        [Orleans.Id(1)]
         public float Pitch { get; set; }
 
         /** The sound played when a block gets broken. */

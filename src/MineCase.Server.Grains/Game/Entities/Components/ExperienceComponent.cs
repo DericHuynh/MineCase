@@ -7,13 +7,17 @@ using MineCase.Server.Network.Play;
 
 namespace MineCase.Server.Game.Entities.Components
 {
+    [Orleans.GenerateSerializer]
     internal class ExperienceComponent : Component
     {
         public static readonly DependencyProperty<uint> ExperienceProperty =
             DependencyProperty.Register<uint>("Experience", typeof(ExperienceComponent));
 
+        [Orleans.Id(0)]
         private uint _levelMaxExp = 7;
+        [Orleans.Id(1)]
         private uint _totalExp = 0;
+        [Orleans.Id(2)]
         private uint _level = 0;
 
         public uint Experience => AttachedObject.GetValue(ExperienceProperty);

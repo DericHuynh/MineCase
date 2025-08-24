@@ -5,10 +5,13 @@ using MineCase.Block;
 
 namespace MineCase.World
 {
+    [Orleans.GenerateSerializer]
     public sealed class ChunkColumnStorage : IChunkColumnStorage
     {
+        [Orleans.Id(0)]
         public ChunkSectionStorage[] Sections { get; } = new ChunkSectionStorage[ChunkConstants.SectionsPerChunk];
 
+        [Orleans.Id(1)]
         public int[] Biomes { get; } = new int[1024];
 
         public BlockState this[int x, int y, int z]
@@ -35,12 +38,16 @@ namespace MineCase.World
         }
     }
 
+    [Orleans.GenerateSerializer]
     public sealed class ChunkSectionStorage
     {
+        [Orleans.Id(0)]
         public BlockState[,,] Data { get; } = new BlockState[ChunkConstants.BlockEdgeWidthInSection, ChunkConstants.BlockEdgeWidthInSection, ChunkConstants.BlockEdgeWidthInSection];
 
+        [Orleans.Id(1)]
         public byte[,,] BlockLight { get; } = new byte[ChunkConstants.BlockEdgeWidthInSection, ChunkConstants.BlockEdgeWidthInSection, ChunkConstants.BlockEdgeWidthInSection];
 
+        [Orleans.Id(2)]
         public byte[,,] SkyLight { get; }
 
         public ChunkSectionStorage(bool hasSkylight)

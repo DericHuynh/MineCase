@@ -8,8 +8,10 @@ using MongoDB.Bson.Serialization.Serializers;
 
 namespace MineCase.Serialization.Serializers
 {
+    [Orleans.GenerateSerializer]
     public class ChunkColumnCompactStorageSerializer : SealedClassSerializerBase<ChunkColumnCompactStorage>
     {
+        [Orleans.Id(0)]
         private readonly IBsonSerializer<ChunkSectionCompactStorage> _serializer = new ChunkSectionCompactStorageSerializer();
 
         protected override void SerializeValue(BsonSerializationContext context, BsonSerializationArgs args, ChunkColumnCompactStorage value)

@@ -16,9 +16,12 @@ namespace MineCase.Buffers
         ArraySegment<T> Rent(int length);
     }
 
+    [Orleans.GenerateSerializer]
     public class BufferPool<T> : IBufferPool<T>
     {
+        [Orleans.Id(0)]
         private readonly ArrayPool<T> _arrayPool;
+        [Orleans.Id(1)]
         private readonly ConcurrentBag<BufferPoolScope> _scopes = new ConcurrentBag<BufferPoolScope>();
 
         public BufferPool(ArrayPool<T> arrayPool)
@@ -38,11 +41,15 @@ namespace MineCase.Buffers
             _scopes.Add(scope);
         }
 
-        private class BufferPoolScope : IBufferPoolScope<T>
+        [Orleans.GenerateSerializer]
+        public class BufferPoolScope : IBufferPoolScope<T>
         {
-            private readonly BufferPool<T> _bufferPool;
-            private readonly ArrayPool<T> _arrayPool;
-            private readonly ConcurrentBag<T[]> _rents = new ConcurrentBag<T[]>();
+            [Orleans.Id(0)]
+            public readonly BufferPool<T> _bufferPool;
+            [Orleans.Id(1)]
+            public readonly ArrayPool<T> _arrayPool;
+            [Orleans.Id(2)]
+            public readonly ConcurrentBag<T[]> _rents = new ConcurrentBag<T[]>();
 
             public BufferPoolScope(BufferPool<T> bufferPool, ArrayPool<T> arrayPool)
             {

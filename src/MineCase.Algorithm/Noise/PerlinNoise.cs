@@ -6,11 +6,13 @@ namespace MineCase.Algorithm.Noise
     /// <summary>
     /// Implementation for Improved Perlin Noise (http://mrl.nyu.edu/~perlin/noise/).
     /// </summary>
+    [Orleans.GenerateSerializer]
     public class PerlinNoise : INoise
     {
         /// <summary>
         /// Permutation.
         /// </summary>
+        [Orleans.Id(0)]
         private readonly byte[] _p = new byte[512];
 
         /// <summary>

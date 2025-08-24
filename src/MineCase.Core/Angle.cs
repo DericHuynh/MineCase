@@ -4,8 +4,10 @@ using System.Text;
 
 namespace MineCase
 {
+    [Orleans.GenerateSerializer]
     public struct Angle
     {
+        [Orleans.Id(0)]
         public byte Value { get; set; }
 
         public float Degrees

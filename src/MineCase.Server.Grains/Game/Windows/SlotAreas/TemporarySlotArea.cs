@@ -11,8 +11,10 @@ using Orleans.Concurrency;
 
 namespace MineCase.Server.Game.Windows.SlotAreas
 {
+    [Orleans.GenerateSerializer]
     internal abstract class TemporarySlotArea : SlotArea
     {
+        [Id(0)]
         private readonly Dictionary<IPlayer, Slot[]> _tempSlotsMap = new Dictionary<IPlayer, Slot[]>();
 
         public TemporarySlotArea(int slotsCount, WindowGrain window, IGrainFactory grainFactory)

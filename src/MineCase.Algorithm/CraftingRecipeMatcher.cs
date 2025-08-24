@@ -3,8 +3,10 @@ using System.Collections.Generic;
 
 namespace MineCase.Algorithm
 {
+    [Orleans.GenerateSerializer]
     public class CraftingRecipeMatcher
     {
+        [Orleans.Id(0)]
         private List<CraftingRecipe> _recipes;
 
         public CraftingRecipeMatcher(List<CraftingRecipe> recipes)

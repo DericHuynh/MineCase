@@ -12,12 +12,14 @@ namespace Grains
     /// <typeparam name="T">
     /// The grain observer type.
     /// </typeparam>
+    [Orleans.GenerateSerializer]
     public class GrainObserverManager<T> : IEnumerable<T>
         where T : IAddressable
     {
         /// <summary>
         /// The observers.
         /// </summary>
+        [Orleans.Id(0)]
         private readonly Dictionary<T, DateTime> observers = new Dictionary<T, DateTime>();
 
         /// <summary>
@@ -31,11 +33,13 @@ namespace Grains
         /// <summary>
         /// Gets or sets the delegate used to get the date and time, for expiry.
         /// </summary>
+        [Orleans.Id(1)]
         public Func<DateTime> GetDateTime { get; set; }
 
         /// <summary>
         /// Gets or sets the expiration time span, after which observers are lazily removed.
         /// </summary>
+        [Orleans.Id(2)]
         public TimeSpan ExpirationDuration { get; set; }
 
         /// <summary>

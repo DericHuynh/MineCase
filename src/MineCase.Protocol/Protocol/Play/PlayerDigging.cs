@@ -29,16 +29,20 @@ namespace MineCase.Protocol.Play
     }
 
     [Packet(0x1A)]
+    [Orleans.GenerateSerializer]
     [GenerateSerializer]
     public sealed partial class PlayerDigging : IPacket
     {
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(0)]
         public PlayerDiggingStatus Status;
 
         [SerializeAs(DataType.Position)]
+        [Orleans.Id(1)]
         public Position Location;
 
         [SerializeAs(DataType.Byte)]
+        [Orleans.Id(2)]
         public PlayerDiggingFace Face;
     }
 }

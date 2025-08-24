@@ -54,7 +54,7 @@ namespace MineCase.Server.World
                 foreach (var entity in State.DiscoveryEntities)
                 {
                     if (entity.Equals(player)) continue;
-                    entity.InvokeOneWay(g => g.Tell(message));
+                    entity.Tell(message);
                 }
 
                 if (active && State.IsTickEmitterActive)
@@ -82,7 +82,7 @@ namespace MineCase.Server.World
             if (State.DiscoveryEntities.Add(entity))
             {
                 MarkDirty();
-                entity.InvokeOneWay(e => e.Tell(BroadcastDiscovered.Default));
+                entity.Tell(BroadcastDiscovered.Default);
             }
 
             return Task.CompletedTask;
@@ -125,10 +125,13 @@ namespace MineCase.Server.World
             return Task.CompletedTask;
         }
 
+        [Orleans.GenerateSerializer]
         internal class StateHolder
         {
+            [Id(0)]
             public HashSet<IEntity> DiscoveryEntities { get; set; }
 
+            [Id(1)]
             public bool IsTickEmitterActive { get; set; }
 
             public StateHolder()

@@ -9,8 +9,10 @@ using Orleans.Concurrency;
 
 namespace MineCase.Server.Game.Windows.SlotAreas
 {
+    [Orleans.GenerateSerializer]
     internal abstract class InventorySlotAreaBase : SlotArea
     {
+        [Id(0)]
         protected int OffsetInContainer { get; }
 
         public InventorySlotAreaBase(int slotsCount, int offsetInContainer, WindowGrain window, IGrainFactory grainFactory)

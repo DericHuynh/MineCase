@@ -7,15 +7,23 @@ using Microsoft.Extensions.Logging;
 using MineCase.Engine;
 using MineCase.Server.World;
 using MineCase.World;
+using Orleans;
+using Orleans.Runtime;
 
 namespace MineCase.Server.Components
 {
+    [Orleans.GenerateSerializer]
     public class FixedUpdateComponent : Component
     {
-        private IDisposable _tickTimer;
+        [Id(0)]
+        private IGrainTimer _tickTimer;
+        [Id(1)]
         private Stopwatch _stopwatch;
+        [Id(2)]
         private long _worldAge;
+        [Id(3)]
         private long _actualAge;
+        [Id(4)]
         private TimeSpan _lastUpdate;
         private static readonly long _updateMs = 50;
 
@@ -33,10 +41,10 @@ namespace MineCase.Server.Components
             _actualAge = 0;
             _stopwatch = new Stopwatch();
             _stopwatch.Start();
-            _tickTimer = AttachedObject.RegisterTimer(OnTick, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(1));
+            _tickTimer = AttachedObject.RegisterGrainTimer(OnTick, TimeSpan.Zero, TimeSpan.FromMilliseconds(1));
         }
 
-        private async Task OnTick(object arg)
+        private async Task OnTick()
         {
             var expectedAge = (_stopwatch.ElapsedMilliseconds + _updateMs - 1) / _updateMs;
             var updateTimes = expectedAge - _actualAge;

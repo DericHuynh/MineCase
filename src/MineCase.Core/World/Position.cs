@@ -6,12 +6,16 @@ using MineCase.World;
 
 namespace MineCase.World
 {
+    [Orleans.GenerateSerializer]
     public struct BlockWorldPos
     {
+        [Orleans.Id(0)]
         public int X { get; set; }
 
+        [Orleans.Id(1)]
         public int Y { get; set; }
 
+        [Orleans.Id(2)]
         public int Z { get; set; }
 
         public BlockWorldPos(int x, int y, int z)
@@ -100,12 +104,16 @@ namespace MineCase.World
         }
     }
 
+    [Orleans.GenerateSerializer]
     public struct BlockVector : IEquatable<BlockVector>
     {
+        [Orleans.Id(0)]
         public int X { get; set; }
 
+        [Orleans.Id(1)]
         public int Y { get; set; }
 
+        [Orleans.Id(2)]
         public int Z { get; set; }
 
         public BlockVector(int x, int y, int z)
@@ -201,12 +209,16 @@ namespace MineCase.World
         }
     }
 
+    [Orleans.GenerateSerializer]
     public struct BlockChunkPos : IEquatable<BlockChunkPos>
     {
+        [Orleans.Id(0)]
         public int X { get; set; }
 
+        [Orleans.Id(1)]
         public int Y { get; set; }
 
+        [Orleans.Id(2)]
         public int Z { get; set; }
 
         public BlockChunkPos(int x, int y, int z)
@@ -292,12 +304,16 @@ namespace MineCase.World
         }
     }
 
+    [Orleans.GenerateSerializer]
     public struct BlockSectionPos
     {
+        [Orleans.Id(0)]
         public int X { get; set; }
 
+        [Orleans.Id(1)]
         public int Y { get; set; }
 
+        [Orleans.Id(2)]
         public int Z { get; set; }
 
         public BlockSectionPos(int x, int y, int z)
@@ -308,10 +324,13 @@ namespace MineCase.World
         }
     }
 
+    [Orleans.GenerateSerializer]
     public struct ChunkWorldPos : IEquatable<ChunkWorldPos>
     {
+        [Orleans.Id(0)]
         public int X { get; set; }
 
+        [Orleans.Id(1)]
         public int Z { get; set; }
 
         public ChunkWorldPos(int x, int z)
@@ -362,12 +381,16 @@ namespace MineCase.World
         }
     }
 
+    [Orleans.GenerateSerializer]
     public struct EntityWorldPos
     {
+        [Orleans.Id(0)]
         public float X { get; set; }
 
+        [Orleans.Id(1)]
         public float Y { get; set; }
 
+        [Orleans.Id(2)]
         public float Z { get; set; }
 
         public EntityWorldPos(float x, float y, float z)
@@ -442,12 +465,16 @@ namespace MineCase.World
         }
     }
 
+    [Orleans.GenerateSerializer]
     public struct EntityChunkPos
     {
+        [Orleans.Id(0)]
         public float X { get; set; }
 
+        [Orleans.Id(1)]
         public float Y { get; set; }
 
+        [Orleans.Id(2)]
         public float Z { get; set; }
 
         public EntityChunkPos(float x, float y, float z)

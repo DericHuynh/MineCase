@@ -9,9 +9,12 @@ using Orleans.Concurrency;
 
 namespace MineCase.Server.Network.Play
 {
+    [Orleans.GenerateSerializer]
     internal class ForwardToPlayerPacketSink : IPacketSink
     {
+        [Id(0)]
         private readonly IPlayer _player;
+        [Id(1)]
         private readonly IPacketPackager _packetPackager;
 
         public ForwardToPlayerPacketSink(IPlayer player, IPacketPackager packetPackager)
@@ -28,11 +31,11 @@ namespace MineCase.Server.Network.Play
 
         public Task SendPacket(uint packetId, Immutable<byte[]> data)
         {
-            _player.InvokeOneWay(e => e.Tell(new PacketForwardToPlayer
+            _player.Tell(new PacketForwardToPlayer
             {
                 PacketId = packetId,
                 Data = data.Value
-            }));
+            });
             return Task.CompletedTask;
         }
     }

@@ -4,13 +4,16 @@ using System.Text;
 using MineCase.Engine;
 using MineCase.Server.Game.Entities;
 using MineCase.World;
+using Orleans;
 using Orleans.Concurrency;
 
 namespace MineCase.Server.Components
 {
+    [Orleans.GenerateSerializer]
     [Immutable]
     public sealed class GameTick : IEntityMessage
     {
+        [Id(0)]
         public GameTickArgs Args { get; set; }
     }
 
@@ -26,9 +29,11 @@ namespace MineCase.Server.Components
         public static readonly Enable Default = new Enable();
     }
 
+    [Orleans.GenerateSerializer]
     [Immutable]
     public sealed class CollisionWith : IEntityMessage
     {
+        [Id(0)]
         public IReadOnlyCollection<IDependencyObject> Entities { get; set; }
     }
 }

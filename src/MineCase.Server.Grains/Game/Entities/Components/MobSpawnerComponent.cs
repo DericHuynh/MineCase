@@ -22,8 +22,10 @@ using Orleans;
 
 namespace MineCase.Server.Game.Entities.Components
 {
+    [Orleans.GenerateSerializer]
     internal class MobSpawnerComponent : Component<PlayerGrain>
     {
+        [Id(0)]
         private Random random;
 
         public MobSpawnerComponent(string name = "mobSpawner")

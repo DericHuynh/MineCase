@@ -88,8 +88,9 @@ namespace MineCase.Engine
             }
         }
 
+        [Id(3)]
         internal readonly Type _realType;
-
+        [Id(4)]
         private DependencyValueStorage _valueStorage;
 
         /// <summary>
@@ -97,8 +98,11 @@ namespace MineCase.Engine
         /// </summary>
         public IDependencyValueStorage ValueStorage => _valueStorage;
 
+        [Id(5)]
         private readonly Dictionary<DependencyProperty, Delegate> _propertyChangedHandlers = new Dictionary<DependencyProperty, Delegate>();
+        [Id(6)]
         private readonly Dictionary<DependencyProperty, Delegate> _propertyChangedHandlersGen = new Dictionary<DependencyProperty, Delegate>();
+        [Id(7)]
         private Delegate _anyPropertyChangedHandler;
 
         /// <summary>
@@ -264,6 +268,7 @@ namespace MineCase.Engine
             return default(T);
         }
 
+        [Id(8)]
         private MultiValueDictionary<Type, IComponentIntern> _messageHandlers;
         private static readonly ConcurrentDictionary<Type, Delegate> _messageCaller = new ConcurrentDictionary<Type, Delegate>();
 

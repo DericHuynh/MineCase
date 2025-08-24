@@ -25,12 +25,8 @@
     <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" />
     <PackageReference Include="Microsoft.Extensions.Logging" />
     <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" />
-    <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.Orleans.Core" />
-    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" />
+    <PackageReference Include="Microsoft.Orleans.Streaming" />
     <PackageReference Include="StyleCop.Analyzers" PrivateAssets="All" />
     <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="MongoDB.Driver" />

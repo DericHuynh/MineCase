@@ -10,44 +10,43 @@ using Orleans.Runtime;
 
 namespace MineCase.Serialization.Serializers
 {
+    [Orleans.GenerateSerializer]
     public class GrainRerferenceSerializer<TInterface> : SealedClassSerializerBase<TInterface>
         where TInterface : class, IAddressable
     {
-        private IGrainReferenceConverter _grainReferenceConverter;
+        [Id(0)]
         private IGrainFactory _grainFactory;
 
         public GrainRerferenceSerializer(IServiceProvider serviceProvider)
         {
-            _grainReferenceConverter = serviceProvider.GetRequiredService<IGrainReferenceConverter>();
             _grainFactory = serviceProvider.GetRequiredService<IGrainFactory>();
         }
 
         protected override void SerializeValue(BsonSerializationContext context, BsonSerializationArgs args, TInterface value)
         {
-            var refer = (GrainReference)(object)value;
-            var key = refer.ToKeyString();
+            var key = value.GetPrimaryKeyString();
             context.Writer.WriteString(key);
         }
 
         protected override TInterface DeserializeValue(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
-            var key = context.Reader.ReadString();
-            var refer = _grainReferenceConverter.GetGrainFromKeyString(key);
-            if (refer != null)
-            {
-                refer.BindGrainReference(_grainFactory);
-                return refer.AsReference<TInterface>();
-            }
-
-            return null;
+            string key = context.Reader.ReadString();
+            GrainId id = GrainId.Parse(key);
+            TInterface grain = _grainFactory.GetGrain<TInterface>(id);
+            return grain;
         }
     }
 
+    [Orleans.GenerateSerializer]
     public class GrainRerferenceSerializerProvider : IBsonSerializationProvider
     {
+        [Id(0)]
         private readonly ConcurrentDictionary<Type, IBsonSerializer> _bsonSerializers = new ConcurrentDictionary<Type, IBsonSerializer>();
+        [Id(1)]
         private readonly Type _referType = typeof(IAddressable);
+        [Id(2)]
         private readonly IServiceProvider _serviceProvider;
+        [Id(3)]
         private readonly Type _serializerTypeGen = typeof(GrainRerferenceSerializer<>);
 
         public GrainRerferenceSerializerProvider(IServiceProvider serviceProvider)

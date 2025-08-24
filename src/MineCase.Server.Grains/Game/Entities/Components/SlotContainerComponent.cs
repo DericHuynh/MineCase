@@ -7,11 +7,13 @@ using MineCase.Engine;
 
 namespace MineCase.Server.Game.Entities.Components
 {
+    [Orleans.GenerateSerializer]
     internal class SlotContainerComponent : Component, IHandle<SetSlot>, IHandle<AskSlot, Slot>
     {
         public static readonly DependencyProperty<Slot[]> SlotsProperty =
             DependencyProperty.Register<Slot[]>("Slots", typeof(SlotContainerComponent));
 
+        [Orleans.Id(0)]
         private readonly int _slotsCount;
 
         public event EventHandler<(int Index, Slot Slot)> SlotChanged;

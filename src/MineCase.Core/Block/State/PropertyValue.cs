@@ -4,10 +4,12 @@ using System.Text;
 
 namespace MineCase.Block.State
 {
+    [Orleans.GenerateSerializer]
     public class PropertyValue
     {
+        [Orleans.Id(0)]
         private IStateProperty _property;
-
+        [Orleans.Id(1)]
         private string _value;
 
         public PropertyValue(IStateProperty prop, string value)

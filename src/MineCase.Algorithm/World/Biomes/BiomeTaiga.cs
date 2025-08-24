@@ -19,8 +19,10 @@ namespace MineCase.Algorithm.World.Biomes
         MegaSpruce
     }
 
+    [Orleans.GenerateSerializer]
     public class BiomeTaiga : Biome
     {
+        [Id(0)]
         private BiomeTaigaType _type;
 
         public BiomeTaiga(BiomeTaigaType type, BiomeProperties properties, GeneratorSettings genSettings)

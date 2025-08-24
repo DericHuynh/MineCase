@@ -33,11 +33,14 @@ namespace MineCase.Serialization
         Array
     }
 
+    [Orleans.GenerateSerializer]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
     public sealed class SerializeAsAttribute : Attribute
     {
+        [Orleans.Id(0)]
         public DataType DataType { get; }
 
+        [Orleans.Id(1)]
         public string ArrayLengthMember { get; set; }
 
         public SerializeAsAttribute(DataType dataType)

@@ -9,12 +9,16 @@ using MineCase.World;
 
 namespace MineCase.Server.Components
 {
+    [Orleans.GenerateSerializer]
     internal class AddressByPartitionKeyComponent : Component
     {
         public static readonly DependencyProperty<string> AddressByPartitionKeyProperty =
             DependencyProperty.Register("AddressByPartitionKey", typeof(AddressByPartitionKeyComponent), new PropertyMetadata<string>(string.Empty, OnAddressByPartitionKeyChanged));
 
         public event EventHandler<(string OldKey, string NewKey)> KeyChanged;
+
+        [Orleans.Id(0)]
+        private ChunkWorldPos? _oldChunkWorldPos;
 
         public AddressByPartitionKeyComponent(string name = "addressByPartitionKey")
             : base(name)
@@ -42,8 +46,6 @@ namespace MineCase.Server.Components
         {
             UpdateKey();
         }
-
-        private ChunkWorldPos? _oldChunkWorldPos;
 
         private void UpdateKey()
         {

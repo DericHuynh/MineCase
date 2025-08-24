@@ -64,16 +64,19 @@ namespace MineCase.Engine.Data
     /// EffectiveValue 变更事件参数
     /// </summary>
     /// <typeparam name="T">值类型</typeparam>
+    [Orleans.GenerateSerializer]
     public class EffectiveValueChangedEventArgs<T> : EventArgs, IEffectiveValueChangedEventArgs
     {
         /// <summary>
         /// 获取原始值
         /// </summary>
+        [Orleans.Id(0)]
         public T OldValue { get; }
 
         /// <summary>
         /// 获取新值
         /// </summary>
+        [Orleans.Id(1)]
         public T NewValue { get; }
 
         object IEffectiveValueChangedEventArgs.OldValue => OldValue;

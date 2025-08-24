@@ -9,8 +9,10 @@ using MineCase.World;
 
 namespace MineCase.Server.Game.Entities.Components
 {
+    [Orleans.GenerateSerializer]
     internal class TeleportComponent : Component
     {
+        [Orleans.Id(0)]
         private uint _teleportId = 0;
 
         public TeleportComponent(string name = "teleport")

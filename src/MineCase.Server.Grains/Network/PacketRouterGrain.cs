@@ -35,19 +35,19 @@ namespace MineCase.Server.Network
             switch (_state)
             {
                 case SessionState.Handshaking:
-                    _logger.LogDebug("Handshaking Packet: id = {id}, length = {length}; Data = {data}", packet.PacketId, packet.Length, string.Join(", ", packet.Data));
+                    _logger.LogDebug("Handshaking Packet: id = {id}, length = {length}; Data = {data}", packet.PacketId, packet.Length, string.Join(", ", packet.Data.Count > 0 ? string.Join(", ", packet.Data) : ""));
                     return DispatchHandshakingPackets(packet);
                 case SessionState.Status:
-                    _logger.LogDebug("Status Packet: id = {id}, length = {length}; Data = {data}", packet.PacketId, packet.Length, string.Join(", ", packet.Data));
+                    _logger.LogDebug("Status Packet: id = {id}, length = {length}; Data = {data}", packet.PacketId, packet.Length, packet.Data.Count > 0 ? string.Join(", ", packet.Data) : "");
                     return DispatchStatusPackets(packet);
                 case SessionState.Login:
-                    _logger.LogDebug("Login Packet: id = {id}, length = {length}; Data = {data}", packet.PacketId, packet.Length, string.Join(", ", packet.Data));
+                    _logger.LogDebug("Login Packet: id = {id}, length = {length}; Data = {data}", packet.PacketId, packet.Length, string.Join(", ", packet.Data.Count > 0 ? string.Join(", ", packet.Data) : ""));
                     return DispatchLoginPackets(packet);
                 case SessionState.Configuration:
-                    _logger.LogDebug("Configuration Packet: id = {id}, length = {length}; Data = {data}", packet.PacketId, packet.Length, string.Join(", ", packet.Data));
+                    _logger.LogDebug("Configuration Packet: id = {id}, length = {length}; Data = {data}", packet.PacketId, packet.Length, string.Join(", ", packet.Data.Count > 0 ? string.Join(", ", packet.Data) : ""));
                     return DispatchConfigurationPackets(packet);
                 case SessionState.Play:
-                    _logger.LogDebug("Play Packet: id = {id}, length = {length}; Data = {data}", packet.PacketId, packet.Length, string.Join(", ", packet.Data));
+                    _logger.LogDebug("Play Packet: id = {id}, length = {length}; Data = {data}", packet.PacketId, packet.Length, string.Join(", ", packet.Data.Count > 0 ? string.Join(", ", packet.Data) : ""));
                     return _user.ForwardPacket(packet);
                 case SessionState.Closed:
                     break;

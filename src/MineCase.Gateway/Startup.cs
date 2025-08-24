@@ -27,8 +27,8 @@ namespace MineCase.Gateway
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddHealthChecks()
-                .AddCheck<BasicOrleansHealthCheck>("basicOrleans");
+            services.AddHealthChecks();
+                //.AddCheck<BasicOrleansHealthCheck>("basicOrleans");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,7 +43,8 @@ namespace MineCase.Gateway
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHealthChecks("/healthz", new() { ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse });
+                endpoints.MapHealthChecks("/health");
+                endpoints.MapHealthChecks("/alive");
             });
         }
     }

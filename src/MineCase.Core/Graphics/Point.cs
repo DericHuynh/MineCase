@@ -5,17 +5,20 @@ using System.Text;
 
 namespace MineCase.Graphics
 {
+    [Orleans.GenerateSerializer]
     [Serializable]
     public struct Point2d : IEquatable<Point2d>
     {
         /// <summary>
         /// Gets or sets the positon of X-axis in minecraft world.
         /// </summary>
+        [Orleans.Id(0)]
         public float X { get; set; }
 
         /// <summary>
         /// Gets or sets the positon of Z-axis in minecraft world.
         /// </summary>
+        [Orleans.Id(1)]
         public float Z { get; set; }
 
         public Point2d(float x, float z)

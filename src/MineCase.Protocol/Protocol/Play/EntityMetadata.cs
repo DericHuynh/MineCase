@@ -7,12 +7,15 @@ using MineCase.Serialization;
 namespace MineCase.Protocol.Play
 {
     [Packet(0x44)]
+    [Orleans.GenerateSerializer]
     public sealed class EntityMetadata : IPacket
     {
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(0)]
         public uint EntityId;
 
         [SerializeAs(DataType.ByteArray)]
+        [Orleans.Id(1)]
         public byte[] Metadata;
 
         public void Deserialize(ref SpanReader br)

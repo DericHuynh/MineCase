@@ -5,27 +5,32 @@ using System.Text;
 
 namespace MineCase.Graphics
 {
+    [Orleans.GenerateSerializer]
     [Serializable]
     public struct Rect
     {
         /// <summary>
         /// Gets or sets the positon of X-axis in minecraft world.
         /// </summary>
+        [Orleans.Id(0)]
         public float X { get; set; }
 
         /// <summary>
         /// Gets or sets the positon of Z-axis in minecraft world.
         /// </summary>
+        [Orleans.Id(1)]
         public float Z { get; set; }
 
         /// <summary>
         /// Gets or sets the size of X-axis.
         /// </summary>
+        [Orleans.Id(2)]
         public float Length { get; set; }
 
         /// <summary>
         /// Gets or sets the size of Y-axis.
         /// </summary>
+        [Orleans.Id(3)]
         public float Width { get; set; }
 
         public Rect(float x, float z, float length, float width)

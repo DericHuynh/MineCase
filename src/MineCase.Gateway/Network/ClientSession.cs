@@ -20,7 +20,7 @@ namespace MineCase.Gateway.Network
     {
         private readonly TcpClient _tcpClient;
         private Stream _remoteStream;
-        private readonly IOrleansClient _grainFactory;
+        private readonly IClusterClient _grainFactory;
         private volatile bool _useCompression = false;
         private readonly Guid _sessionId;
         private readonly OutcomingPacketObserver _outcomingPacketObserver;
@@ -32,7 +32,7 @@ namespace MineCase.Gateway.Network
 
         private uint _compressThreshold;
 
-        public ClientSession(TcpClient tcpClient, IOrleansClient grainFactory, IBufferPool<byte> bufferPool, ObjectPool<UncompressedPacket> uncompressedPacketObjectPool, IPacketCompress packetCompress)
+        public ClientSession(TcpClient tcpClient, IClusterClient grainFactory, IBufferPool<byte> bufferPool, ObjectPool<UncompressedPacket> uncompressedPacketObjectPool, IPacketCompress packetCompress)
         {
             _sessionId = Guid.NewGuid();
             _tcpClient = tcpClient;
@@ -49,7 +49,7 @@ namespace MineCase.Gateway.Network
             using (_remoteStream = _tcpClient.GetStream())
             {
                 // subscribe observer to get packet from server
-                _clientboundPacketObserverRef = await _grainFactory.CreateObjectReference<IClientboundPacketObserver>(_outcomingPacketObserver);
+                _clientboundPacketObserverRef = _grainFactory.CreateObjectReference<IClientboundPacketObserver>(_outcomingPacketObserver);
                 await _grainFactory.GetGrain<IClientboundPacketSink>(_sessionId).Subscribe(_clientboundPacketObserverRef);
                 try
                 {

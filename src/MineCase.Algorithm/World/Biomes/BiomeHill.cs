@@ -18,8 +18,10 @@ namespace MineCase.Algorithm.World.Biomes
         Mutated
     }
 
+    [Orleans.GenerateSerializer]
     public class BiomeHill : Biome
     {
+        [Id(0)]
         protected BiomeHillType _type;
 
         public BiomeHill(BiomeHillType type, BiomeProperties properties, GeneratorSettings genSettings)

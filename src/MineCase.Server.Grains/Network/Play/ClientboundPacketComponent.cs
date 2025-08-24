@@ -12,9 +12,12 @@ using Orleans.Concurrency;
 
 namespace MineCase.Server.Network.Play
 {
+    [Orleans.GenerateSerializer]
     internal class ClientboundPacketComponent : Component, IHandle<BindToUser>, IHandle<KickPlayer>, IHandle<PacketForwardToPlayer>
     {
+        [Id(0)]
         private IClientboundPacketSink _sink;
+        [Id(1)]
         private IUser _user;
 
         public ClientboundPacketComponent(string name = "clientboundPacket")

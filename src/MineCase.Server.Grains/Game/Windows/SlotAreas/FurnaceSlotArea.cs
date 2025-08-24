@@ -9,10 +9,11 @@ using Orleans;
 
 namespace MineCase.Server.Game.Windows.SlotAreas
 {
+    [Orleans.GenerateSerializer]
     internal class FurnaceSlotArea : SlotArea
     {
         public const int FurnaceSlotsCount = 3;
-
+        [Id(0)]
         private readonly IBlockEntity _furnaceEntity;
 
         public FurnaceSlotArea(IBlockEntity furnaceEntity, WindowGrain window, IGrainFactory grainFactory)

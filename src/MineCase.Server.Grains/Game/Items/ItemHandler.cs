@@ -20,8 +20,10 @@ using Orleans.Concurrency;
 
 namespace MineCase.Server.Game.Items
 {
+    [Orleans.GenerateSerializer]
     public abstract class ItemHandler
     {
+        [Id(0)]
         public ItemState Item { get; }
 
         public abstract bool IsUsable { get; }

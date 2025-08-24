@@ -15,8 +15,10 @@ using Orleans;
 
 namespace MineCase.Server.Game.Blocks
 {
+    [Orleans.GenerateSerializer]
     public abstract class BlockHandler
     {
+        [Id(0)]
         public BlockId BlockId { get; }
 
         public abstract bool IsUsable { get; }
@@ -89,9 +91,11 @@ namespace MineCase.Server.Game.Blocks
         }
     }
 
+    [Orleans.GenerateSerializer]
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
     public sealed class BlockHandlerAttribute : Attribute
     {
+        [Id(0)]
         public BlockId BlockId { get; }
 
         public BlockHandlerAttribute(BlockId blockId)

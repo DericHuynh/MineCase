@@ -8,9 +8,12 @@ using Orleans.Concurrency;
 
 namespace MineCase.Server.Network
 {
+    [Orleans.GenerateSerializer]
     internal class BroadcastPacketSink : IPacketSink
     {
+        [Orleans.Id(0)]
         private IReadOnlyCollection<IPacketSink> _sinks;
+        [Orleans.Id(1)]
         private readonly IPacketPackager _packetPackager;
 
         public BroadcastPacketSink(IReadOnlyCollection<IPacketSink> sinks, IPacketPackager packetPackager)

@@ -9,8 +9,10 @@ using Orleans;
 
 namespace MineCase.Algorithm.Game.Entity.Ai.Action
 {
+    [Orleans.GenerateSerializer]
     internal class CreatureAiActionFollow : CreatureAiAction
     {
+        [Id(0)]
         private uint _itemId;
 
         public CreatureAiActionFollow(uint itemId)

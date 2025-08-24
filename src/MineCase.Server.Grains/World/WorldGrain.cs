@@ -33,9 +33,9 @@ namespace MineCase.Server.World
             SetComponent(new PeriodicSaveStateComponent(TimeSpan.FromMinutes(1)));
         }
 
-        public override async Task OnActivateAsync()
+        public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            await base.OnActivateAsync();
+            await base.OnActivateAsync(cancellationToken);
 
             var serverSettings = GrainFactory.GetGrain<IServerSettings>(0);
             _genSettings = new GeneratorSettings();
@@ -105,10 +105,13 @@ namespace MineCase.Server.World
             ValueStorage.IsDirty = true;
         }
 
+        [Orleans.GenerateSerializer]
         internal class StateHolder
         {
+            [Id(0)]
             public long WorldAge { get; set; }
 
+            [Id(1)]
             public uint NextAvailEId { get; set; }
 
             public StateHolder()

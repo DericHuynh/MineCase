@@ -49,6 +49,7 @@ public static class Extensions
         {
             services.AddServiceDiscovery();
             services.ConfigureOpenTelemetryServices(applicationName);
+            services.AddStartupHealthCheck();
             services.ConfigureHttpClientDefaults(http =>
             {
                 // Turn on resilience by default
@@ -62,7 +63,7 @@ public static class Extensions
         return builder;
     }
 
-    public static IServiceCollection ConfigureOpenTelemetryServices(this IServiceCollection services, string applicationName)
+    private static IServiceCollection ConfigureOpenTelemetryServices(this IServiceCollection services, string applicationName)
     {
         services.AddOpenTelemetry()
                 .WithMetrics(metrics =>
@@ -88,7 +89,7 @@ public static class Extensions
         return services;
     }
 
-    public static ILoggingBuilder ConfigureOpenTelemetryLogging(this ILoggingBuilder logging)
+    private static ILoggingBuilder ConfigureOpenTelemetryLogging(this ILoggingBuilder logging)
     {
         logging.ClearProviders();
 
@@ -101,7 +102,7 @@ public static class Extensions
         return logging;
     }
 
-    public static IServiceCollection AddStartupHealthCheck(this IServiceCollection services)
+    private static IServiceCollection AddStartupHealthCheck(this IServiceCollection services)
     {
         services.AddHealthChecks()
                 // Add a default liveness check to ensure app is responsive

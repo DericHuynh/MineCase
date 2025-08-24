@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using MineCase.Engine.Serialization;
 using MineCase.Server.Settings;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace MineCase.Server.Persistence

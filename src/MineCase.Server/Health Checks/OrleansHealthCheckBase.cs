@@ -18,20 +18,9 @@ namespace MineCase.Server.Health_Checks
             _client = client;
         }
 
-        /// <summary>
-        /// Entry into health check, ensures the client is initialized, if it is not returns a healthy status.
-        /// </summary>
-        /// <param name="context">The health check context.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns><see cref="Task"/> of <see cref="HealthCheckResult"/>.</returns>
-        public virtual async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default(CancellationToken))
+        Task<HealthCheckResult> IHealthCheck.CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken)
         {
-            if (!_client.IsInitialized)
-            {
-                return HealthCheckResult.Healthy($"{nameof(_client)} not yet initialized.");
-            }
-
-            return await CheckHealthGrainAsync(context, cancellationToken);
+            return CheckHealthAsync(context, cancellationToken);
         }
 
         /// <summary>
@@ -40,6 +29,6 @@ namespace MineCase.Server.Health_Checks
         /// <param name="context">The health check context.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns><see cref="Task"/> of <see cref="HealthCheckResult"/>.</returns>
-        protected abstract Task<HealthCheckResult> CheckHealthGrainAsync(HealthCheckContext context, CancellationToken cancellationToken);
+        protected abstract Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken);
     }
 }

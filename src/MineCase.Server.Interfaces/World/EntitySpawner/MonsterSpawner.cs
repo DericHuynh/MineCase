@@ -12,10 +12,12 @@ using Orleans;
 
 namespace MineCase.Server.World.EntitySpawner
 {
+    [Orleans.GenerateSerializer]
     public class MonsterSpawner
     {
+        [Id(0)]
         private int _groupMaxNum;
-
+        [Id(1)]
         private MobType _mobType;
 
         public MonsterSpawner(MobType mobType, int groupMaxNum)

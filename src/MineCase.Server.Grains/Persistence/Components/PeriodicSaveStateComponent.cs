@@ -5,11 +5,14 @@ using System.Threading.Tasks;
 using MineCase.Engine;
 using MineCase.Server.Components;
 using MineCase.World;
+using Orleans;
 
 namespace MineCase.Server.Persistence.Components
 {
+    [Orleans.GenerateSerializer]
     internal class PeriodicSaveStateComponent : Component
     {
+        [Id(0)]
         private readonly TimeSpan _periodTime;
 
         public PeriodicSaveStateComponent(TimeSpan periodTime, string name = "periodicSaveState")
@@ -20,10 +23,10 @@ namespace MineCase.Server.Persistence.Components
 
         protected override void OnAttached()
         {
-            AttachedObject.RegisterTimer(SaveIfDirty, null, _periodTime, _periodTime);
+            AttachedObject.RegisterGrainTimer(SaveIfDirty, _periodTime, _periodTime);
         }
 
-        private Task SaveIfDirty(object state)
+        private Task SaveIfDirty()
         {
             if (AttachedObject.ValueStorage.IsDirty)
             {

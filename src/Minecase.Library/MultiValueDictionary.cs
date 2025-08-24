@@ -5,6 +5,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Orleans;
 
 namespace MineCase.Library
 {
@@ -24,6 +25,7 @@ namespace MineCase.Library
     /// </summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TValue">The type of the value.</typeparam>
+    [Orleans.GenerateSerializer]
     public class MultiValueDictionary<TKey, TValue> :
         IReadOnlyDictionary<TKey, IReadOnlyCollection<TValue>>
     {
@@ -35,19 +37,22 @@ namespace MineCase.Library
         /// <summary>
         /// The private dictionary that this class effectively wraps around
         /// </summary>
-        private readonly Dictionary<TKey, InnerCollectionView> _dictionary;
+        [Id(0)]
+        public readonly Dictionary<TKey, InnerCollectionView> _dictionary;
 
         /// <summary>
         /// The function to construct a new <see cref="ICollection{TValue}"/>
         /// </summary>
         /// <returns></returns>
-        private Func<ICollection<TValue>> NewCollectionFactory = () => new List<TValue>();
+        [Id(1)]
+        public Func<ICollection<TValue>> NewCollectionFactory = () => new List<TValue>();
 
         /// <summary>
         /// The current version of this MultiValueDictionary used to determine MultiValueDictionary modification
         /// during enumeration
         /// </summary>
-        private int _version;
+        [Id(2)]
+        public int _version;
 
         #endregion
 
@@ -975,11 +980,13 @@ namespace MineCase.Library
         /// <summary>
         /// An inner class that functions as a view of an ICollection within a MultiValueDictionary
         /// </summary>
-        private class InnerCollectionView :
+        [Orleans.GenerateSerializer]
+        public class InnerCollectionView :
             ICollection<TValue>,
             IReadOnlyCollection<TValue>
         {
-            private readonly ICollection<TValue> _collection;
+            [Id(0)]
+            public readonly ICollection<TValue> _collection;
 
             #region Private Concrete API
             /*======================================================================
@@ -1027,6 +1034,7 @@ namespace MineCase.Library
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+            [Id(1)]
             public TKey Key { get; }
 
             #endregion

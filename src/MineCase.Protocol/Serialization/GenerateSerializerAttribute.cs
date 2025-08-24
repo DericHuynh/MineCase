@@ -13,9 +13,11 @@ namespace MineCase.Serialization
         Both = 2
     }
 
+    [Orleans.GenerateSerializer]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public sealed class GenerateSerializerAttribute : Attribute
     {
+        [Orleans.Id(0)]
         public GenerateSerializerMethods Methods { get; set; } = GenerateSerializerMethods.Both;
     }
 }

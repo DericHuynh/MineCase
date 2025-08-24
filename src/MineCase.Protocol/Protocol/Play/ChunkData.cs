@@ -10,36 +10,47 @@ using MineCase.World;
 namespace MineCase.Protocol.Play
 {
     [Packet(0x22)]
+    [Orleans.GenerateSerializer]
     public sealed class ChunkData : IPacket
     {
         [SerializeAs(DataType.Int)]
+        [Orleans.Id(0)]
         public int ChunkX;
 
         [SerializeAs(DataType.Int)]
+        [Orleans.Id(1)]
         public int ChunkZ;
 
         [SerializeAs(DataType.Boolean)]
+        [Orleans.Id(2)]
         public bool FullChunk;
 
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(3)]
         public uint PrimaryBitMask;
 
         [SerializeAs(DataType.NBTTag)]
+        [Orleans.Id(4)]
         public NbtCompound Heightmaps;
 
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(5)]
         public uint Size;
 
         [SerializeAs(DataType.Array)]
+        [Orleans.Id(6)]
         public ChunkSection[] Data;
 
         [SerializeAs(DataType.IntArray)]
+        [Orleans.Id(7)]
         public int[] Biomes;
 
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(8)]
         public uint NumberOfBlockEntities;
 
         [SerializeAs(DataType.NbtArray)]
+        [Orleans.Id(9)]
         public NbtCompound[] BlockEntities;
 
         public static ChunkData Deserialize(ref SpanReader br, bool isOverworld)
@@ -101,24 +112,31 @@ namespace MineCase.Protocol.Play
         }
     }
 
+    [Orleans.GenerateSerializer]
     public sealed class ChunkSection : IPacket
     {
         [SerializeAs(DataType.Short)]
+        [Orleans.Id(0)]
         public short BlockCount;
 
         [SerializeAs(DataType.Byte)]
+        [Orleans.Id(1)]
         public byte BitsPerBlock;
 
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(2)]
         public uint PaletteLength;
 
         [SerializeAs(DataType.Array)]
+        [Orleans.Id(3)]
         public uint[] Palette;
 
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(4)]
         public uint DataArrayLength;
 
         [SerializeAs(DataType.Array)]
+        [Orleans.Id(5)]
         public ulong[] DataArray;
 
         public static ChunkSection Deserialize(ref SpanReader br, bool isOverworld)

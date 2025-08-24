@@ -10,6 +10,7 @@ using Orleans.Concurrency;
 
 namespace MineCase.Server.Game.Windows.SlotAreas
 {
+    [Orleans.GenerateSerializer]
     internal abstract class SlotArea
     {
         public const int ArmorSlotsCount = 4;
@@ -24,10 +25,13 @@ namespace MineCase.Server.Game.Windows.SlotAreas
         public const int HotbarOffsetInContainer = InventoryOffsetInContainer + InventorySlotsCount;
         public const int OffhandOffsetInContainer = HotbarOffsetInContainer + HotbarSlotsCount;
 
+        [Id(0)]
         public int SlotsCount { get; }
 
+        [Id(1)]
         protected WindowGrain Window { get; }
 
+        [Id(2)]
         protected IGrainFactory GrainFactory { get; }
 
         public SlotArea(int slotsCount, WindowGrain window, IGrainFactory grainFactory)

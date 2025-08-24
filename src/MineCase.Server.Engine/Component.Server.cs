@@ -9,8 +9,10 @@ namespace MineCase.Engine
 {
     public partial class Component
     {
+        [Orleans.Id(3)]
         protected IGrainFactory GrainFactory { get; private set; }
 
+        [Orleans.Id(4)]
         protected ILogger Logger { get; private set; }
 
         partial void AttatchPartial(DependencyObject dependencyObject, IServiceProvider serviceProvider)

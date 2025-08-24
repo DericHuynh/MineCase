@@ -72,8 +72,10 @@ namespace MineCase.Server.World
             ValueStorage.IsDirty = true;
         }
 
+        [Orleans.GenerateSerializer]
         internal class StateHolder
         {
+            [Id(0)]
             public HashSet<IDependencyObject> Subscription { get; set; }
 
             public StateHolder()

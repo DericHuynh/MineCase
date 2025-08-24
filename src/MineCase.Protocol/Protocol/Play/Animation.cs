@@ -12,10 +12,12 @@ namespace MineCase.Protocol.Play
     }
 
     [Packet(0x2A)]
+    [Orleans.GenerateSerializer]
     [GenerateSerializer]
     public sealed partial class ServerboundAnimation : IPacket
     {
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(0)]
         public Hand Hand;
     }
 }

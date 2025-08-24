@@ -5,12 +5,16 @@ using System.Text;
 
 namespace MineCase
 {
+    [Orleans.GenerateSerializer]
     public struct Position : IEquatable<Position>
     {
+        [Orleans.Id(0)]
         public int X { get; set; }
 
+        [Orleans.Id(1)]
         public int Y { get; set; }
 
+        [Orleans.Id(2)]
         public int Z { get; set; }
 
         public static implicit operator Vector3(Position position)

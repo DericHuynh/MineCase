@@ -12,10 +12,12 @@ using Orleans;
 
 namespace MineCase.Server.Game.Entities.Components
 {
+    [Orleans.GenerateSerializer]
     internal class SyncPlayerStateComponent : Component<PlayerGrain>, IHandle<PlayerLoggedIn>, IHandle<BindToUser>
     {
+        [Id(0)]
         private IUser _user;
-
+        [Id(1)]
         private bool _isHandlersInstalled;
 
         public SyncPlayerStateComponent(string name = "syncPlayerState")
@@ -67,6 +69,7 @@ namespace MineCase.Server.Game.Entities.Components
             AttachedObject.RegisterPropertyChangedHandler(HealthComponent.HealthProperty, OnEntityHealthChanged);
         }
 
+        [Id(2)]
         private ChunkEventBroadcastComponent _broadcastComponent;
 
         private void OnEntityHeadYawChanged(object sender, PropertyChangedEventArgs<float> e)

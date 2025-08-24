@@ -10,10 +10,11 @@ using Orleans;
 
 namespace MineCase.Server.Game.Windows.SlotAreas
 {
+    [Orleans.GenerateSerializer]
     internal class ChestSlotArea : SlotArea
     {
         public const int ChestSlotsCount = 9 * 3;
-
+        [Id(0)]
         private readonly IDependencyObject _chestEntity;
 
         public ChestSlotArea(IDependencyObject chestEntity, WindowGrain window, IGrainFactory grainFactory)

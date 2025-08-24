@@ -18,9 +18,9 @@ namespace MineCase.Server.World.Decoration.Plants
             _logger = loggerFactory.CreateLogger<JungleGeneratorGrain>();
         }
 
-        public async override Task OnActivateAsync()
+        public async override Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            await base.OnActivateAsync();
+            await base.OnActivateAsync(cancellationToken);
             _wood = BlockStates.AcaciaLog();
             _leaves = BlockStates.AcaciaLeaves(AcaciaLeavesDistanceType.Distance1, AcaciaLeavesPersistentType.False);
         }

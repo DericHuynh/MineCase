@@ -7,12 +7,14 @@ using MineCase.Nbt.Serialization;
 namespace MineCase.Nbt.Tags
 {
     /// <see cref="NbtTagType.Double"/>
+    [Orleans.GenerateSerializer]
     public sealed class NbtDouble : NbtTag
     {
         public override NbtTagType TagType => NbtTagType.Double;
 
         public override bool HasValue => true;
 
+        [Orleans.Id(0)]
         public double Value { get; set; }
 
         /// <summary>

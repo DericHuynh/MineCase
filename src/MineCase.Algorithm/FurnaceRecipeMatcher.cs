@@ -2,9 +2,12 @@
 
 namespace MineCase.Algorithm
 {
+    [Orleans.GenerateSerializer]
     public class FurnaceRecipeMatcher
     {
+        [Orleans.Id(0)]
         private List<FurnaceRecipe> _recipes;
+        [Orleans.Id(1)]
         private List<FurnaceFuel> _fuels;
 
         public FurnaceRecipeMatcher(List<FurnaceRecipe> recipes, List<FurnaceFuel> fuels)

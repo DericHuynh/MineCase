@@ -18,7 +18,7 @@ namespace MineCase.Server.World.Decoration.Biomes
     [StatelessWorker]
     public class BiomeTaigaDecoratorGrain : BiomeDecoratorGrain, IBiomeTaigaDecorator
     {
-        public override Task OnActivateAsync()
+        public override Task OnActivateAsync(CancellationToken cancellationToken)
         {
             if (this.GetPrimaryKeyLong() == (long)BiomeId.Taiga)
             {

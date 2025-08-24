@@ -4,10 +4,13 @@ using System.Text;
 
 namespace MineCase.Block
 {
+    [Orleans.GenerateSerializer]
     public struct BlockState : IEquatable<BlockState>
     {
+        [Orleans.Id(0)]
         public uint Id { get; set; }
 
+        [Orleans.Id(1)]
         public uint MetaValue { get; set; }
 
         public bool IsId(BlockId id)

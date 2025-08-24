@@ -9,14 +9,19 @@ using MineCase.World;
 
 namespace MineCase.Server.Game.Entities.Components
 {
+    [Orleans.GenerateSerializer]
     internal class KeepAliveComponent : Component, IHandle<BeginLogin>, IHandle<PlayerLoggedIn>, IHandle<KickPlayer>
     {
+        [Orleans.Id(0)]
         private uint _keepAliveId = 0;
+        [Orleans.Id(1)]
         public readonly Dictionary<long, DateTime> _keepAliveWaiters = new Dictionary<long, DateTime>();
+        [Orleans.Id(2)]
         private bool _isOnline = false;
 
         private const int ClientKeepInterval = 6;
 
+        [Orleans.Id(3)]
         public uint Ping { get; private set; }
 
         public KeepAliveComponent(string name = "keepAlive")

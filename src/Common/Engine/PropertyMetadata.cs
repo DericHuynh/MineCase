@@ -9,9 +9,12 @@ namespace MineCase.Engine
     /// 依赖属性元数据
     /// </summary>
     /// <typeparam name="T">值类型</typeparam>
+    [Orleans.GenerateSerializer]
     public class PropertyMetadata<T>
     {
+        [Orleans.Id(0)]
         private bool _defaultValueSet;
+        [Orleans.Id(1)]
         private T _defaultValue;
 
         /// <summary>

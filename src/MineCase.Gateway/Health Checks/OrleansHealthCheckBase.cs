@@ -6,15 +6,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Orleans;
-using Orleans.MultiClient;
 
 namespace MineCase.Gateway.Health_Checks
 {
     public abstract class OrleansHealthCheckBase : IHealthCheck 
     {
-        protected readonly IOrleansClient _client;
+        protected readonly IClusterClient _client;
 
-        protected OrleansHealthCheckBase(IOrleansClient client) 
+        protected OrleansHealthCheckBase(IClusterClient client) 
         {
               _client = client;
         }

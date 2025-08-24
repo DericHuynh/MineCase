@@ -15,31 +15,51 @@ using Orleans;
 
 namespace MineCase.Algorithm.World.Biomes
 {
+    [Orleans.GenerateSerializer]
     public abstract class Biome
     {
         // Biome�йص�������������
+        [Id(0)]
         protected GeneratorSettings _genSettings;
-
+        [Id(1)]
         protected string _name;
-
+        [Id(2)]
         protected BiomeId _biomeId;
+
         /** The base height of this biome. Default 0.1. */
+        [Id(3)]
         protected float _baseHeight;
+
         /** The variation from the base height of the biome. Default 0.3. */
+        [Id(4)]
         protected float _heightVariation;
+
         /** The temperature of this biome. */
+        [Id(5)]
         protected float _temperature;
+
         /** The rainfall in this biome. */
+        [Id(6)]
         protected float _rainfall;
+
         /** Color tint applied to water depending on biome */
+        [Id(7)]
         protected int _waterColor;
+
         /** Set to true if snow is enabled for this biome. */
+        [Id(8)]
         protected bool _enableSnow;
+
         /** Is true (default) if the biome support rain (desert and nether can't have rain) */
+        [Id(9)]
         protected bool _enableRain;
+
         /** The block expected to be on the top of this biome */
+        [Id(10)]
         public BlockState _topBlock = BlockStates.GrassBlock();
+
         /** The block to fill spots in when not on the top */
+        [Id(11)]
         public BlockState _fillerBlock = BlockStates.Dirt();
 
         // ��������
@@ -50,37 +70,59 @@ namespace MineCase.Algorithm.World.Biomes
             new OctavedNoise<PerlinNoise>(new PerlinNoise(2345), 4, 0.5F);
 
         // ����������
+        [Id(12)]
         private MinableGenerator _dirtGen; // ��û��������Щ������������
+        [Id(13)]
         private MinableGenerator _gravelOreGen;
+        [Id(14)]
         private MinableGenerator _graniteGen;
+        [Id(15)]
         private MinableGenerator _dioriteGen;
+        [Id(16)]
         private MinableGenerator _andesiteGen;
-
+        [Id(17)]
         private MinableGenerator _coalGen;
+        [Id(18)]
         private MinableGenerator _ironGen;
+        [Id(19)]
         private MinableGenerator _goldGen;
+        [Id(20)]
         private MinableGenerator _redstoneGen;
+        [Id(21)]
         private MinableGenerator _diamondGen;
+        [Id(22)]
         private MinableGenerator _lapisGen;
 
         // ֲ������
+        [Id(23)]
         protected int _treesPerChunk;
+        [Id(24)]
         protected float _extraTreeChance;
+        [Id(25)]
         protected int _grassPerChunk;
+        [Id(26)]
         protected int _flowersPerChunk;
+        [Id(27)]
         protected int _mushroomsPerChunk;
-
+        [Id(28)]
         protected int _deadBushPerChunk;
+        [Id(29)]
         protected int _reedsPerChunk;
+        [Id(30)]
         protected int _cactiPerChunk;
 
         // ��������
+        [Id(31)]
         protected List<MobType> _passiveMobList;
+        [Id(32)]
         protected List<MobType> _monsterList;
-
+        [Id(33)]
         protected int _clayPerChunk;
+        [Id(34)]
         protected int _waterlilyPerChunk;
+        [Id(35)]
         protected int _sandPatchesPerChunk;
+        [Id(36)]
         protected int _gravelPatchesPerChunk;
 
         public Biome(BiomeProperties properties, GeneratorSettings genSettings)

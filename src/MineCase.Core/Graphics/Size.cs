@@ -6,22 +6,26 @@ using System.Text;
 
 namespace MineCase.Graphics
 {
+    [Orleans.GenerateSerializer]
     [Serializable]
     public struct Size : IEquatable<Size>
     {
         /// <summary>
         /// Gets or sets the size of X-axis.
         /// </summary>
+        [Orleans.Id(0)]
         public float Length { get; set; }
 
         /// <summary>
         /// Gets or sets the size of Z-axis.
         /// </summary>
+        [Orleans.Id(1)]
         public float Width { get; set; }
 
         /// <summary>
         /// Gets or sets the size of Y-axis.
         /// </summary>
+        [Orleans.Id(2)]
         public float Height { get; set; }
 
         public Size(float length, float width, float height = 0f)

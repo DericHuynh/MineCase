@@ -48,7 +48,7 @@ namespace MineCase.Server.World.Generation
 
         private GenLayer _genlayer;
 
-        public override Task OnActivateAsync()
+        public override Task OnActivateAsync(CancellationToken cancellationToken)
         {
             _densityMap = new float[5, 33, 5];
             _depthMap = new float[5, 1, 5];

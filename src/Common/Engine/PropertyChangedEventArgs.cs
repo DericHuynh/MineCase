@@ -7,11 +7,13 @@ namespace MineCase.Engine
     /// <summary>
     /// 属性变更事件参数
     /// </summary>
+    [Orleans.GenerateSerializer]
     public class PropertyChangedEventArgs : EventArgs
     {
         /// <summary>
         /// 依赖属性
         /// </summary>
+        [Orleans.Id(0)]
         public DependencyProperty Property { get; }
 
         /// <summary>
@@ -28,6 +30,7 @@ namespace MineCase.Engine
     /// 属性变更事件参数
     /// </summary>
     /// <typeparam name="T">值类型</typeparam>
+    [Orleans.GenerateSerializer]
     public class PropertyChangedEventArgs<T> : PropertyChangedEventArgs
     {
         /// <summary>
@@ -38,11 +41,13 @@ namespace MineCase.Engine
         /// <summary>
         /// 获取原始值
         /// </summary>
+        [Orleans.Id(0)]
         public T OldValue { get; }
 
         /// <summary>
         /// 获取新值
         /// </summary>
+        [Orleans.Id(1)]
         public T NewValue { get; }
 
         /// <summary>

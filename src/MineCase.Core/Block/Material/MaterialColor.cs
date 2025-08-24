@@ -4,10 +4,13 @@ using System.Text;
 
 namespace MineCase.Block.Material
 {
+    [Orleans.GenerateSerializer]
     public struct MaterialColor : IEquatable<MaterialColor>
     {
+        [Orleans.Id(0)]
         public int ColorValue { get; set; }
 
+        [Orleans.Id(1)]
         public int ColorIndex { get; set; }
 
         public MaterialColor(int index, int value)

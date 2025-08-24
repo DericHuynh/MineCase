@@ -23,7 +23,7 @@ namespace MineCase.Server.Game
             _fileProvider = new PhysicalFileProvider(AppContext.BaseDirectory);
         }
 
-        public override async Task OnActivateAsync()
+        public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
             var file = _fileProvider.GetFileInfo(_recipesFileName);
 

@@ -35,10 +35,12 @@ namespace MineCase.World
         South
     }
 
+    [Orleans.GenerateSerializer]
     public class Facing : IEquatable<Facing>
     {
+        [Orleans.Id(0)]
         private EnumFacing _facing;
-
+        [Orleans.Id(1)]
         private Axis _axis;
 
         public Facing(EnumFacing facing)

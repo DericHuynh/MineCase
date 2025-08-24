@@ -9,9 +9,12 @@ using MongoDB.Bson.Serialization.Serializers;
 
 namespace MineCase.Serialization.Serializers
 {
+    [Orleans.GenerateSerializer]
     public class ChunkSectionCompactStorageSerializer : SealedClassSerializerBase<ChunkSectionCompactStorage>
     {
+        [Orleans.Id(0)]
         private readonly IBsonSerializer<ChunkSectionCompactStorage.NibbleArray> _nibbleSerializer = new NibbleArraySerializer();
+        [Orleans.Id(1)]
         private readonly IBsonSerializer<ChunkSectionCompactStorage.DataArray> _dataSerializer = new DataArraySerializer();
 
         protected override void SerializeValue(BsonSerializationContext context, BsonSerializationArgs args, ChunkSectionCompactStorage value)

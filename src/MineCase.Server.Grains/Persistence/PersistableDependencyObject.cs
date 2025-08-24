@@ -7,13 +7,16 @@ using Microsoft.Extensions.DependencyInjection;
 using MineCase.Engine;
 using MineCase.Engine.Serialization;
 using MongoDB.Driver;
+using Orleans;
 using Orleans.Concurrency;
 
 namespace MineCase.Server.Persistence
 {
+    [Orleans.GenerateSerializer]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public sealed class PersistTableName : Attribute
     {
+        [Id(0)]
         public string TableName { get; }
 
         public PersistTableName(string tableName)
@@ -30,7 +33,7 @@ namespace MineCase.Server.Persistence
             if (CanPersist())
             {
                 var coll = GetStateCollection();
-                var key = GrainReference.ToKeyString();
+                var key = GrainReference.GetPrimaryKeyString();
                 await coll.ReplaceOneAsync(o => o.GrainKeyString == key, state, new ReplaceOptions { IsUpsert = true });
             }
         }
@@ -40,7 +43,7 @@ namespace MineCase.Server.Persistence
             if (CanPersist())
             {
                 var coll = GetStateCollection();
-                var key = GrainReference.ToKeyString();
+                var key = GrainReference.GetPrimaryKeyString();
                 return await coll.Find(o => o.GrainKeyString == key).FirstOrDefaultAsync();
             }
 
@@ -52,7 +55,7 @@ namespace MineCase.Server.Persistence
             if (CanPersist())
             {
                 var coll = GetStateCollection();
-                var key = GrainReference.ToKeyString();
+                var key = GrainReference.GetPrimaryKeyString();
                 await coll.DeleteOneAsync(o => o.GrainKeyString == key);
             }
         }

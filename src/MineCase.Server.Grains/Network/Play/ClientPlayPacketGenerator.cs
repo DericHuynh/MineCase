@@ -20,12 +20,16 @@ using Orleans.Concurrency;
 
 namespace MineCase.Server.Network.Play
 {
+    [Orleans.GenerateSerializer]
     internal struct ClientPlayPacketGenerator
     {
+        [Orleans.Id(0)]
         public IPacketSink Sink { get; }
 
+        [Orleans.Id(1)]
         public IBroadcastPacketSink BroadcastSink { get; }
 
+        [Orleans.Id(2)]
         private IPlayer _except;
 
         public ClientPlayPacketGenerator(IPacketSink sink)

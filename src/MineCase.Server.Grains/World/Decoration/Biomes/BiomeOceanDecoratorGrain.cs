@@ -17,7 +17,7 @@ namespace MineCase.Server.World.Decoration.Biomes
     [StatelessWorker]
     public class BiomeOceanDecoratorGrain : BiomeDecoratorGrain, IBiomeOceanDecorator
     {
-        public override Task OnActivateAsync()
+        public override Task OnActivateAsync(CancellationToken cancellationToken)
         {
             if (this.GetPrimaryKeyLong() == (long)BiomeId.Ocean)
             {

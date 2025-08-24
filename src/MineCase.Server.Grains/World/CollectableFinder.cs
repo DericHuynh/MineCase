@@ -31,9 +31,9 @@ namespace MineCase.Server.World
 
         private StateHolder State => GetValue(StateComponent<StateHolder>.StateProperty);
 
-        public override async Task OnActivateAsync()
+        public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            await base.OnActivateAsync();
+            await base.OnActivateAsync(cancellationToken);
             _neighborFinders = new List<(Cuboid Box, ICollectableFinder Finder)>();
             foreach (var crossCoord in CrossCoords)
             {
@@ -76,7 +76,7 @@ namespace MineCase.Server.World
                                                                             .SelectMany(o => o));
             result.Remove(entity);
             if (result.Count != 0)
-                entity.InvokeOneWay(e => e.Tell(new CollisionWith { Entities = result }));
+                await entity.Tell(new CollisionWith { Entities = result });
         }
 
         public async Task SpawnPickup(Vector3 position, Immutable<Slot[]> slots)
@@ -115,8 +115,10 @@ namespace MineCase.Server.World
             ValueStorage.IsDirty = true;
         }
 
+        [Orleans.GenerateSerializer]
         public class StateHolder
         {
+            [Id(0)]
             public Dictionary<IDependencyObject, Shape> Colliders { get; set; }
 
             public StateHolder()

@@ -7,12 +7,14 @@ using MineCase.Nbt.Serialization;
 namespace MineCase.Nbt.Tags
 {
     /// <see cref="NbtTagType.LongArray"/>
+    [Orleans.GenerateSerializer]
     public sealed class NbtLongArray : NbtTag
     {
         public override NbtTagType TagType => NbtTagType.LongArray;
 
         public override bool HasValue => true;
 
+        [Orleans.Id(0)]
         private long[] _value;
 
         public long[] Value

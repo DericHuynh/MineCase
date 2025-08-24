@@ -2,10 +2,12 @@ using System;
 
 namespace MineCase.Algorithm.World.Layer
 {
+    [Orleans.GenerateSerializer]
     public abstract class GenLayer
     {
+        [Orleans.Id(0)]
         protected int _baseSeed;
-
+        [Orleans.Id(1)]
         protected GenLayer _parent;
 
         public GenLayer(int seed, GenLayer parent)

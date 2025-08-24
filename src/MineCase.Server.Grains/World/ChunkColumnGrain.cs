@@ -407,15 +407,20 @@ namespace MineCase.Server.World
             ValueStorage.IsDirty = true;
         }
 
+        [Orleans.GenerateSerializer]
         internal class StateHolder
         {
+            [Id(0)]
             public bool Populated { get; set; } = false;
 
+            [Id(1)]
             public bool Generated { get; set; } = false;
 
+            [Id(2)]
             public ChunkColumnCompactStorage Storage { get; set; }
 
             [BsonDictionaryOptions(DictionaryRepresentation.ArrayOfDocuments)]
+            [Id(3)]
             public Dictionary<BlockChunkPos, IBlockEntity> BlockEntities { get; set; }
 
             public StateHolder()

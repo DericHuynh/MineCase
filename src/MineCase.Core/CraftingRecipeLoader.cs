@@ -11,8 +11,10 @@ using MineCase.Item;
 
 namespace MineCase
 {
+    [Orleans.GenerateSerializer]
     public class CraftingRecipeLoader
     {
+        [Orleans.Id(0)]
         public List<CraftingRecipe> Recipes { get; } = new List<CraftingRecipe>();
 
         public async Task LoadRecipes(StreamReader streamReader)
@@ -223,18 +225,27 @@ namespace MineCase
         }
     }
 
+    [Orleans.GenerateSerializer]
     public struct CraftingRecipeSlot
     {
+        [Orleans.Id(0)]
         public Slot Slot;
+        [Orleans.Id(1)]
         public int X;
+        [Orleans.Id(2)]
         public int Y;
     }
 
+    [Orleans.GenerateSerializer]
     public class CraftingRecipe
     {
+        [Orleans.Id(0)]
         public CraftingRecipeSlot[] Inputs;
+        [Orleans.Id(1)]
         public int Width;
+        [Orleans.Id(2)]
         public int Height;
+        [Orleans.Id(3)]
         public Slot Output;
     }
 }

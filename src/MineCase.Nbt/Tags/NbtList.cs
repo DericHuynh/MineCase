@@ -11,14 +11,17 @@ using MineCase.Nbt.Serialization;
 namespace MineCase.Nbt.Tags
 {
     /// <see cref="NbtTagType.List"/>
+    [Orleans.GenerateSerializer]
     public sealed class NbtList : NbtTag, IEnumerable<NbtTag>
     {
         public override NbtTagType TagType => NbtTagType.List;
 
         public override bool HasValue => false;
 
+        [Orleans.Id(0)]
         public NbtTagType ElementType { get; private set; }
 
+        [Orleans.Id(1)]
         private readonly List<NbtTag> _childTags;
 
         public int Count => _childTags.Count;

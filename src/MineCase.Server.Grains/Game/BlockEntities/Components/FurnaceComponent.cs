@@ -15,20 +15,22 @@ namespace MineCase.Server.Game.BlockEntities.Components
 {
     internal class FurnaceComponent : Component<BlockEntityGrain>, IHandle<SetSlot>, IHandle<SpawnBlockEntity>, IHandle<DestroyBlockEntity>, IHandle<UseBy>
     {
+        [Orleans.GenerateSerializer]
         public class FurnaceState
         {
+            [Orleans.Id(0)]
             public bool IsCooking;
-
+            [Orleans.Id(1)]
             public FurnaceRecipe CurrentRecipe;
-
+            [Orleans.Id(2)]
             public FurnaceFuel CurrentFuel;
-
+            [Orleans.Id(3)]
             public int FuelLeft;
-
+            [Orleans.Id(4)]
             public int MaxFuelTime;
-
+            [Orleans.Id(5)]
             public int CookProgress;
-
+            [Orleans.Id(6)]
             public int MaxProgress;
         }
 

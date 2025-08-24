@@ -10,9 +10,12 @@ using Orleans.Concurrency;
 
 namespace MineCase.Server.Game.Windows.SlotAreas
 {
+    [Orleans.GenerateSerializer]
     internal class CraftingSlotArea : TemporarySlotArea
     {
+        [Id(0)]
         private readonly int _gridSize;
+        [Id(1)]
         private Slot[,] _afterSlots;
 
         public CraftingSlotArea(int gridSize, WindowGrain window, IGrainFactory grainFactory)

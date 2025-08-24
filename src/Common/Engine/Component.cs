@@ -15,12 +15,16 @@ namespace MineCase.Engine
         int GetMessageOrder(object message);
     }
 
+    [Orleans.GenerateSerializer]
     public abstract partial class Component : IComponentIntern
     {
+        [Orleans.Id(0)]
         public string Name { get; }
 
+        [Orleans.Id(1)]
         protected DependencyObject AttachedObject { get; private set; }
 
+        [Orleans.Id(2)]
         protected ServiceProviderType ServiceProvider { get; private set; }
 
         public Component(string name)

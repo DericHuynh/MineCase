@@ -7,24 +7,31 @@ using MineCase.Serialization;
 namespace MineCase.Protocol.Play
 {
     [Packet(0x0A)]
+    [Orleans.GenerateSerializer]
     public sealed class UseEntity : IPacket
     {
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(0)]
         public int Target;
 
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(1)]
         public int Type;
 
         [SerializeAs(DataType.Float)]
+        [Orleans.Id(2)]
         public float? TargetX;
 
         [SerializeAs(DataType.Float)]
+        [Orleans.Id(3)]
         public float? TargetY;
 
         [SerializeAs(DataType.Float)]
+        [Orleans.Id(4)]
         public float? TargetZ;
 
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(5)]
         public int? Hand;
 
         public void Deserialize(ref SpanReader br)

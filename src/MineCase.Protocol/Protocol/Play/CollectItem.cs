@@ -7,16 +7,20 @@ using MineCase.Serialization;
 namespace MineCase.Protocol.Play
 {
     [Packet(0x56)]
+    [Orleans.GenerateSerializer]
     [GenerateSerializer]
     public sealed partial class CollectItem : IPacket
     {
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(0)]
         public uint CollectedEntityId;
 
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(1)]
         public uint CollectorEntityId;
 
         [SerializeAs(DataType.VarInt)]
+        [Orleans.Id(2)]
         public uint PickupItemCount;
     }
 }

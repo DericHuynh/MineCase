@@ -1,13 +1,30 @@
-﻿using Autofac.Extensions.DependencyInjection;
+﻿using Autofac;
+using Autofac.Core;
+using Autofac.Extensions.DependencyInjection;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.IO;
 using MineCase.Serialization.Serializers;
+using MineCase.Server.Health_Checks;
+using MineCase.Server.Settings;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using Orleans;
-using Orleans.ApplicationParts;
 using Orleans.Configuration;
 using Orleans.Hosting;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace MineCase.Server
@@ -22,67 +39,122 @@ namespace MineCase.Server
             return port;
         }
 
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddControllers();
+            services.AddHealthChecks()
+                .AddCheck<BasicOrleansHealthCheck>("basicOrleans");
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseRouting();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHealthChecks("/healthz", new() { ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse });
+                endpoints.MapHealthChecks("/health");
+                endpoints.MapHealthChecks("/alive");
+            });
+            app.Map("/dashboard", x => x.UseOrleansDashboard());
+        }
+
         static async Task Main(string[] args)
         {
             var createShardKey = false;
             Serializers.RegisterAll();
 
-            var hostBuilder = new HostBuilder()
-                .ConfigureWebHostDefaults(conf => { conf.UseStartup<Startup>(); })
-                .UseServiceProviderFactory(x => new AutofacServiceProviderFactory(ConfigureAutofac))
-                .ConfigureAppConfiguration(ConfigureAppConfiguration)
-                .ConfigureServices(ConfigureServices)
-                .ConfigureLogging(ConfigureLogging)
-                .UseConsoleLifetime()
-                .UseOrleans((Microsoft.Extensions.Hosting.HostBuilderContext context, ISiloBuilder builder) =>
-                {
-                    builder.Configure<ClusterOptions>(options =>
-                    {
-                        options.ClusterId = "dev";
-                        options.ServiceId = "MineCaseService";
-                    })
-                    .Configure<SchedulingOptions>(options =>
-                    {
-                        options.AllowCallChainReentrancy = true;
-                        options.PerformDeadlockDetection = true;
-                    })
-                    .ConfigureEndpoints(siloPort: GetAvailablePort(), gatewayPort: GetAvailablePort())
-                    .UseMongoDBClient(context.Configuration.GetSection("persistenceOptions")["connectionString"])
-                    .AddSimpleMessageStreamProvider("JobsProvider")
-                    .AddSimpleMessageStreamProvider("TransientProvider")
-                    .UseMongoDBReminders(options =>
-                    {
-                        options.DatabaseName = context.Configuration.GetSection("persistenceOptions")["databaseName"];
-                        options.CreateShardKeyForCosmos = createShardKey;
-                    })
-                    .UseMongoDBClustering(c =>
-                    {
-                        c.DatabaseName = context.Configuration.GetSection("persistenceOptions")["databaseName"];
-                        c.CreateShardKeyForCosmos = createShardKey;
-                        // c.UseJsonFormat = true;
-                    })
-                    .UseDashboard(config => { config.HostSelf = false; })
-                    .ConfigureApplicationParts(ConfigureApplicationParts)
-                    .AddMongoDBGrainStorageAsDefault(c => c.Configure(options =>
-                    {
-                        options.DatabaseName = context.Configuration.GetSection("persistenceOptions")["databaseName"];
-                        options.CreateShardKeyForCosmos = createShardKey;
-                    }))
-                    .AddMongoDBGrainStorage("PubSubStore", options =>
-                    {
-                        options.DatabaseName = context.Configuration.GetSection("persistenceOptions")["databaseName"];
-                        options.CreateShardKeyForCosmos = createShardKey;
-                    });
-                });
+            var hostBuilder = WebApplication.CreateBuilder();
 
+            hostBuilder.Configuration.SetBasePath(Directory.GetCurrentDirectory())
+                                     .AddJsonFile("config.json", false, false)
+                                     .AddJsonFile("server.json", false, false)
+                                     .AddEnvironmentVariables();
+
+            // Set GUID representation for MongoDB otherwise it throws an exception
+            BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
+
+            hostBuilder.AddServiceDefaults();
+
+            hostBuilder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+            hostBuilder.Host.ConfigureContainer<ContainerBuilder>(ConfigureAutofac);
+
+            hostBuilder.Services.AddOptions();
+            hostBuilder.Services.AddLogging();
+            hostBuilder.Services.AddSingleton<RecyclableMemoryStreamManager>();
+
+            hostBuilder.Services.AddControllers();
+            hostBuilder.Services.AddHealthChecks();
+                                //.AddCheck<BasicOrleansHealthCheck>("basicOrleans");
+
+            hostBuilder.Services.Configure<PersistenceOptions>(hostBuilder.Configuration.GetSection("persistenceOptions"));
+
+            hostBuilder.UseOrleans((siloBuilder) =>
+            {
+                //siloBuilder.UseDashboard();
+                siloBuilder.Configure<ClusterOptions>(options =>
+                {
+                    options.ClusterId = "dev";
+                    options.ServiceId = "MineCaseService";
+                });
+                siloBuilder.ConfigureEndpoints(siloPort: 11111, gatewayPort: 30000);
+                siloBuilder.UseMongoDBClient(hostBuilder.Configuration.GetSection("persistenceOptions")["connectionString"]);
+                siloBuilder.AddMemoryStreams("JobsProvider");
+                siloBuilder.AddMemoryStreams("TransientProvider");
+                siloBuilder.UseMongoDBReminders(options =>
+                {
+                    options.DatabaseName = hostBuilder.Configuration.GetSection("persistenceOptions")["databaseName"];
+                    options.CreateShardKeyForCosmos = createShardKey;
+                });
+                siloBuilder.UseMongoDBClustering(c =>
+                {
+                    c.DatabaseName = hostBuilder.Configuration.GetSection("persistenceOptions")["databaseName"];
+                    c.CreateShardKeyForCosmos = createShardKey;
+                });
+                siloBuilder.AddMongoDBGrainStorageAsDefault(c => c.Configure(options =>
+                {
+                    options.DatabaseName = hostBuilder.Configuration.GetSection("persistenceOptions")["databaseName"];
+                    options.CreateShardKeyForCosmos = createShardKey;
+                }));
+                siloBuilder.AddMongoDBGrainStorage("PubSubStore", options =>
+                {
+                    options.DatabaseName = hostBuilder.Configuration.GetSection("persistenceOptions")["databaseName"];
+                    options.CreateShardKeyForCosmos = createShardKey;
+                });
+            });
+            
             var host = hostBuilder.Build();
             Serializers.RegisterAll(host.Services);
+
+            if (host.Environment.IsDevelopment())
+            {
+                host.UseDeveloperExceptionPage();
+            }
+
+            host.UseRouting();
+
+            host.MapHealthChecks("/health", new() { ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse });
+            host.MapHealthChecks("/alive", new() { ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse });
+
+            //host.Map("/dashboard", x => x.UseOrleansDashboard());
+
             await host.RunAsync();
         }
 
-        private static void ConfigureApplicationParts(IApplicationPartManager parts)
+        private static void ConfigureAutofac(ContainerBuilder builder)
         {
-            parts.AddFromApplicationBaseDirectory().WithReferences();
+            var assemblies = new List<Assembly>();
+            assemblies
+                .AddEngine()
+                .AddInterfaces()
+                .AddGrains();
+            builder.RegisterAssemblyModules(assemblies.ToArray());
         }
     }
 }

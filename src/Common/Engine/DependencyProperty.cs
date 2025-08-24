@@ -30,6 +30,7 @@ namespace MineCase.Engine
     /// <summary>
     /// 依赖属性.
     /// </summary>
+    [Orleans.GenerateSerializer]
     public abstract class DependencyProperty : IEquatable<DependencyProperty>
     {
         private static int _nextAvailableGlobalId = 0;
@@ -44,11 +45,13 @@ namespace MineCase.Engine
         /// <summary>
         /// 获取名称.
         /// </summary>
+        [Orleans.Id(0)]
         public string Name { get; }
 
         /// <summary>
         /// 获取所有者类型.
         /// </summary>
+        [Orleans.Id(1)]
         public Type OwnerType { get; }
 
         /// <summary>
@@ -66,10 +69,12 @@ namespace MineCase.Engine
         /// </summary>
         public bool IsReadOnly => Flags.HasFlag(DependencyPropertyFlags.ReadOnly);
 
+        [Orleans.Id(2)]
         internal DependencyPropertyFlags Flags { get; }
 
         internal abstract IDependencyPropertyHelper Helper { get; }
 
+        [Orleans.Id(3)]
         private readonly int _globalId;
 
         internal DependencyProperty(string name, Type ownerType, DependencyPropertyFlags flags)
@@ -219,12 +224,16 @@ namespace MineCase.Engine
         {
         }
 
-        private struct FromNameKey : IEquatable<FromNameKey>
+        [Orleans.GenerateSerializer]
+        public struct FromNameKey : IEquatable<FromNameKey>
         {
+            [Orleans.Id(0)]
             public string Name { get; }
 
+            [Orleans.Id(1)]
             public Type OwnerType { get; }
 
+            [Orleans.Id(2)]
             private readonly int _hashCode;
 
             public FromNameKey(string name, Type ownerType)
@@ -257,14 +266,18 @@ namespace MineCase.Engine
     /// 依赖属性.
     /// </summary>
     /// <typeparam name="T">属性类型.</typeparam>
+    [Orleans.GenerateSerializer]
     public sealed class DependencyProperty<T> : DependencyProperty
     {
+        [Orleans.Id(0)]
         private PropertyMetadata<T> _baseMetadata;
+        [Orleans.Id(1)]
         private readonly ConcurrentDictionary<Type, PropertyMetadata<T>> _metadatas = new ConcurrentDictionary<Type, PropertyMetadata<T>>();
 
         /// <inheritdoc/>
         public override Type PropertyType => typeof(T);
 
+        [Orleans.Id(2)]
         internal override IDependencyPropertyHelper Helper { get; } = new DependencyPropertyHelper<T>();
 
         internal DependencyProperty(string name, Type ownerType, DependencyPropertyFlags flags, PropertyMetadata<T> metadata)

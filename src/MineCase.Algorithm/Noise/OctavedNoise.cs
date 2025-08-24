@@ -3,11 +3,15 @@ using System.Numerics;
 
 namespace MineCase.Algorithm.Noise
 {
+    [Orleans.GenerateSerializer]
     public class OctavedNoise<TNoise>
         where TNoise : INoise
     {
+        [Orleans.Id(0)]
         private readonly TNoise _innerNoise;
+        [Orleans.Id(1)]
         private readonly int _octaves;
+        [Orleans.Id(2)]
         private readonly float _persistence;
 
         public OctavedNoise(TNoise innerNoise, int octaves, float persistence)

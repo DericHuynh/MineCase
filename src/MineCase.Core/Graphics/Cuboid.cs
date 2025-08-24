@@ -4,13 +4,16 @@ using System.Text;
 
 namespace MineCase.Graphics
 {
+    [Orleans.GenerateSerializer]
     [Serializable]
     public class Cuboid : Shape, IEquatable<Cuboid>
     {
         public override ShapeType Type => ShapeType.Cuboid;
 
+        [Orleans.Id(0)]
         public Point3d Point { get; set; }
 
+        [Orleans.Id(1)]
         public Size Size { get; set; }
 
         public Cuboid(Point3d point, Size size)

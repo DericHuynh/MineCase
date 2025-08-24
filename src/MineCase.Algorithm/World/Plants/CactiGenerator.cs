@@ -7,8 +7,10 @@ using Orleans;
 
 namespace MineCase.Algorithm.World.Plants
 {
+    [Orleans.GenerateSerializer]
     public class CactiGenerator : PlantsGenerator
     {
+        [Id(0)]
         private int _minCactiHeight;
 
         public CactiGenerator(int cactiHeight = 2)

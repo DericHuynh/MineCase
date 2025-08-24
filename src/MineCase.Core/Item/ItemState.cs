@@ -1052,10 +1052,13 @@ namespace MineCase.Item
         SplashPotion = 16384
     }
 
+    [Orleans.GenerateSerializer]
     public struct ItemState : IEquatable<ItemState>
     {
+        [Orleans.Id(0)]
         public uint Id { get; set; }
 
+        [Orleans.Id(1)]
         public uint MetaValue { get; set; }
 
         public override bool Equals(object obj)

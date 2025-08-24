@@ -37,7 +37,6 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
     <PackageReference Include="Microsoft.Extensions.ObjectPool" />
     <PackageReference Include="Microsoft.Orleans.Client" />
-    <PackageReference Include="Orleans.MultiClient" />
     <PackageReference Include="Orleans.Providers.MongoDB" />
     <PackageReference Include="Polly" />
     <PackageReference Include="sharpcompress" />

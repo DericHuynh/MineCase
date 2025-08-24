@@ -2,14 +2,16 @@
 
 namespace MineCase.Algorithm
 {
+    [Orleans.GenerateSerializer]
     public struct UniformRNG
     {
         // https://en.wikipedia.org/wiki/Linear_congruential_generator
         // MMIX by Donald Knuth
         private static readonly ulong _multiplier = 6364136223846793005;
         private static readonly ulong _increment = 1442695040888963407;
-
+        [Orleans.Id(0)]
         private ulong _state;
+        [Orleans.Id(1)]
         private uint _count;
 
         public UniformRNG(ulong state)
