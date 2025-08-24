@@ -71,7 +71,6 @@ namespace MineCase.Server.World
                 if (_players.Count == 0)
                 {
                     _fixedUpdate.Stop();
-                    DeactivateOnIdle();
                 }
             }
 
