@@ -78,7 +78,7 @@ namespace MineCase.Engine
                     await Tell(BeforeWriteState.Default);
                     var state = new DependencyObjectState
                     {
-                        GrainKeyString = GrainReference.GetPrimaryKeyString(),
+                        GrainKeyString = GrainReference.GetGrainId().ToString(),
                         ValueStorage = _valueStorage
                     };
 

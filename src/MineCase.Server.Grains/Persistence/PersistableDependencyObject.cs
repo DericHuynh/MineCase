@@ -33,7 +33,7 @@ namespace MineCase.Server.Persistence
             if (CanPersist())
             {
                 var coll = GetStateCollection();
-                var key = GrainReference.GetPrimaryKeyString();
+                var key = GrainReference.GetGrainId().ToString();
                 await coll.ReplaceOneAsync(o => o.GrainKeyString == key, state, new ReplaceOptions { IsUpsert = true });
             }
         }
@@ -43,7 +43,7 @@ namespace MineCase.Server.Persistence
             if (CanPersist())
             {
                 var coll = GetStateCollection();
-                var key = GrainReference.GetPrimaryKeyString();
+                var key = GrainReference.GetGrainId().ToString();
                 return await coll.Find(o => o.GrainKeyString == key).FirstOrDefaultAsync();
             }
 
@@ -55,7 +55,7 @@ namespace MineCase.Server.Persistence
             if (CanPersist())
             {
                 var coll = GetStateCollection();
-                var key = GrainReference.GetPrimaryKeyString();
+                var key = GrainReference.GetGrainId().ToString();
                 await coll.DeleteOneAsync(o => o.GrainKeyString == key);
             }
         }
