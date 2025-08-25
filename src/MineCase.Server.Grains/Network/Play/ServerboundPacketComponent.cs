@@ -439,9 +439,11 @@ namespace MineCase.Server.Network.Play
         }
     }
 
+    [Orleans.GenerateSerializer]
     [Immutable]
     public sealed class ServerboundPacketMessage : IEntityMessage
     {
+        [Id(0)]
         public UncompressedPacket Packet { get; set; }
     }
 }

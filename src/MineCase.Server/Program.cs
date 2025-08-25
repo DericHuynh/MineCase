@@ -95,6 +95,9 @@ namespace MineCase.Server
 
             hostBuilder.Services.Configure<PersistenceOptions>(hostBuilder.Configuration.GetSection("persistenceOptions"));
 
+            var siloPort = GetAvailablePort();
+            var gatewayPort = GetAvailablePort();
+
             hostBuilder.UseOrleans((siloBuilder) =>
             {
                 //siloBuilder.UseDashboard();
@@ -104,7 +107,7 @@ namespace MineCase.Server
                     options.ClusterId = "dev";
                     options.ServiceId = "MineCaseService";
                 });
-                siloBuilder.ConfigureEndpoints(siloPort: 11111, gatewayPort: 30000);
+                siloBuilder.ConfigureEndpoints(siloPort: siloPort, gatewayPort: gatewayPort);
                 siloBuilder.UseMongoDBClient(hostBuilder.Configuration.GetSection("persistenceOptions")["connectionString"]);
                 siloBuilder.AddMemoryStreams("JobsProvider");
                 siloBuilder.AddMemoryStreams("TransientProvider");

@@ -55,7 +55,6 @@ namespace MineCase.Server.Game
         private async Task OnNextAsync(SendChunkJob job, StreamSequenceToken token)
         {
             var chunkColumn = GrainFactory.GetGrain<IChunkColumn>(job.World.MakeAddressByPartitionKey(job.ChunkPosition));
-
             var generator = new ClientPlayPacketGenerator(new BroadcastPacketSink(job.Clients, _packetPackager));
             await generator.ChunkData(Dimension.Overworld, job.ChunkPosition.X, job.ChunkPosition.Z, await chunkColumn.GetState());
             foreach (var loader in job.Loaders)

@@ -15,7 +15,7 @@ var silos = builder.AddProject<Projects.MineCase_Server>("minecase-server")
                    //    annotation.Url = "/dashboard";
                    //})
                    .WithEnvironment("persistenceOptions:connectionString", minecaseDb)
-                   .WithReplicas(1);
+                   .WithReplicas(6);
 
 silos.WaitFor(mongodb);
 
