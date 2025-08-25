@@ -24,7 +24,7 @@ namespace MineCase.Serialization.Serializers
 
         protected override void SerializeValue(BsonSerializationContext context, BsonSerializationArgs args, TInterface value)
         {
-            var key = value.GetPrimaryKeyString();
+            var key = value.GetGrainId().ToString();
             context.Writer.WriteString(key);
         }
 
