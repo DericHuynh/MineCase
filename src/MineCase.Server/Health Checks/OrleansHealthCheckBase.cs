@@ -9,26 +9,21 @@ using Orleans;
 
 namespace MineCase.Server.Health_Checks
 {
-    public abstract class OrleansHealthCheckBase : IHealthCheck
+    public abstract class OrleansHealthCheckBase : IHealthCheck 
     {
         protected readonly IClusterClient _client;
 
-        protected OrleansHealthCheckBase(IClusterClient client)
+        protected OrleansHealthCheckBase(IClusterClient client) 
         {
-            _client = client;
-        }
-
-        Task<HealthCheckResult> IHealthCheck.CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken)
-        {
-            return CheckHealthAsync(context, cancellationToken);
+              _client = client;
         }
 
         /// <summary>
-        /// Perform the actual health check work within this implemented method.
+        /// Entry into health check, ensures the client is initialized, if it is not returns a healthy status.
         /// </summary>
         /// <param name="context">The health check context.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns><see cref="Task"/> of <see cref="HealthCheckResult"/>.</returns>
-        protected abstract Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken);
+        public abstract Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

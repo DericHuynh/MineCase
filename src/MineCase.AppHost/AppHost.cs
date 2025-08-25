@@ -14,8 +14,10 @@ var silos = builder.AddProject<Projects.MineCase_Server>("minecase-server")
                    //    annotation.DisplayText = "Orleans Dashboard";
                    //    annotation.Url = "/dashboard";
                    //})
+                   .WithHttpEndpoint()
+                   .WithHttpHealthCheck("/health")
                    .WithEnvironment("persistenceOptions:connectionString", minecaseDb)
-                   .WithReplicas(6);
+                   .WithReplicas(2);
 
 silos.WaitFor(mongodb);
 

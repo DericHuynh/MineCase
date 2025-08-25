@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 using MineCase.Buffers;
+using MineCase.Gateway.Health_Checks;
 using MineCase.Gateway.Network;
 using MineCase.Protocol;
 using MineCase.Server;
@@ -28,95 +30,48 @@ namespace MineCase.Gateway
 {
     partial class Program
     {
-        private static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
-        {
-            services.AddLogging();
-            services.AddSingleton<ConnectionRouter>();
-            services.AddSingleton<IPacketCompress, PacketCompress>();
-            services.AddTransient<ClientSession>();
-            services.AddHostedService<ConnectionRouter>();
-            services.AddOrleansClient(c =>
-            {
-                c.Configure<ClusterOptions>(configure =>
-                {
-                    configure.ClusterId = "dev";
-                    configure.ServiceId = "MineCaseService";
-                });
-                c.AddActivityPropagation();
-                c.UseMongoDBClient(context.Configuration.GetSection("persistenceOptions")["connectionString"]);
-                c.UseMongoDBClustering(options =>
-                {
-                    options.DatabaseName = context.Configuration.GetSection("persistenceOptions")["databaseName"];
-                });
-
-            });
-
-            ConfigureObjectPools(services);
-        }
-
-        private static void ConfigureObjectPools(IServiceCollection services)
-        {
-            services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
-            services.AddSingleton<ObjectPool<UncompressedPacket>>(s =>
-            {
-                var provider = s.GetRequiredService<ObjectPoolProvider>();
-                return provider.Create<UncompressedPacket>();
-            });
-            services.AddSingleton<IBufferPool<byte>>(s => new BufferPool<byte>(ArrayPool<byte>.Shared));
-        }
-
-        private static void ConfigureAppConfiguration(HostBuilderContext context, IConfigurationBuilder builder)
-        {
-            builder.SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("config.json", false, false)
-                .AddEnvironmentVariables();
-        }
-
-        private static void ConfigureLogging(ILoggingBuilder loggingBuilder)
-        {
-            //loggingBuilder.ConfigureOpenTelemetryLogging();
-        }
-
         static async Task Main(string[] args)
         {
-            var webHostBuilder = WebApplication.CreateBuilder();
+            var appBuilder = WebApplication.CreateBuilder();
 
-            webHostBuilder.AddServiceDefaults();
+            appBuilder.AddServiceDefaults();
 
-            webHostBuilder.Configuration.SetBasePath(Directory.GetCurrentDirectory())
+            appBuilder.Configuration.SetBasePath(Directory.GetCurrentDirectory())
                                         .AddJsonFile("config.json", false, false)
                                         .AddEnvironmentVariables();
 
-            webHostBuilder.Services.AddSingleton<ConnectionRouter>();
-            webHostBuilder.Services.AddSingleton<IPacketCompress, PacketCompress>();
-            webHostBuilder.Services.AddTransient<ClientSession>();
-            webHostBuilder.Services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
-            webHostBuilder.Services.AddSingleton<ObjectPool<UncompressedPacket>>(s =>
+            appBuilder.Services.AddControllers();
+            appBuilder.Services.AddHealthChecks()
+                               .AddCheck<SettingsHealthCheck>("settingsHealthCheck");
+
+            appBuilder.Services.AddSingleton<ConnectionRouter>();
+            appBuilder.Services.AddSingleton<IPacketCompress, PacketCompress>();
+            appBuilder.Services.AddTransient<ClientSession>();
+            appBuilder.Services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
+            appBuilder.Services.AddSingleton<ObjectPool<UncompressedPacket>>(s =>
             {
                 var provider = s.GetRequiredService<ObjectPoolProvider>();
                 return provider.Create<UncompressedPacket>();
             });
-            webHostBuilder.Services.AddSingleton<IBufferPool<byte>>(s => new BufferPool<byte>(ArrayPool<byte>.Shared));
+            appBuilder.Services.AddSingleton<IBufferPool<byte>>(s => new BufferPool<byte>(ArrayPool<byte>.Shared));
 
-            webHostBuilder.Services.AddControllers();
-
-            webHostBuilder.Services.AddOrleansClient(c =>
+            appBuilder.Services.AddOrleansClient(c =>
             {
                 c.Configure<ClusterOptions>(configure =>
                 {
                     configure.ClusterId = "dev";
                     configure.ServiceId = "MineCaseService";
                 });
-                c.UseMongoDBClient(webHostBuilder.Configuration.GetSection("persistenceOptions")["connectionString"]);
+                c.UseMongoDBClient(appBuilder.Configuration.GetSection("persistenceOptions")["connectionString"]);
                 c.UseMongoDBClustering(options =>
                 {
-                    options.DatabaseName = webHostBuilder.Configuration.GetSection("persistenceOptions")["databaseName"];
+                    options.DatabaseName = appBuilder.Configuration.GetSection("persistenceOptions")["databaseName"];
                 });
 
             });
-            webHostBuilder.Services.AddHostedService<ConnectionRouter>();
+            appBuilder.Services.AddHostedService<ConnectionRouter>();
 
-            var host = webHostBuilder.Build();
+            var host = appBuilder.Build();
 
             if (host.Environment.IsDevelopment())
             {
@@ -125,8 +80,8 @@ namespace MineCase.Gateway
 
             host.UseRouting();
 
-            host.MapHealthChecks("/health");
-            host.MapHealthChecks("/alive");
+            host.MapHealthChecks("/health", new() { ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse });
+            host.MapHealthChecks("/alive", new() { ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse });
 
             await host.RunAsync();
         }

@@ -89,7 +89,7 @@ public static class HealthChecksUIDefaults
     /// <summary>
     /// The default request path projects serve health check details from.
     /// </summary>
-    public const string ProbePath = "/healthz";
+    public const string ProbePath = "/health";
 
     /// <summary>
     /// The default name of the HTTP endpoint projects serve health check details from.

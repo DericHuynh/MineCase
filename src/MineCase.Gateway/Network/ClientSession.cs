@@ -69,11 +69,13 @@ namespace MineCase.Gateway.Network
                 catch (EndOfStreamException)
                 {
                     var router = _grainFactory.GetGrain<IPacketRouter>(_sessionId);
-                    // Need to explicitly UnSubscribe https://learn.microsoft.com/en-us/dotnet/orleans/streaming/streams-programming-apis?pivots=orleans-7-0
-                    await _grainFactory.GetGrain<IClientboundPacketSink>(_sessionId).UnSubscribe(_clientboundPacketObserverRef);
                     await router.Close();
 
                     await _outcomingPacketDispatcher.Completion;
+                }
+                catch (IOException ex)
+                {
+
                 }
             }
         }

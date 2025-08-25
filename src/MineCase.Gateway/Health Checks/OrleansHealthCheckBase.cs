@@ -24,17 +24,6 @@ namespace MineCase.Gateway.Health_Checks
         /// <param name="context">The health check context.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns><see cref="Task"/> of <see cref="HealthCheckResult"/>.</returns>
-        public virtual async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return await CheckHealthGrainAsync(context, cancellationToken);
-        }
-
-        /// <summary>
-        /// Perform the actual health check work within this implemented method.
-        /// </summary>
-        /// <param name="context">The health check context.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns><see cref="Task"/> of <see cref="HealthCheckResult"/>.</returns>
-        protected abstract Task<HealthCheckResult> CheckHealthGrainAsync(HealthCheckContext context, CancellationToken cancellationToken);
+        public abstract Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

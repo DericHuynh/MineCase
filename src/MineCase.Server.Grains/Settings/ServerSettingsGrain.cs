@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MineCase.Server.Health_Checks;
 using Newtonsoft.Json;
 using Orleans;
 using Orleans.Concurrency;
@@ -46,6 +48,19 @@ namespace MineCase.Server.Settings
         {
             _serverSettings = settings;
             return Task.CompletedTask;
+        }
+
+        public Task<GrainHealthStatus> CheckHealthAsync(CancellationToken cancellationToken)
+        {
+            if (_serverSettings is null)
+                return Task.FromResult(GrainHealthStatus.Unhealthy("Server setting not initialized."));
+
+            bool parsed = IPAddress.TryParse(_serverSettings.ServerIp, out IPAddress address);
+
+            if (!parsed)
+                return Task.FromResult(GrainHealthStatus.Unhealthy("IPAddress could not be parsed."));
+
+            return Task.FromResult(GrainHealthStatus.Healthy($"Healthy, server bound to {address}:{_serverSettings.ServerPort}."));
         }
     }
 }

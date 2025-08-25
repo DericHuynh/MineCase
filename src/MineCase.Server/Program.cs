@@ -31,40 +31,6 @@ namespace MineCase.Server
 {
     partial class Program
     {
-        public static int GetAvailablePort()
-        {
-            using var listener = new TcpListener(IPAddress.Loopback, 0);
-            listener.Start();
-            var port = ((IPEndPoint)listener.LocalEndpoint).Port;
-            return port;
-        }
-
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddControllers();
-            services.AddHealthChecks()
-                .AddCheck<BasicOrleansHealthCheck>("basicOrleans");
-        }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseRouting();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapHealthChecks("/healthz", new() { ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse });
-                endpoints.MapHealthChecks("/health");
-                endpoints.MapHealthChecks("/alive");
-            });
-            app.Map("/dashboard", x => x.UseOrleansDashboard());
-        }
-
         static async Task Main(string[] args)
         {
             var createShardKey = false;
@@ -86,12 +52,11 @@ namespace MineCase.Server
             hostBuilder.Host.ConfigureContainer<ContainerBuilder>(ConfigureAutofac);
 
             hostBuilder.Services.AddOptions();
-            hostBuilder.Services.AddLogging();
             hostBuilder.Services.AddSingleton<RecyclableMemoryStreamManager>();
 
             hostBuilder.Services.AddControllers();
-            hostBuilder.Services.AddHealthChecks();
-                                //.AddCheck<BasicOrleansHealthCheck>("basicOrleans");
+            hostBuilder.Services.AddHealthChecks()
+                                .AddCheck<SettingsHealthCheck>("settingsHealthCheck");
 
             hostBuilder.Services.Configure<PersistenceOptions>(hostBuilder.Configuration.GetSection("persistenceOptions"));
 
@@ -149,6 +114,14 @@ namespace MineCase.Server
             //host.Map("/dashboard", x => x.UseOrleansDashboard());
 
             await host.RunAsync();
+        }
+
+        public static int GetAvailablePort()
+        {
+            using var listener = new TcpListener(IPAddress.Loopback, 0);
+            listener.Start();
+            var port = ((IPEndPoint)listener.LocalEndpoint).Port;
+            return port;
         }
 
         private static void ConfigureAutofac(ContainerBuilder builder)

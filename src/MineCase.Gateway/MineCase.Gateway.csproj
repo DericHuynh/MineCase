@@ -11,18 +11,10 @@
 
   <ItemGroup>
     <None Remove="config.json" />
-    <None Remove="OrleansConfiguration.dev.xml" />
-    <None Remove="OrleansConfiguration.docker.xml" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="config.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="OrleansConfiguration.dev.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="OrleansConfiguration.docker.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
