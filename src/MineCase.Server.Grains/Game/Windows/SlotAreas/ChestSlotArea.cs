@@ -15,9 +15,9 @@ namespace MineCase.Server.Game.Windows.SlotAreas
     {
         public const int ChestSlotsCount = 9 * 3;
         [Id(0)]
-        private readonly IDependencyObject _chestEntity;
+        private readonly Engine.IEntity _chestEntity;
 
-        public ChestSlotArea(IDependencyObject chestEntity, WindowGrain window, IGrainFactory grainFactory)
+        public ChestSlotArea(Engine.IEntity chestEntity, WindowGrain window, IGrainFactory grainFactory)
             : base(ChestSlotsCount, window, grainFactory)
         {
             _chestEntity = chestEntity;

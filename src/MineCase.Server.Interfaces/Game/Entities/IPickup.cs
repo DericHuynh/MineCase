@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MineCase.Server.Game.Entities
 {
-    public interface IPickup : IEntity
+    public interface IPickup : IMineCaseEntity
     {
     }
 }

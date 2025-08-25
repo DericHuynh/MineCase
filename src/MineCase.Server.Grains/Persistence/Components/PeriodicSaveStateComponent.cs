@@ -23,14 +23,14 @@ namespace MineCase.Server.Persistence.Components
 
         protected override void OnAttached()
         {
-            AttachedObject.RegisterGrainTimer(SaveIfDirty, _periodTime, _periodTime);
+            AttachedEntity.RegisterGrainTimer(SaveIfDirty, _periodTime, _periodTime);
         }
 
         private Task SaveIfDirty()
         {
-            if (AttachedObject.ValueStorage.IsDirty)
+            if (AttachedEntity.ValueStorage.IsDirty)
             {
-                return AttachedObject.WriteStateAsync();
+                return AttachedEntity.WriteStateAsync();
             }
 
             return Task.CompletedTask;

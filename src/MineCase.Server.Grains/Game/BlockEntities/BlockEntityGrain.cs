@@ -16,7 +16,7 @@ namespace MineCase.Server.Game.BlockEntities
 {
     [PersistTableName("blockEntity")]
     [Reentrant]
-    internal abstract class BlockEntityGrain : PersistableDependencyObject, IBlockEntity
+    internal abstract class BlockEntityGrain : PersistableEntity, IBlockEntity
     {
         public IWorld World => GetValue(WorldComponent.WorldProperty);
 

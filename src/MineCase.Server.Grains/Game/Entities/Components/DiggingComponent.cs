@@ -29,9 +29,9 @@ namespace MineCase.Server.Game.Entities.Components
 
         public async Task StartDigging(BlockWorldPos location, PlayerDiggingFace face)
         {
-            var playerPos = AttachedObject.GetEntityWorldPosition();
-            var gameMode = AttachedObject.GetValue(GameModeComponent.GameModeProperty);
-            var world = AttachedObject.GetWorld();
+            var playerPos = AttachedEntity.GetEntityWorldPosition();
+            var gameMode = AttachedEntity.GetValue(GameModeComponent.GameModeProperty);
+            var world = AttachedEntity.GetWorld();
 
             // A Notchian server only accepts digging packets with coordinates within a 6-unit radius between the center of the block and 1.5 units from the player's feet (not their eyes).
             var distance = (new Vector3(location.X + 0.5f, location.Y + 0.5f, location.Z + 0.5f)
@@ -57,15 +57,15 @@ namespace MineCase.Server.Game.Entities.Components
 
         public async Task FinishDigging(BlockWorldPos location, PlayerDiggingFace face)
         {
-            var gameMode = AttachedObject.GetValue(GameModeComponent.GameModeProperty);
+            var gameMode = AttachedEntity.GetValue(GameModeComponent.GameModeProperty);
             if (_diggingBlock != null)
             {
-                var heldItem = await AttachedObject.Ask(new AskHeldItem());
+                var heldItem = await AttachedEntity.Ask(new AskHeldItem());
                 var itemHandler = ItemHandler.Create(new ItemState { Id = (uint)heldItem.Slot.BlockId, MetaValue = 0 });
 
-                var world = AttachedObject.GetWorld();
+                var world = AttachedEntity.GetWorld();
                 var usedTick = (await world.GetAge()) - _diggingStartTick;
-                if (await itemHandler.FinishedDigging(AttachedObject, GrainFactory, world, _diggingBlock.Value.Item1, _diggingBlock.Value.Item2, usedTick, gameMode))
+                if (await itemHandler.FinishedDigging(AttachedEntity, GrainFactory, world, _diggingBlock.Value.Item1, _diggingBlock.Value.Item2, usedTick, gameMode))
                     return;
             }
         }

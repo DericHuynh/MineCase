@@ -12,10 +12,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IO;
 using MineCase.Serialization.Serializers;
 using MineCase.Server.Health_Checks;
+using MineCase.Server.Sampling;
 using MineCase.Server.Settings;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
+using OpenTelemetry.Trace;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
@@ -48,6 +50,8 @@ namespace MineCase.Server
             BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
 
             hostBuilder.AddServiceDefaults();
+            hostBuilder.Services.AddOpenTelemetry()
+                                .WithTracing(x => x.AddProcessor(new TailSamplingProcessor()));
 
             hostBuilder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
             hostBuilder.Host.ConfigureContainer<ContainerBuilder>(ConfigureAutofac);
@@ -74,7 +78,7 @@ namespace MineCase.Server
                     options.ServiceId = "MineCaseService";
                 });
 #pragma warning disable ORLEANSEXP001
-                siloBuilder.AddActivationRepartitioner();
+                //siloBuilder.AddActivationRepartitioner(); // Doesnt work, but it should, so there's something wrong with the current grain persistence and state mechanisms.
 #pragma warning restore ORLEANSEXP001
                 siloBuilder.ConfigureEndpoints(siloPort: siloPort, gatewayPort: gatewayPort);
                 siloBuilder.UseMongoDBClient(hostBuilder.Configuration.GetSection("persistenceOptions")["connectionString"]);

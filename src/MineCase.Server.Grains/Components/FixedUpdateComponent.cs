@@ -41,7 +41,7 @@ namespace MineCase.Server.Components
             _actualAge = 0;
             _stopwatch = new Stopwatch();
             _stopwatch.Start();
-            _tickTimer = AttachedObject.RegisterGrainTimer(OnTick, TimeSpan.Zero, TimeSpan.FromMilliseconds(1));
+            _tickTimer = AttachedEntity.RegisterGrainTimer(OnTick, TimeSpan.Zero, TimeSpan.FromMilliseconds(1));
         }
 
         private async Task OnTick()

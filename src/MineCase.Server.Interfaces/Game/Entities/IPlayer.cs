@@ -12,7 +12,7 @@ using Orleans.Concurrency;
 
 namespace MineCase.Server.Game.Entities
 {
-    public interface IPlayer : IEntity
+    public interface IPlayer : IMineCaseEntity
     {
         Task<uint> GetViewDistance();
     }

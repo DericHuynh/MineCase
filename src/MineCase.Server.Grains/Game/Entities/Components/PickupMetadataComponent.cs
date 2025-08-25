@@ -15,7 +15,7 @@ namespace MineCase.Server.Game.Entities.Components
         public static readonly DependencyProperty<Pickup> PickupMetadataProperty =
             DependencyProperty.Register<Pickup>("PickupMetadata", typeof(PickupMetadataComponent));
 
-        public Pickup PickupMetadata => AttachedObject.GetValue(PickupMetadataProperty);
+        public Pickup PickupMetadata => AttachedEntity.GetValue(PickupMetadataProperty);
 
         public PickupMetadataComponent(string name = "pickupMetadata")
             : base(name)
@@ -24,7 +24,7 @@ namespace MineCase.Server.Game.Entities.Components
 
         protected override void OnAttached()
         {
-            AttachedObject.SetLocalValue(PickupMetadataProperty, new Pickup());
+            AttachedEntity.SetLocalValue(PickupMetadataProperty, new Pickup());
         }
 
         async Task IHandle<SetSlot>.Handle(SetSlot message)
@@ -36,13 +36,13 @@ namespace MineCase.Server.Game.Entities.Components
         {
             var result = await message.Entity.Ask(new AskCollectionResult
             {
-                Source = AttachedObject,
+                Source = AttachedEntity,
                 Slot = PickupMetadata.Item
             });
             result.MakeEmptyIfZero();
             if (result.IsEmpty)
             {
-                await AttachedObject.Tell(DestroyEntity.Default);
+                await AttachedEntity.Tell(DestroyEntity.Default);
             }
             else if (PickupMetadata.Item.ItemCount != result.ItemCount)
             {
@@ -53,8 +53,8 @@ namespace MineCase.Server.Game.Entities.Components
         private async Task UpdateItem(Slot slot)
         {
             PickupMetadata.Item = slot;
-            await AttachedObject.GetComponent<ChunkEventBroadcastComponent>().GetGenerator()
-                .EntityMetadata(AttachedObject.EntityId, PickupMetadata);
+            await AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator()
+                .EntityMetadata(AttachedEntity.EntityId, PickupMetadata);
         }
 
         async Task<Slot> IHandle<AskCollectionResult, Slot>.Handle(AskCollectionResult message)

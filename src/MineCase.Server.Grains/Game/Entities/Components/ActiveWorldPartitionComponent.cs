@@ -17,24 +17,24 @@ namespace MineCase.Server.Game.Entities.Components
 
         protected override void OnAttached()
         {
-            AttachedObject.GetComponent<AddressByPartitionKeyComponent>()
+            AttachedEntity.GetComponent<AddressByPartitionKeyComponent>()
                 .KeyChanged += ActiveWorldPartitionComponent_KeyChanged;
         }
 
         protected override void OnDetached()
         {
-            AttachedObject.GetComponent<AddressByPartitionKeyComponent>()
+            AttachedEntity.GetComponent<AddressByPartitionKeyComponent>()
                 .KeyChanged -= ActiveWorldPartitionComponent_KeyChanged;
         }
 
         private void ActiveWorldPartitionComponent_KeyChanged(object sender, (string OldKey, string NewKey) e)
         {
-            AttachedObject.QueueOperation(async () =>
+            AttachedEntity.QueueOperation(async () =>
             {
                 if (!string.IsNullOrEmpty(e.OldKey))
-                    await GrainFactory.GetGrain<IWorldPartition>(e.OldKey).Leave(AttachedObject);
+                    await GrainFactory.GetGrain<IWorldPartition>(e.OldKey).Leave(AttachedEntity);
                 if (!string.IsNullOrEmpty(e.NewKey))
-                    await GrainFactory.GetGrain<IWorldPartition>(e.NewKey).Enter(AttachedObject);
+                    await GrainFactory.GetGrain<IWorldPartition>(e.NewKey).Enter(AttachedEntity);
             });
         }
     }

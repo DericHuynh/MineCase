@@ -16,7 +16,7 @@ namespace MineCase.Server.World
 {
     [PersistTableName("world")]
     [Reentrant]
-    internal class WorldGrain : PersistableDependencyObject, IWorld
+    internal class WorldGrain : PersistableEntity, IWorld
     {
         private GeneratorSettings _genSettings; // Generation settings
         private string _seed; // World Seed

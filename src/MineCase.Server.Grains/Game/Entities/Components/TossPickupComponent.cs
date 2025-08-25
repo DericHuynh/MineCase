@@ -18,9 +18,9 @@ namespace MineCase.Server.Game.Entities.Components
 
         async Task IHandle<TossPickup>.Handle(TossPickup message)
         {
-            var position = AttachedObject.Position;
-            var world = AttachedObject.World;
-            var yaw = AttachedObject.Yaw;
+            var position = AttachedEntity.Position;
+            var world = AttachedEntity.World;
+            var yaw = AttachedEntity.Yaw;
 
             var x = -Math.Cos(0) * Math.Sin(yaw);
             var y = -Math.Sin(0);

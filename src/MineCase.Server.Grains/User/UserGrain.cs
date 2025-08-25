@@ -26,7 +26,7 @@ namespace MineCase.Server.User
 {
     [PersistTableName("user")]
     [Reentrant]
-    internal class UserGrain : PersistableDependencyObject, IUser
+    internal class UserGrain : PersistableEntity, IUser
     {
         private uint _protocolVersion;
         private IClientboundPacketSink _sink;

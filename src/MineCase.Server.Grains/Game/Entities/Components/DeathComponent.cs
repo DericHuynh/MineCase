@@ -17,7 +17,7 @@ namespace MineCase.Server.Game.Entities.Components
         public static readonly DependencyProperty<bool> IsDeathProperty =
             DependencyProperty.Register<bool>("IsDeath", typeof(DeathComponent), new PropertyMetadata<bool>(false, OnDeath));
 
-        public bool IsDeath => AttachedObject.GetValue(IsDeathProperty);
+        public bool IsDeath => AttachedEntity.GetValue(IsDeathProperty);
 
         public DeathComponent(string name = "death")
             : base(name)
@@ -34,16 +34,16 @@ namespace MineCase.Server.Game.Entities.Components
 
         private async Task Respawn()
         {
-            var generator = AttachedObject.GetComponent<ClientboundPacketComponent>().GetGenerator();
+            var generator = AttachedEntity.GetComponent<ClientboundPacketComponent>().GetGenerator();
 
-            var teleportComponent = AttachedObject.GetComponent<TeleportComponent>();
-            var world = AttachedObject.GetWorld();
+            var teleportComponent = AttachedEntity.GetComponent<TeleportComponent>();
+            var world = AttachedEntity.GetWorld();
             var spawnPos = await world.GetSpawnPosition();
             await teleportComponent.Teleport(spawnPos, 0, 0);
             await generator.Respawn(Dimension.Overworld, await world.GetSeed(), new GameMode { ModeClass = GameMode.Class.Survival, IsHardcore = false }, LevelTypes.Default);
-            AttachedObject.SetLocalValue(HealthComponent.HealthProperty, AttachedObject.GetValue(HealthComponent.MaxHealthProperty));
-            AttachedObject.SetLocalValue(FoodComponent.FoodProperty, AttachedObject.GetValue(FoodComponent.MaxFoodProperty));
-            AttachedObject.SetLocalValue(DeathComponent.IsDeathProperty, false);
+            AttachedEntity.SetLocalValue(HealthComponent.HealthProperty, AttachedEntity.GetValue(HealthComponent.MaxHealthProperty));
+            AttachedEntity.SetLocalValue(FoodComponent.FoodProperty, AttachedEntity.GetValue(FoodComponent.MaxFoodProperty));
+            AttachedEntity.SetLocalValue(DeathComponent.IsDeathProperty, false);
         }
 
         private void OnDeath(PropertyChangedEventArgs<bool> e)
@@ -53,7 +53,7 @@ namespace MineCase.Server.Game.Entities.Components
 
         private static void OnDeath(object sender, PropertyChangedEventArgs<bool> e)
         {
-            var component = ((DependencyObject)sender).GetComponent<DeathComponent>();
+            var component = ((Entity)sender).GetComponent<DeathComponent>();
             component.OnDeath(e);
         }
     }

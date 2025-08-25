@@ -15,7 +15,7 @@ namespace MineCase.Server.Game.Entities.Components
         public static readonly DependencyProperty<Shape> ColliderShapeProperty =
             DependencyProperty.Register<Shape>("ColliderShape", typeof(ColliderComponent), new PropertyMetadata<Shape>(null, OnColliderShapeChanged));
 
-        public Shape ColliderShape => AttachedObject.GetValue(ColliderShapeProperty);
+        public Shape ColliderShape => AttachedEntity.GetValue(ColliderShapeProperty);
 
         public ColliderComponent(string name = "collider")
             : base(name)
@@ -24,26 +24,26 @@ namespace MineCase.Server.Game.Entities.Components
 
         protected override void OnAttached()
         {
-            AttachedObject.GetComponent<AddressByPartitionKeyComponent>()
+            AttachedEntity.GetComponent<AddressByPartitionKeyComponent>()
                 .KeyChanged += AddressByPartitionKeyChanged;
-            AttachedObject.RegisterPropertyChangedHandler(IsEnabledComponent.IsEnabledProperty, OnIsEnabledChanged);
-            AttachedObject.QueueOperation(TrySubscribe);
+            AttachedEntity.RegisterPropertyChangedHandler(IsEnabledComponent.IsEnabledProperty, OnIsEnabledChanged);
+            AttachedEntity.QueueOperation(TrySubscribe);
         }
 
         protected override void OnDetached()
         {
-            AttachedObject.GetComponent<AddressByPartitionKeyComponent>()
+            AttachedEntity.GetComponent<AddressByPartitionKeyComponent>()
                 .KeyChanged -= AddressByPartitionKeyChanged;
-            AttachedObject.QueueOperation(TryUnsubscribe);
+            AttachedEntity.QueueOperation(TryUnsubscribe);
         }
 
         private void AddressByPartitionKeyChanged(object sender, (string OldKey, string NewKey) e)
         {
-            AttachedObject.QueueOperation(async () =>
+            AttachedEntity.QueueOperation(async () =>
             {
                 var shape = ColliderShape;
                 if (!string.IsNullOrEmpty(e.OldKey))
-                    await GrainFactory.GetGrain<ICollectableFinder>(e.OldKey).UnregisterCollider(AttachedObject);
+                    await GrainFactory.GetGrain<ICollectableFinder>(e.OldKey).UnregisterCollider(AttachedEntity);
                 await TrySubscribe();
             });
         }
@@ -51,46 +51,46 @@ namespace MineCase.Server.Game.Entities.Components
         private void OnIsEnabledChanged(object sender, PropertyChangedEventArgs<bool> e)
         {
             if (e.NewValue)
-                AttachedObject.QueueOperation(TrySubscribe);
+                AttachedEntity.QueueOperation(TrySubscribe);
             else
-                AttachedObject.QueueOperation(TryUnsubscribe);
+                AttachedEntity.QueueOperation(TryUnsubscribe);
         }
 
         private void OnColliderShapeChanged(PropertyChangedEventArgs<Shape> e)
         {
             var shape = ColliderShape;
-            var key = AttachedObject.GetValue(AddressByPartitionKeyComponent.AddressByPartitionKeyProperty);
+            var key = AttachedEntity.GetValue(AddressByPartitionKeyComponent.AddressByPartitionKeyProperty);
             if (shape != null)
-                AttachedObject.QueueOperation(() => GrainFactory.GetGrain<ICollectableFinder>(key).RegisterCollider(AttachedObject, shape));
+                AttachedEntity.QueueOperation(() => GrainFactory.GetGrain<ICollectableFinder>(key).RegisterCollider(AttachedEntity, shape));
             else
-                AttachedObject.QueueOperation(TrySubscribe);
+                AttachedEntity.QueueOperation(TrySubscribe);
         }
 
         private static void OnColliderShapeChanged(object sender, PropertyChangedEventArgs<Shape> e)
         {
-            var component = ((DependencyObject)sender).GetComponent<ColliderComponent>();
+            var component = ((Entity)sender).GetComponent<ColliderComponent>();
             component.OnColliderShapeChanged(e);
         }
 
         public void SetColliderShape(Shape value) =>
-            AttachedObject.SetLocalValue(ColliderShapeProperty, value);
+            AttachedEntity.SetLocalValue(ColliderShapeProperty, value);
 
         private async Task TrySubscribe()
         {
-            if (AttachedObject.GetValue(IsEnabledComponent.IsEnabledProperty))
+            if (AttachedEntity.GetValue(IsEnabledComponent.IsEnabledProperty))
             {
-                var key = AttachedObject.GetAddressByPartitionKey();
+                var key = AttachedEntity.GetAddressByPartitionKey();
                 var shape = ColliderShape;
                 if (!string.IsNullOrEmpty(key) && shape != null)
-                    await GrainFactory.GetGrain<ICollectableFinder>(key).RegisterCollider(AttachedObject, ColliderShape);
+                    await GrainFactory.GetGrain<ICollectableFinder>(key).RegisterCollider(AttachedEntity, ColliderShape);
             }
         }
 
         private async Task TryUnsubscribe()
         {
-            var key = AttachedObject.GetAddressByPartitionKey();
+            var key = AttachedEntity.GetAddressByPartitionKey();
             if (!string.IsNullOrEmpty(key))
-                await GrainFactory.GetGrain<ICollectableFinder>(key).UnregisterCollider(AttachedObject);
+                await GrainFactory.GetGrain<ICollectableFinder>(key).UnregisterCollider(AttachedEntity);
         }
     }
 }

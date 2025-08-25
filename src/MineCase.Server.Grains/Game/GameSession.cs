@@ -23,7 +23,7 @@ using Orleans.Concurrency;
 namespace MineCase.Server.Game
 {
     [Reentrant]
-    internal class GameSession : DependencyObject, IGameSession
+    internal class GameSession : Engine.Entity, IGameSession
     {
         private IWorld _world;
         private FixedUpdateComponent _fixedUpdate;

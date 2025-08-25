@@ -17,25 +17,25 @@ namespace MineCase.Server.Game.Entities.Components
 
         protected override void OnAttached()
         {
-            AttachedObject.GetComponent<AddressByPartitionKeyComponent>()
+            AttachedEntity.GetComponent<AddressByPartitionKeyComponent>()
                 .KeyChanged += AddressByPartitionKeyChanged;
-            AttachedObject.RegisterPropertyChangedHandler(IsEnabledComponent.IsEnabledProperty, OnIsEnabledChanged);
-            AttachedObject.QueueOperation(TrySubscribe);
+            AttachedEntity.RegisterPropertyChangedHandler(IsEnabledComponent.IsEnabledProperty, OnIsEnabledChanged);
+            AttachedEntity.QueueOperation(TrySubscribe);
         }
 
         protected override void OnDetached()
         {
-            AttachedObject.GetComponent<AddressByPartitionKeyComponent>()
+            AttachedEntity.GetComponent<AddressByPartitionKeyComponent>()
                 .KeyChanged -= AddressByPartitionKeyChanged;
-            AttachedObject.QueueOperation(TryUnsubscribe);
+            AttachedEntity.QueueOperation(TryUnsubscribe);
         }
 
         private void AddressByPartitionKeyChanged(object sender, (string OldKey, string NewKey) e)
         {
-            AttachedObject.QueueOperation(async () =>
+            AttachedEntity.QueueOperation(async () =>
             {
                 if (!string.IsNullOrEmpty(e.OldKey))
-                    await GrainFactory.GetGrain<IWorldPartition>(e.OldKey).UnsubscribeDiscovery(AttachedObject);
+                    await GrainFactory.GetGrain<IWorldPartition>(e.OldKey).UnsubscribeDiscovery(AttachedEntity);
                 await TrySubscribe();
             });
         }
@@ -43,26 +43,26 @@ namespace MineCase.Server.Game.Entities.Components
         private void OnIsEnabledChanged(object sender, PropertyChangedEventArgs<bool> e)
         {
             if (e.NewValue)
-                AttachedObject.QueueOperation(TrySubscribe);
+                AttachedEntity.QueueOperation(TrySubscribe);
             else
-                AttachedObject.QueueOperation(TryUnsubscribe);
+                AttachedEntity.QueueOperation(TryUnsubscribe);
         }
 
         private async Task TrySubscribe()
         {
-            if (AttachedObject.GetValue(IsEnabledComponent.IsEnabledProperty))
+            if (AttachedEntity.GetValue(IsEnabledComponent.IsEnabledProperty))
             {
-                var key = AttachedObject.GetAddressByPartitionKey();
+                var key = AttachedEntity.GetAddressByPartitionKey();
                 if (!string.IsNullOrEmpty(key))
-                    await GrainFactory.GetGrain<IWorldPartition>(key).SubscribeDiscovery(AttachedObject);
+                    await GrainFactory.GetGrain<IWorldPartition>(key).SubscribeDiscovery(AttachedEntity);
             }
         }
 
         private async Task TryUnsubscribe()
         {
-            var key = AttachedObject.GetAddressByPartitionKey();
+            var key = AttachedEntity.GetAddressByPartitionKey();
             if (!string.IsNullOrEmpty(key))
-                await GrainFactory.GetGrain<IWorldPartition>(key).UnsubscribeDiscovery(AttachedObject);
+                await GrainFactory.GetGrain<IWorldPartition>(key).UnsubscribeDiscovery(AttachedEntity);
         }
     }
 }

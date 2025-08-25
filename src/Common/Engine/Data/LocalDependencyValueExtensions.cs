@@ -19,7 +19,7 @@ namespace MineCase.Engine
         /// <param name="property">依赖属性</param>
         /// <param name="value">值</param>
         /// <returns>是否获取成功</returns>
-        public static bool TryGetLocalValue<T>(this DependencyObject d, DependencyProperty<T> property, out T value)
+        public static bool TryGetLocalValue<T>(this Entity d, DependencyProperty<T> property, out T value)
         {
             return LocalDependencyValueProvider.Current.TryGetValue(property, d.ValueStorage, out value);
         }
@@ -31,7 +31,7 @@ namespace MineCase.Engine
         /// <param name="d">依赖对象</param>
         /// <param name="property">依赖属性</param>
         /// <param name="value">值</param>
-        public static void SetLocalValue<T>(this DependencyObject d, DependencyProperty<T> property, T value)
+        public static void SetLocalValue<T>(this Entity d, DependencyProperty<T> property, T value)
         {
             LocalDependencyValueProvider.Current.SetValue(property, d.ValueStorage, value);
         }
@@ -42,7 +42,7 @@ namespace MineCase.Engine
         /// <typeparam name="T">值类型</typeparam>
         /// <param name="d">依赖对象</param>
         /// <param name="property">依赖属性</param>
-        public static void ClearLocalValue<T>(this DependencyObject d, DependencyProperty<T> property)
+        public static void ClearLocalValue<T>(this Entity d, DependencyProperty<T> property)
         {
             LocalDependencyValueProvider.Current.ClearValue(property, d.ValueStorage);
         }

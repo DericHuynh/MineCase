@@ -19,15 +19,15 @@ namespace MineCase.Server.Components
         }
 
         public void SetPosition(EntityWorldPos entityWorldPos)
-            => AttachedObject.SetLocalValue(EntityWorldPositionProperty, entityWorldPos);
+            => AttachedEntity.SetLocalValue(EntityWorldPositionProperty, entityWorldPos);
     }
 
     public static class EntityWorldPositionComponentExtensions
     {
-        public static EntityWorldPos GetEntityWorldPosition(this DependencyObject d) =>
+        public static EntityWorldPos GetEntityWorldPosition(this Entity d) =>
             d.GetValue(EntityWorldPositionComponent.EntityWorldPositionProperty);
 
-        public static bool TryGetEntityWorldPosition(this DependencyObject d, out EntityWorldPos value) =>
+        public static bool TryGetEntityWorldPosition(this Entity d, out EntityWorldPos value) =>
             d.TryGetLocalValue(EntityWorldPositionComponent.EntityWorldPositionProperty, out value);
     }
 }

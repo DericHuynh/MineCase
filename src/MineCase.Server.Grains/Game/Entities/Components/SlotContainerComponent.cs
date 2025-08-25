@@ -26,17 +26,17 @@ namespace MineCase.Server.Game.Entities.Components
 
         protected override void OnAttached()
         {
-            var slots = AttachedObject.GetValue(SlotsProperty);
+            var slots = AttachedEntity.GetValue(SlotsProperty);
             if (slots == null || slots.Length != _slotsCount)
-                AttachedObject.SetLocalValue(SlotsProperty, Enumerable.Repeat(Slot.Empty, _slotsCount).ToArray());
+                AttachedEntity.SetLocalValue(SlotsProperty, Enumerable.Repeat(Slot.Empty, _slotsCount).ToArray());
         }
 
         public Slot GetSlot(int index) =>
-            AttachedObject.GetValue(SlotsProperty)[index];
+            AttachedEntity.GetValue(SlotsProperty)[index];
 
         public void SetSlot(int index, Slot slot)
         {
-            ref var old = ref AttachedObject.GetValue(SlotsProperty)[index];
+            ref var old = ref AttachedEntity.GetValue(SlotsProperty)[index];
             if (old != slot)
             {
                 old = slot;
@@ -50,7 +50,7 @@ namespace MineCase.Server.Game.Entities.Components
             if (slots.Length != _slotsCount)
                 throw new ArgumentException(nameof(slots));
 
-            AttachedObject.SetLocalValue(SlotsProperty, slots);
+            AttachedEntity.SetLocalValue(SlotsProperty, slots);
             for (int i = 0; i < _slotsCount; i++)
                 SlotChanged?.Invoke(this, (i, slots[i]));
         }
@@ -66,7 +66,7 @@ namespace MineCase.Server.Game.Entities.Components
 
         private void MarkDirty()
         {
-            AttachedObject.ValueStorage.IsDirty = true;
+            AttachedEntity.ValueStorage.IsDirty = true;
         }
     }
 }

@@ -25,17 +25,17 @@ namespace MineCase.Server.Game.Entities.Components
 
         async Task IHandle<EntityMove>.Handle(EntityMove message)
         {
-            await SendMovePacket(AttachedObject.GetComponent<ChunkEventBroadcastComponent>().GetGenerator());
+            await SendMovePacket(AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator());
         }
 
         protected Task SendMovePacket(ClientPlayPacketGenerator generator)
         {
-            uint eid = AttachedObject.GetValue(EntityIdComponent.EntityIdProperty);
-            EntityWorldPos pos = AttachedObject.GetValue(EntityWorldPositionComponent.EntityWorldPositionProperty);
+            uint eid = AttachedEntity.GetValue(EntityIdComponent.EntityIdProperty);
+            EntityWorldPos pos = AttachedEntity.GetValue(EntityWorldPositionComponent.EntityWorldPositionProperty);
             short x = (short)(pos.X * 32 * 128);
             short y = (short)(pos.Y * 32 * 128);
             short z = (short)(pos.Z * 32 * 128);
-            bool onGround = AttachedObject.GetValue(EntityOnGroundComponent.IsOnGroundProperty);
+            bool onGround = AttachedEntity.GetValue(EntityOnGroundComponent.IsOnGroundProperty);
             return generator.EntityRelativeMove(eid, x, y, z, onGround);
         }
     }

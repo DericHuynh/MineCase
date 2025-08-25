@@ -11,7 +11,7 @@ namespace MineCase.Server.Game.Entities.Components
         public static readonly DependencyProperty<int> HeldItemIndexProperty =
             DependencyProperty.Register("HeldItemIndex", typeof(HeldItemComponent), new PropertyMetadata<int>(0));
 
-        public int HeldItemIndex => AttachedObject.GetValue(HeldItemIndexProperty);
+        public int HeldItemIndex => AttachedEntity.GetValue(HeldItemIndexProperty);
 
         public HeldItemComponent(string name = "heldItem")
             : base(name)
@@ -20,13 +20,13 @@ namespace MineCase.Server.Game.Entities.Components
 
         public async Task<(int Index, Slot Slot)> GetHeldItem()
         {
-            var inventory = AttachedObject.GetComponent<InventoryComponent>().GetInventoryWindow();
-            var index = await inventory.GetHotbarGlobalIndex(AttachedObject, HeldItemIndex);
-            return (index, await inventory.GetSlot(AttachedObject, index));
+            var inventory = AttachedEntity.GetComponent<InventoryComponent>().GetInventoryWindow();
+            var index = await inventory.GetHotbarGlobalIndex(AttachedEntity, HeldItemIndex);
+            return (index, await inventory.GetSlot(AttachedEntity, index));
         }
 
         public void SetHeldItemIndex(int index) =>
-            AttachedObject.SetLocalValue(HeldItemIndexProperty, index);
+            AttachedEntity.SetLocalValue(HeldItemIndexProperty, index);
 
         Task IHandle<SetHeldItemIndex>.Handle(SetHeldItemIndex message)
         {
@@ -39,9 +39,9 @@ namespace MineCase.Server.Game.Entities.Components
 
         async Task IHandle<SetHeldItem>.Handle(SetHeldItem message)
         {
-            var inventory = AttachedObject.GetComponent<InventoryComponent>().GetInventoryWindow();
-            var index = await inventory.GetHotbarGlobalIndex(AttachedObject, HeldItemIndex);
-            await inventory.SetSlot(AttachedObject, index, message.Slot);
+            var inventory = AttachedEntity.GetComponent<InventoryComponent>().GetInventoryWindow();
+            var index = await inventory.GetHotbarGlobalIndex(AttachedEntity, HeldItemIndex);
+            await inventory.SetSlot(AttachedEntity, index, message.Slot);
         }
     }
 }

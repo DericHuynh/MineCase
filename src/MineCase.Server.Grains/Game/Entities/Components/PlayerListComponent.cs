@@ -19,7 +19,7 @@ namespace MineCase.Server.Game.Entities.Components
 
         async Task IHandle<PlayerLoggedIn>.Handle(PlayerLoggedIn message)
         {
-            await SendPlayerListAddPlayer(new[] { AttachedObject });
+            await SendPlayerListAddPlayer(new[] { AttachedEntity });
         }
 
         async Task IHandle<PlayerListAdd>.Handle(PlayerListAdd message)
@@ -31,16 +31,16 @@ namespace MineCase.Server.Game.Entities.Components
         {
             return Task.FromResult(new PlayerDescription
             {
-                UUID = AttachedObject.GetPrimaryKey(),
-                Name = AttachedObject.GetComponent<NameComponent>().Name,
+                UUID = AttachedEntity.GetPrimaryKey(),
+                Name = AttachedEntity.GetComponent<NameComponent>().Name,
                 GameMode = new GameMode { ModeClass = GameMode.Class.Creative },
-                Ping = AttachedObject.GetComponent<KeepAliveComponent>().Ping
+                Ping = AttachedEntity.GetComponent<KeepAliveComponent>().Ping
             });
         }
 
         Task IHandle<PlayerListRemove>.Handle(PlayerListRemove message)
         {
-            return AttachedObject.GetComponent<ChunkEventBroadcastComponent>().GetGenerator()
+            return AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator()
                 .PlayerListItemRemovePlayer((from p in message.Players
                                              select p.GetPrimaryKey()).ToList());
         }
@@ -49,9 +49,9 @@ namespace MineCase.Server.Game.Entities.Components
         {
             var desc = await Task.WhenAll(from p in players
                                           select p.Ask(AskPlayerDescription.Default));
-            await AttachedObject.GetComponent<ClientboundPacketComponent>().GetGenerator()
+            await AttachedEntity.GetComponent<ClientboundPacketComponent>().GetGenerator()
                 .PlayerListItemAddPlayer(desc);
-            await AttachedObject.GetComponent<ChunkEventBroadcastComponent>().GetGenerator()
+            await AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator()
                 .PlayerListItemAddPlayer(desc);
         }
     }

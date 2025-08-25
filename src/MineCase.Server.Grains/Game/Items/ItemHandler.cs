@@ -63,7 +63,7 @@ namespace MineCase.Server.Game.Items
             return new DefaultItemHandler(item);
         }
 
-        public virtual async Task<bool> PlaceBy(IEntity entity, IGrainFactory grainFactory, IWorld world, BlockWorldPos position, Slot heldItem, PlayerDiggingFace face, Vector3 cursorPosition)
+        public virtual async Task<bool> PlaceBy(IMineCaseEntity entity, IGrainFactory grainFactory, IWorld world, BlockWorldPos position, Slot heldItem, PlayerDiggingFace face, Vector3 cursorPosition)
         {
             if (IsPlaceable)
             {
@@ -93,7 +93,7 @@ namespace MineCase.Server.Game.Items
             return false;
         }
 
-        protected virtual Task<BlockState> ConvertToBlock(IEntity entity, IGrainFactory grainFactory, IWorld world, BlockWorldPos position, Slot slot)
+        protected virtual Task<BlockState> ConvertToBlock(IMineCaseEntity entity, IGrainFactory grainFactory, IWorld world, BlockWorldPos position, Slot slot)
         {
             return Task.FromResult(new BlockState { Id = (uint)slot.BlockId, MetaValue = (uint)slot.ItemDamage });
         }
@@ -127,7 +127,7 @@ namespace MineCase.Server.Game.Items
             }
         }
 
-        public async Task<bool> FinishedDigging(IEntity entity, IGrainFactory grainFactory, IWorld world, BlockWorldPos position, BlockState blockState, long usedTick, GameMode gameMode)
+        public async Task<bool> FinishedDigging(IMineCaseEntity entity, IGrainFactory grainFactory, IWorld world, BlockWorldPos position, BlockState blockState, long usedTick, GameMode gameMode)
         {
             if (!blockState.IsSameId(BlockStates.Bedrock()))
             {

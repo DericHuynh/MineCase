@@ -64,7 +64,7 @@ namespace MineCase.Engine
         /// <param name="property">依赖属性</param>
         /// <param name="value">值</param>
         /// <returns>是否具有默认值</returns>
-        public bool TryGetDefaultValue(DependencyObject d, DependencyProperty<T> property, out T value)
+        public bool TryGetDefaultValue(Entity d, DependencyProperty<T> property, out T value)
         {
             if (TryGetDefaultValueOverride(d, property, out value))
                 return true;
@@ -84,7 +84,7 @@ namespace MineCase.Engine
         /// <param name="property">依赖属性</param>
         /// <param name="value">值</param>
         /// <returns>是否具有默认值</returns>
-        protected virtual bool TryGetDefaultValueOverride(DependencyObject d, DependencyProperty<T> property, out T value)
+        protected virtual bool TryGetDefaultValueOverride(Entity d, DependencyProperty<T> property, out T value)
         {
             value = default(T);
             return false;
@@ -136,7 +136,7 @@ namespace MineCase.Engine
         /// <param name="property">依赖属性</param>
         /// <param name="value">值</param>
         /// <returns>是否具有非默认值</returns>
-        public virtual bool TryGetNonDefaultValue(DependencyObject d, DependencyProperty<T> property, out T value)
+        public virtual bool TryGetNonDefaultValue(Entity d, DependencyProperty<T> property, out T value)
         {
             value = default(T);
             return false;

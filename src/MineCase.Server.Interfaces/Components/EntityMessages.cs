@@ -34,6 +34,6 @@ namespace MineCase.Server.Components
     public sealed class CollisionWith : IEntityMessage
     {
         [Id(0)]
-        public IReadOnlyCollection<IDependencyObject> Entities { get; set; }
+        public IReadOnlyCollection<IEntity> Entities { get; set; }
     }
 }

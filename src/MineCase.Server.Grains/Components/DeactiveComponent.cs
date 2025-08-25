@@ -22,7 +22,7 @@ namespace MineCase.Server.Components
 
         Task IHandle<Disable>.Handle(Disable message)
         {
-            AttachedObject.Destroy();
+            AttachedEntity.Destroy();
             return Task.CompletedTask;
         }
     }

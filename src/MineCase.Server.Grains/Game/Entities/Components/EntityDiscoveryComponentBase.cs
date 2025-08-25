@@ -24,24 +24,24 @@ namespace MineCase.Server.Game.Entities.Components
 
         async Task IHandle<DiscoveredByPlayer>.Handle(DiscoveredByPlayer message)
         {
-            if (!message.Player.Equals(AttachedObject))
+            if (!message.Player.Equals(AttachedEntity))
                 await SendSpawnPacket(GetPlayerPacketGenerator(message.Player));
         }
 
         async Task IHandle<BroadcastDiscovered>.Handle(BroadcastDiscovered message)
         {
-            await SendSpawnPacket(AttachedObject.GetComponent<ChunkEventBroadcastComponent>().GetGenerator(AttachedObject as IPlayer));
+            await SendSpawnPacket(AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator(AttachedEntity as IPlayer));
         }
 
         protected abstract Task SendSpawnPacket(ClientPlayPacketGenerator generator);
 
         protected void CompleteSpawn()
         {
-            AttachedObject.QueueOperation(async () =>
+            AttachedEntity.QueueOperation(async () =>
             {
-                await AttachedObject.Tell(Enable.Default);
-                if (AttachedObject.ValueStorage.IsDirty)
-                    await AttachedObject.WriteStateAsync();
+                await AttachedEntity.Tell(Enable.Default);
+                if (AttachedEntity.ValueStorage.IsDirty)
+                    await AttachedEntity.WriteStateAsync();
             });
         }
     }

@@ -7,7 +7,7 @@ using MineCase.Server.World.EntitySpawner;
 
 namespace MineCase.Server.Game.Entities
 {
-    public interface ICreature : IEntity /*, ITickable*/
+    public interface ICreature : IMineCaseEntity /*, ITickable*/
     {
         /*
         Task Spawn(Guid uuid, Vector3 position, MobType type);

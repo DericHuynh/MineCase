@@ -16,20 +16,20 @@ namespace MineCase.Server.Game.BlockEntities.Components
 
         Task IHandle<SpawnBlockEntity>.Handle(SpawnBlockEntity message)
         {
-            AttachedObject.GetComponent<WorldComponent>().SetWorld(message.World);
-            AttachedObject.GetComponent<BlockWorldPositionComponent>().SetBlockWorldPosition(message.Position);
-            AttachedObject.QueueOperation(async () =>
+            AttachedEntity.GetComponent<WorldComponent>().SetWorld(message.World);
+            AttachedEntity.GetComponent<BlockWorldPositionComponent>().SetBlockWorldPosition(message.Position);
+            AttachedEntity.QueueOperation(async () =>
             {
-                await AttachedObject.Tell(Enable.Default);
-                if (AttachedObject.ValueStorage.IsDirty)
-                    await AttachedObject.WriteStateAsync();
+                await AttachedEntity.Tell(Enable.Default);
+                if (AttachedEntity.ValueStorage.IsDirty)
+                    await AttachedEntity.WriteStateAsync();
             });
             return Task.CompletedTask;
         }
 
         Task IHandle<DestroyBlockEntity>.Handle(DestroyBlockEntity message)
         {
-            return AttachedObject.Tell(Disable.Default);
+            return AttachedEntity.Tell(Disable.Default);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace MineCase.Server.Game.Entities.Components
         public static readonly DependencyProperty<MobType> MobTypeProperty =
             DependencyProperty.Register<MobType>("MobType", typeof(MobTypeComponent));
 
-        public MobType MobType => AttachedObject.GetValue(MobTypeProperty);
+        public MobType MobType => AttachedEntity.GetValue(MobTypeProperty);
 
         public MobTypeComponent(string name = "mobType")
             : base(name)
@@ -19,6 +19,6 @@ namespace MineCase.Server.Game.Entities.Components
         }
 
         public void SetMobType(MobType value) =>
-            AttachedObject.SetLocalValue(MobTypeProperty, value);
+            AttachedEntity.SetLocalValue(MobTypeProperty, value);
     }
 }

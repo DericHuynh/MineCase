@@ -20,7 +20,7 @@ namespace MineCase.Server.Game.Entities.Components
         [Orleans.Id(2)]
         private uint _level = 0;
 
-        public uint Experience => AttachedObject.GetValue(ExperienceProperty);
+        public uint Experience => AttachedEntity.GetValue(ExperienceProperty);
 
         public float ExperienceBar => (float)Experience / _levelMaxExp;
 

@@ -18,18 +18,18 @@ namespace MineCase.Server.Game.Entities.Components
         }
 
         public IInventoryWindow GetInventoryWindow() =>
-            GrainFactory.GetGrain<IInventoryWindow>(AttachedObject.GetPrimaryKey());
+            GrainFactory.GetGrain<IInventoryWindow>(AttachedEntity.GetPrimaryKey());
 
         Task<IInventoryWindow> IHandle<AskInventoryWindow, IInventoryWindow>.Handle(AskInventoryWindow message) =>
             Task.FromResult(GetInventoryWindow());
 
         async Task<Slot> IHandle<AskCollectionResult, Slot>.Handle(AskCollectionResult message)
         {
-            var after = await GetInventoryWindow().DistributeStack(AttachedObject, message.Slot);
+            var after = await GetInventoryWindow().DistributeStack(AttachedEntity, message.Slot);
             if (after.ItemCount != message.Slot.ItemCount)
             {
-                await AttachedObject.GetComponent<ChunkEventBroadcastComponent>().GetGenerator()
-                    .CollectItem(await message.Source.GetEntityId(), AttachedObject.EntityId, (uint)message.Slot.ItemCount - after.ItemCount);
+                await AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator()
+                    .CollectItem(await message.Source.GetEntityId(), AttachedEntity.EntityId, (uint)message.Slot.ItemCount - after.ItemCount);
             }
 
             return after;

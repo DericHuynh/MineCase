@@ -17,7 +17,7 @@ namespace MineCase.Server.Persistence.Components
         public static readonly DependencyProperty<T> StateProperty =
             DependencyProperty.Register<T>(nameof(State), typeof(StateComponent<T>));
 
-        public T State => AttachedObject.GetValue(StateProperty);
+        public T State => AttachedEntity.GetValue(StateProperty);
 
         public event EventHandler<EventArgs> BeforeWriteState;
 
@@ -35,7 +35,7 @@ namespace MineCase.Server.Persistence.Components
             // 如果为 null 需要初始化状态
             if (State == null)
             {
-                AttachedObject.SetLocalValue(StateProperty, (T)Activator.CreateInstance(typeof(T), InitializeStateMark.Default));
+                AttachedEntity.SetLocalValue(StateProperty, (T)Activator.CreateInstance(typeof(T), InitializeStateMark.Default));
                 if (SetDefaultState != null)
                     await SetDefaultState.InvokeSerial(this, EventArgs.Empty);
             }

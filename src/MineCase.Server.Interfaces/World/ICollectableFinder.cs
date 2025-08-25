@@ -15,11 +15,11 @@ namespace MineCase.Server.World
 {
     public interface ICollectableFinder : IAddressByPartition
     {
-        Task RegisterCollider(IDependencyObject entity, Shape colliderShape);
+        Task RegisterCollider(Engine.IEntity entity, Shape colliderShape);
 
-        Task UnregisterCollider(IDependencyObject entity);
+        Task UnregisterCollider(Engine.IEntity entity);
 
-        Task<IReadOnlyCollection<IDependencyObject>> CollisionInChunk(Shape colliderShape);
+        Task<IReadOnlyCollection<Engine.IEntity>> CollisionInChunk(Shape colliderShape);
 
         Task SpawnPickup(Vector3 position, Immutable<Slot[]> slots);
     }

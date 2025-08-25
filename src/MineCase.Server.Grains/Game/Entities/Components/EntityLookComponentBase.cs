@@ -24,7 +24,7 @@ namespace MineCase.Server.Game.Entities.Components
 
         async Task IHandle<EntityLook>.Handle(EntityLook message)
         {
-            await SendLookPacket(AttachedObject.GetComponent<ChunkEventBroadcastComponent>().GetGenerator());
+            await SendLookPacket(AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator());
         }
 
         protected abstract Task SendLookPacket(ClientPlayPacketGenerator generator);

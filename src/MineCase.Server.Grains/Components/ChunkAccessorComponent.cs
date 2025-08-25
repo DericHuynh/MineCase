@@ -23,7 +23,7 @@ namespace MineCase.Server.Components
         {
             BlockChunkPos blockChunkPos = pos.ToBlockChunkPos();
             ChunkWorldPos chunkWorldPos = pos.ToChunkWorldPos();
-            IWorld world = AttachedObject.GetWorld();
+            IWorld world = AttachedEntity.GetWorld();
             var chunkColumnKey = world.MakeAddressByPartitionKey(new ChunkWorldPos(chunkWorldPos.X, chunkWorldPos.Z));
             return GrainFactory.GetGrain<IChunkColumn>(chunkColumnKey).SetBlockState(
                 blockChunkPos.X,
@@ -36,7 +36,7 @@ namespace MineCase.Server.Components
         {
             BlockChunkPos blockChunkPos = pos.ToBlockChunkPos();
             ChunkWorldPos chunkWorldPos = pos.ToChunkWorldPos();
-            IWorld world = AttachedObject.GetWorld();
+            IWorld world = AttachedEntity.GetWorld();
             var chunkColumnKey = world.MakeAddressByPartitionKey(new ChunkWorldPos(chunkWorldPos.X, chunkWorldPos.Z));
             return GrainFactory.GetGrain<IChunkColumn>(chunkColumnKey).GetBlockState(
                 blockChunkPos.X,
@@ -48,7 +48,7 @@ namespace MineCase.Server.Components
         {
             BlockChunkPos blockChunkPos = pos.ToBlockChunkPos();
             ChunkWorldPos chunkWorldPos = pos.ToChunkWorldPos();
-            IWorld world = AttachedObject.GetWorld();
+            IWorld world = AttachedEntity.GetWorld();
             var chunkColumnKey = world.MakeAddressByPartitionKey(new ChunkWorldPos(chunkWorldPos.X, chunkWorldPos.Z));
             return GrainFactory.GetGrain<IChunkColumn>(chunkColumnKey).GetBlockBiome(
                 blockChunkPos.X,
@@ -58,7 +58,7 @@ namespace MineCase.Server.Components
 
         public Task<IChunkColumn> GetChunk(ChunkWorldPos pos)
         {
-            IWorld world = AttachedObject.GetWorld();
+            IWorld world = AttachedEntity.GetWorld();
             var chunkColumnKey = world.MakeAddressByPartitionKey(new ChunkWorldPos(pos.X, pos.Z));
             return Task.FromResult(GrainFactory.GetGrain<IChunkColumn>(chunkColumnKey));
         }

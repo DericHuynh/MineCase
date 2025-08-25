@@ -11,7 +11,7 @@ namespace MineCase.Server.User
 {
     [PersistTableName("nonAuthenticatedUser")]
     [Reentrant]
-    internal class NonAuthenticatedUserGrain : PersistableDependencyObject, INonAuthenticatedUser
+    internal class NonAuthenticatedUserGrain : PersistableEntity, INonAuthenticatedUser
     {
         private StateHolder State => GetValue(StateComponent<StateHolder>.StateProperty);
 

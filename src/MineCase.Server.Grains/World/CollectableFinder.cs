@@ -54,24 +54,24 @@ namespace MineCase.Server.World
             SetComponent(new PeriodicSaveStateComponent(TimeSpan.FromMinutes(1)));
         }
 
-        public Task RegisterCollider(IDependencyObject entity, Shape colliderShape)
+        public Task RegisterCollider(Engine.IEntity entity, Shape colliderShape)
         {
             State.Colliders[entity] = colliderShape;
             MarkDirty();
             return Collision(entity, colliderShape);
         }
 
-        public Task UnregisterCollider(IDependencyObject entity)
+        public Task UnregisterCollider(Engine.IEntity entity)
         {
             if (State.Colliders.Remove(entity))
                 MarkDirty();
             return Task.CompletedTask;
         }
 
-        private async Task Collision(IDependencyObject entity, Shape colliderShape)
+        private async Task Collision(Engine.IEntity entity, Shape colliderShape)
         {
-            var result = new HashSet<IDependencyObject>((await Task.WhenAll(from finder in _neighborFinders
-                                                                            where colliderShape.CollideWith(finder.Box)
+            var result = new HashSet<Engine.IEntity>((await Task.WhenAll(from finder in _neighborFinders
+                                                                         where colliderShape.CollideWith(finder.Box)
                                                                             select finder.Finder.CollisionInChunk(colliderShape)))
                                                                             .SelectMany(o => o));
             result.Remove(entity);
@@ -94,20 +94,20 @@ namespace MineCase.Server.World
             }
         }
 
-        public Task<IReadOnlyCollection<IDependencyObject>> CollisionInChunk(Shape colliderShape)
+        public Task<IReadOnlyCollection<Engine.IEntity>> CollisionInChunk(Shape colliderShape)
         {
-            List<IDependencyObject> result = null;
+            List<Engine.IEntity> result = null;
             foreach (var collider in State.Colliders)
             {
                 if (collider.Value.CollideWith(colliderShape))
                 {
                     if (result == null)
-                        result = new List<IDependencyObject>();
+                        result = new List<Engine.IEntity>();
                     result.Add(collider.Key);
                 }
             }
 
-            return Task.FromResult((IReadOnlyCollection<IDependencyObject>)result ?? Array.Empty<IDependencyObject>());
+            return Task.FromResult((IReadOnlyCollection<IEntity>)result ?? Array.Empty<IEntity>());
         }
 
         private void MarkDirty()
@@ -119,7 +119,7 @@ namespace MineCase.Server.World
         public class StateHolder
         {
             [Id(0)]
-            public Dictionary<IDependencyObject, Shape> Colliders { get; set; }
+            public Dictionary<Engine.IEntity, Shape> Colliders { get; set; }
 
             public StateHolder()
             {
@@ -127,7 +127,7 @@ namespace MineCase.Server.World
 
             public StateHolder(InitializeStateMark mark)
             {
-                Colliders = new Dictionary<IDependencyObject, Shape>();
+                Colliders = new Dictionary<Engine.IEntity, Shape>();
             }
         }
     }

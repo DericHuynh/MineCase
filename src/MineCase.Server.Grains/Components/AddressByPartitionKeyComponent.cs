@@ -27,9 +27,9 @@ namespace MineCase.Server.Components
 
         protected override void OnAttached()
         {
-            AttachedObject.RegisterPropertyChangedHandler(WorldComponent.WorldProperty, OnWorldChanged);
-            AttachedObject.RegisterPropertyChangedHandler(EntityWorldPositionComponent.EntityWorldPositionProperty, OnEntityWorldPositionChanged);
-            AttachedObject.RegisterPropertyChangedHandler(BlockWorldPositionComponent.BlockWorldPositionProperty, OnBlockWorldPositionChanged);
+            AttachedEntity.RegisterPropertyChangedHandler(WorldComponent.WorldProperty, OnWorldChanged);
+            AttachedEntity.RegisterPropertyChangedHandler(EntityWorldPositionComponent.EntityWorldPositionProperty, OnEntityWorldPositionChanged);
+            AttachedEntity.RegisterPropertyChangedHandler(BlockWorldPositionComponent.BlockWorldPositionProperty, OnBlockWorldPositionChanged);
         }
 
         private void OnBlockWorldPositionChanged(object sender, PropertyChangedEventArgs<BlockWorldPos> e)
@@ -49,26 +49,26 @@ namespace MineCase.Server.Components
 
         private void UpdateKey()
         {
-            if (AttachedObject.TryGetWorld(out var world))
+            if (AttachedEntity.TryGetWorld(out var world))
             {
                 ChunkWorldPos? chunkWorldPos = null;
-                if (AttachedObject.TryGetLocalValue(EntityWorldPositionComponent.EntityWorldPositionProperty, out var entityPos))
+                if (AttachedEntity.TryGetLocalValue(EntityWorldPositionComponent.EntityWorldPositionProperty, out var entityPos))
                     chunkWorldPos = entityPos.ToChunkWorldPos();
-                else if (AttachedObject.TryGetLocalValue(BlockWorldPositionComponent.BlockWorldPositionProperty, out var blockPos))
+                else if (AttachedEntity.TryGetLocalValue(BlockWorldPositionComponent.BlockWorldPositionProperty, out var blockPos))
                     chunkWorldPos = blockPos.ToChunkWorldPos();
 
                 if (chunkWorldPos.HasValue && _oldChunkWorldPos != chunkWorldPos)
                 {
                     _oldChunkWorldPos = chunkWorldPos;
                     var key = world.MakeAddressByPartitionKey(chunkWorldPos.Value);
-                    AttachedObject.SetLocalValue(AddressByPartitionKeyProperty, key);
+                    AttachedEntity.SetLocalValue(AddressByPartitionKeyProperty, key);
                 }
             }
         }
 
         private static void OnAddressByPartitionKeyChanged(object sender, PropertyChangedEventArgs<string> e)
         {
-            var component = ((DependencyObject)sender).GetComponent<AddressByPartitionKeyComponent>();
+            var component = ((Entity)sender).GetComponent<AddressByPartitionKeyComponent>();
             if (component != null)
                 component.KeyChanged?.Invoke(sender, (e.OldValue, e.NewValue));
         }
@@ -76,7 +76,7 @@ namespace MineCase.Server.Components
 
     public static class AddressByPartitionKeyComponentExtensions
     {
-        public static string GetAddressByPartitionKey(this DependencyObject d) =>
+        public static string GetAddressByPartitionKey(this Entity d) =>
             d.GetValue(AddressByPartitionKeyComponent.AddressByPartitionKeyProperty);
     }
 }

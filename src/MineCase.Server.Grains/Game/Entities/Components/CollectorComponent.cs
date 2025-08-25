@@ -19,9 +19,9 @@ namespace MineCase.Server.Game.Entities.Components
         Task IHandle<CollisionWith>.Handle(CollisionWith message)
         {
             foreach (var e in message.Entities)
-                e.Tell(new CollectBy { Entity = AttachedObject });
+                e.Tell(new CollectBy { Entity = AttachedEntity });
 
-            // e.InvokeOneWay(g => g.Tell(new CollectBy { Entity = AttachedObject }));
+            // e.InvokeOneWay(g => g.Tell(new CollectBy { Entity = AttachedEntity }));
             return Task.CompletedTask;
         }
     }

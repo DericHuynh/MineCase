@@ -26,7 +26,7 @@ namespace MineCase.Server.Persistence
     }
 
     [Reentrant]
-    public abstract class PersistableDependencyObject : DependencyObject
+    public abstract class PersistableEntity : Entity
     {
         protected override async Task SerializeStateAsync(DependencyObjectState state)
         {

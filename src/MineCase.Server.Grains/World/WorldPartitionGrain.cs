@@ -77,7 +77,7 @@ namespace MineCase.Server.World
             return Task.CompletedTask;
         }
 
-        Task IWorldPartition.SubscribeDiscovery(IEntity entity)
+        Task IWorldPartition.SubscribeDiscovery(IMineCaseEntity entity)
         {
             if (State.DiscoveryEntities.Add(entity))
             {
@@ -88,7 +88,7 @@ namespace MineCase.Server.World
             return Task.CompletedTask;
         }
 
-        Task IWorldPartition.UnsubscribeDiscovery(IEntity entity)
+        Task IWorldPartition.UnsubscribeDiscovery(IMineCaseEntity entity)
         {
             if (State.DiscoveryEntities.Remove(entity))
                 MarkDirty();
@@ -129,7 +129,7 @@ namespace MineCase.Server.World
         internal class StateHolder
         {
             [Id(0)]
-            public HashSet<IEntity> DiscoveryEntities { get; set; }
+            public HashSet<IMineCaseEntity> DiscoveryEntities { get; set; }
 
             [Id(1)]
             public bool IsTickEmitterActive { get; set; }
@@ -140,7 +140,7 @@ namespace MineCase.Server.World
 
             public StateHolder(InitializeStateMark mark)
             {
-                DiscoveryEntities = new HashSet<IEntity>();
+                DiscoveryEntities = new HashSet<IMineCaseEntity>();
             }
         }
     }

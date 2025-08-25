@@ -17,13 +17,13 @@ namespace MineCase.Server.Components
 
         public ClientPlayPacketGenerator GetGenerator(IPlayer except = null)
         {
-            return new ClientPlayPacketGenerator(GrainFactory.GetGrain<IChunkTrackingHub>(AttachedObject.GetAddressByPartitionKey()), except);
+            return new ClientPlayPacketGenerator(GrainFactory.GetGrain<IChunkTrackingHub>(AttachedEntity.GetAddressByPartitionKey()), except);
         }
     }
 
     internal static class ChunkEventBroadcastComponentExtensions
     {
-        public static ClientPlayPacketGenerator GetBroadcaster(this DependencyObject d) =>
+        public static ClientPlayPacketGenerator GetBroadcaster(this Entity d) =>
             d.GetComponent<ChunkEventBroadcastComponent>().GetGenerator();
     }
 }

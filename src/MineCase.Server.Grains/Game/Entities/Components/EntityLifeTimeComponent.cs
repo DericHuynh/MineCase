@@ -17,9 +17,9 @@ namespace MineCase.Server.Game.Entities.Components
 
         Task IHandle<SpawnEntity>.Handle(SpawnEntity message)
         {
-            AttachedObject.GetComponent<WorldComponent>().SetWorld(message.World);
-            AttachedObject.GetComponent<EntityWorldPositionComponent>().SetPosition(message.Position);
-            var lookComponent = AttachedObject.GetComponent<EntityLookComponent>();
+            AttachedEntity.GetComponent<WorldComponent>().SetWorld(message.World);
+            AttachedEntity.GetComponent<EntityWorldPositionComponent>().SetPosition(message.Position);
+            var lookComponent = AttachedEntity.GetComponent<EntityLookComponent>();
             lookComponent.SetPitch(message.Pitch);
             lookComponent.SetHeadYaw(message.Yaw);
             lookComponent.SetYaw(message.Yaw);
@@ -28,10 +28,10 @@ namespace MineCase.Server.Game.Entities.Components
 
         async Task IHandle<DestroyEntity>.Handle(DestroyEntity message)
         {
-            await AttachedObject.Tell(Disable.Default);
-            AttachedObject.QueueOperation(() =>
+            await AttachedEntity.Tell(Disable.Default);
+            AttachedEntity.QueueOperation(() =>
             {
-                AttachedObject.Destroy();
+                AttachedEntity.Destroy();
                 return Task.CompletedTask;
             });
         }

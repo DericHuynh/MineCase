@@ -84,7 +84,7 @@ namespace MineCase.UnitTest.Serialization
             return doc;
         }
 
-        internal class TestEntity : DependencyObject
+        internal class TestEntity : Entity
         {
             public BsonDocument BsonDocument;
 

@@ -20,9 +20,9 @@ namespace MineCase.Server.Game.BlockEntities.Components
         public static readonly DependencyProperty<IChestWindow> ChestWindowProperty =
             DependencyProperty.Register<IChestWindow>(nameof(ChestWindow), typeof(ChestComponent));
 
-        public IBlockEntity NeighborEntity => AttachedObject.GetValue(NeighborEntityProperty);
+        public IBlockEntity NeighborEntity => AttachedEntity.GetValue(NeighborEntityProperty);
 
-        public IChestWindow ChestWindow => AttachedObject.GetValue(ChestWindowProperty);
+        public IChestWindow ChestWindow => AttachedEntity.GetValue(ChestWindowProperty);
 
         public ChestComponent(string name = "chest")
             : base(name)
@@ -31,29 +31,29 @@ namespace MineCase.Server.Game.BlockEntities.Components
 
         Task IHandle<NeighborEntityChanged>.Handle(NeighborEntityChanged message)
         {
-            AttachedObject.SetLocalValue(NeighborEntityProperty, message.Entity);
+            AttachedEntity.SetLocalValue(NeighborEntityProperty, message.Entity);
             return Task.CompletedTask;
         }
 
         private static void OnNeighborEntityChanged(object sender, PropertyChangedEventArgs<IBlockEntity> e)
         {
-            var component = ((DependencyObject)sender).GetComponent<ChestComponent>();
+            var component = ((Entity)sender).GetComponent<ChestComponent>();
             var window = component?.ChestWindow;
             if (window == null) return;
             if (e.NewValue == null)
             {
-                component.AttachedObject.QueueOperation(async () =>
+                component.AttachedEntity.QueueOperation(async () =>
                 {
                     await window.Destroy();
-                    await window.SetEntities(new[] { component.AttachedObject.AsReference<IDependencyObject>() }.AsImmutable());
+                    await window.SetEntities(new[] { component.AttachedEntity.AsReference<IEntity>() }.AsImmutable());
                 });
             }
             else
             {
-                component.AttachedObject.QueueOperation(async () =>
+                component.AttachedEntity.QueueOperation(async () =>
                 {
                     await window.Destroy();
-                    await window.SetEntities(new[] { component.AttachedObject.AsReference<IDependencyObject>(), e.NewValue.AsReference<IDependencyObject>() }.AsImmutable());
+                    await window.SetEntities(new[] { component.AttachedEntity.AsReference<IEntity>(), e.NewValue.AsReference<IEntity>() }.AsImmutable());
                 });
             }
         }
@@ -67,14 +67,14 @@ namespace MineCase.Server.Game.BlockEntities.Components
         async Task IHandle<UseBy>.Handle(UseBy message)
         {
             var masterEntity = await FindMasterEntity(NeighborEntity);
-            if (object.Equals(masterEntity, AttachedObject.AsReference<IBlockEntity>()))
+            if (object.Equals(masterEntity, AttachedEntity.AsReference<IBlockEntity>()))
             {
                 if (ChestWindow == null)
-                    AttachedObject.SetLocalValue(ChestWindowProperty, GrainFactory.GetGrain<IChestWindow>(Guid.NewGuid()));
+                    AttachedEntity.SetLocalValue(ChestWindowProperty, GrainFactory.GetGrain<IChestWindow>(Guid.NewGuid()));
 
                 await ChestWindow.SetEntities((NeighborEntity == null ?
-                    new[] { AttachedObject.AsReference<IDependencyObject>() } :
-                    new[] { AttachedObject.AsReference<IDependencyObject>(), NeighborEntity }).AsImmutable());
+                    new[] { AttachedEntity.AsReference<IEntity>() } :
+                    new[] { AttachedEntity.AsReference<IEntity>(), NeighborEntity }).AsImmutable());
                 await message.Entity.Tell(new OpenWindow { Window = ChestWindow });
             }
             else
@@ -86,13 +86,13 @@ namespace MineCase.Server.Game.BlockEntities.Components
         private async Task<IBlockEntity> FindMasterEntity(IBlockEntity neighborEntity)
         {
             if (NeighborEntity == null)
-                return AttachedObject.AsReference<IBlockEntity>();
+                return AttachedEntity.AsReference<IBlockEntity>();
 
             async Task<(IBlockEntity Entity, BlockWorldPos Position)> GetPosition(IBlockEntity entity) =>
                 (entity, await entity.GetPosition());
 
             // 按 X, Z 排序取最小
-            return (from e in await Task.WhenAll(new[] { GetPosition(AttachedObject.AsReference<IBlockEntity>()), GetPosition(NeighborEntity) })
+            return (from e in await Task.WhenAll(new[] { GetPosition(AttachedEntity.AsReference<IBlockEntity>()), GetPosition(NeighborEntity) })
                     orderby e.Position.X, e.Position.Z
                     select e.Entity).First();
         }

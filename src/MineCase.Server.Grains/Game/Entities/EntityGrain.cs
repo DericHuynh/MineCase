@@ -18,7 +18,7 @@ namespace MineCase.Server.Game.Entities
 {
     [PersistTableName("entity")]
     [Reentrant]
-    internal abstract class EntityGrain : PersistableDependencyObject, IEntity
+    internal abstract class EntityGrain : PersistableEntity, IMineCaseEntity
     {
         public Guid UUID => this.GetPrimaryKey();
 
@@ -48,16 +48,16 @@ namespace MineCase.Server.Game.Entities
             SetComponent(new AutoSaveStateComponent(AutoSaveStateComponent.PerMinute));
         }
 
-        Task<uint> IEntity.GetEntityId() =>
+        Task<uint> IMineCaseEntity.GetEntityId() =>
             Task.FromResult(EntityId);
 
-        Task<EntityWorldPos> IEntity.GetPosition() =>
+        Task<EntityWorldPos> IMineCaseEntity.GetPosition() =>
             Task.FromResult(Position);
 
-        Task<IWorld> IEntity.GetWorld() =>
+        Task<IWorld> IMineCaseEntity.GetWorld() =>
             Task.FromResult(World);
 
-        Task<float> IEntity.GetYaw() =>
+        Task<float> IMineCaseEntity.GetYaw() =>
             Task.FromResult(Yaw);
     }
 }

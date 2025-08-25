@@ -28,13 +28,13 @@ namespace MineCase.Server.Game.Entities.Components
         protected override void OnAttached()
         {
             _loaded = false;
-            _chunkLoader = GrainFactory.GetGrain<IUserChunkLoader>(AttachedObject.GetPrimaryKey());
+            _chunkLoader = GrainFactory.GetGrain<IUserChunkLoader>(AttachedEntity.GetPrimaryKey());
         }
 
         async Task IHandle<PlayerLoggedIn>.Handle(PlayerLoggedIn message)
         {
             _loaded = false;
-            await _chunkLoader.JoinGame(await AttachedObject.GetWorld(), _player);
+            await _chunkLoader.JoinGame(await AttachedEntity.GetWorld(), _player);
             _loaded = true;
         }
 

@@ -49,7 +49,7 @@ namespace MineCase.Server.Game.Blocks
             return await base.CanBeAt(position, grainFactory, world);
         }
 
-        public override async Task UseBy(IEntity entity, IGrainFactory grainFactory, IWorld world, BlockWorldPos blockPosition, Vector3 cursorPosition)
+        public override async Task UseBy(IMineCaseEntity entity, IGrainFactory grainFactory, IWorld world, BlockWorldPos blockPosition, Vector3 cursorPosition)
         {
             var blockEntity = (await world.GetBlockEntity(grainFactory, blockPosition)).Cast<IChestBlockEntity>();
             await blockEntity.Tell(new UseBy { Entity = entity });
@@ -74,7 +74,7 @@ namespace MineCase.Server.Game.Blocks
             }
         }
 
-        public override async Task OnPlaced(IEntity entity, IGrainFactory grainFactory, IWorld world, BlockWorldPos position, BlockState blockState)
+        public override async Task OnPlaced(IMineCaseEntity entity, IGrainFactory grainFactory, IWorld world, BlockWorldPos position, BlockState blockState)
         {
             BlockWorldPos? neighborPosition = null;
             foreach (var crossCoord in CrossCoords)

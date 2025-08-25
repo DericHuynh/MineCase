@@ -21,13 +21,13 @@ namespace MineCase.Server.Game.Entities.Components
 
         protected override void OnAttached()
         {
-            _chunkLoader = GrainFactory.GetGrain<IUserChunkLoader>(AttachedObject.GetPrimaryKey());
-            AttachedObject.RegisterPropertyChangedHandler(ViewDistanceComponent.ViewDistanceProperty, OnViewDistanceChanged);
+            _chunkLoader = GrainFactory.GetGrain<IUserChunkLoader>(AttachedEntity.GetPrimaryKey());
+            AttachedEntity.RegisterPropertyChangedHandler(ViewDistanceComponent.ViewDistanceProperty, OnViewDistanceChanged);
         }
 
         private void OnViewDistanceChanged(object sender, PropertyChangedEventArgs<byte> e)
         {
-            AttachedObject.QueueOperation(() => _chunkLoader.SetViewDistance(e.NewValue));
+            AttachedEntity.QueueOperation(() => _chunkLoader.SetViewDistance(e.NewValue));
         }
     }
 }

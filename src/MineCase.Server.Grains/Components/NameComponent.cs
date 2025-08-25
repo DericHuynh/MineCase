@@ -11,7 +11,7 @@ namespace MineCase.Server.Components
         public static readonly DependencyProperty<string> NameProperty =
             DependencyProperty.Register<string>("Name", typeof(NameComponent));
 
-        public new string Name => AttachedObject.GetValue(NameProperty);
+        public new string Name => AttachedEntity.GetValue(NameProperty);
 
         public NameComponent(string name = "name")
             : base(name)
@@ -19,6 +19,6 @@ namespace MineCase.Server.Components
         }
 
         public void SetName(string value) =>
-            AttachedObject.SetLocalValue(NameProperty, value);
+            AttachedEntity.SetLocalValue(NameProperty, value);
     }
 }

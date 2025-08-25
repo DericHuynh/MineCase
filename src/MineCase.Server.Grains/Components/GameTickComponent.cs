@@ -21,25 +21,25 @@ namespace MineCase.Server.Components
 
         protected override void OnAttached()
         {
-            AttachedObject.GetComponent<AddressByPartitionKeyComponent>()
+            AttachedEntity.GetComponent<AddressByPartitionKeyComponent>()
                 .KeyChanged += OnAddressByPartitionKeyChanged;
-            AttachedObject.RegisterPropertyChangedHandler(IsEnabledComponent.IsEnabledProperty, OnIsEnabledChanged);
-            AttachedObject.QueueOperation(TrySubscribe);
+            AttachedEntity.RegisterPropertyChangedHandler(IsEnabledComponent.IsEnabledProperty, OnIsEnabledChanged);
+            AttachedEntity.QueueOperation(TrySubscribe);
         }
 
         protected override void OnDetached()
         {
-            AttachedObject.GetComponent<AddressByPartitionKeyComponent>()
+            AttachedEntity.GetComponent<AddressByPartitionKeyComponent>()
                 .KeyChanged -= OnAddressByPartitionKeyChanged;
-            AttachedObject.QueueOperation(TryUnsubscribe);
+            AttachedEntity.QueueOperation(TryUnsubscribe);
         }
 
         private void OnAddressByPartitionKeyChanged(object sender, (string OldKey, string NewKey) e)
         {
-            AttachedObject.QueueOperation(async () =>
+            AttachedEntity.QueueOperation(async () =>
             {
                 if (!string.IsNullOrEmpty(e.OldKey))
-                    await GrainFactory.GetGrain<ITickEmitter>(e.OldKey).Unsubscribe(AttachedObject);
+                    await GrainFactory.GetGrain<ITickEmitter>(e.OldKey).Unsubscribe(AttachedEntity);
                 await TrySubscribe();
             });
         }
@@ -47,9 +47,9 @@ namespace MineCase.Server.Components
         private void OnIsEnabledChanged(object sender, PropertyChangedEventArgs<bool> e)
         {
             if (e.NewValue)
-                AttachedObject.QueueOperation(TrySubscribe);
+                AttachedEntity.QueueOperation(TrySubscribe);
             else
-                AttachedObject.QueueOperation(TryUnsubscribe);
+                AttachedEntity.QueueOperation(TryUnsubscribe);
         }
 
         public Task OnGameTick(GameTickArgs e)
@@ -64,19 +64,19 @@ namespace MineCase.Server.Components
 
         private async Task TrySubscribe()
         {
-            if (AttachedObject.GetValue(IsEnabledComponent.IsEnabledProperty))
+            if (AttachedEntity.GetValue(IsEnabledComponent.IsEnabledProperty))
             {
-                var key = AttachedObject.GetAddressByPartitionKey();
+                var key = AttachedEntity.GetAddressByPartitionKey();
                 if (!string.IsNullOrEmpty(key))
-                    await GrainFactory.GetGrain<ITickEmitter>(key).Subscribe(AttachedObject);
+                    await GrainFactory.GetGrain<ITickEmitter>(key).Subscribe(AttachedEntity);
             }
         }
 
         private async Task TryUnsubscribe()
         {
-            var key = AttachedObject.GetAddressByPartitionKey();
+            var key = AttachedEntity.GetAddressByPartitionKey();
             if (!string.IsNullOrEmpty(key))
-                await GrainFactory.GetGrain<ITickEmitter>(key).Unsubscribe(AttachedObject);
+                await GrainFactory.GetGrain<ITickEmitter>(key).Unsubscribe(AttachedEntity);
         }
     }
 }

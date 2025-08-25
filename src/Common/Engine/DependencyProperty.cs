@@ -342,7 +342,7 @@ namespace MineCase.Engine
         /// <param name="type">类型.</param>
         /// <param name="value">值.</param>
         /// <returns>是否获取成功.</returns>
-        public bool TryGetDefaultValue(DependencyObject d, Type type, out T value)
+        public bool TryGetDefaultValue(Entity d, Type type, out T value)
         {
             return GetMetadata(type).TryGetDefaultValue(d, this, out value);
         }
@@ -403,7 +403,7 @@ namespace MineCase.Engine
         /// <param name="type">类型.</param>
         /// <param name="value">值.</param>
         /// <returns>是否具有非默认值.</returns>
-        public bool TryGetNonDefaultValue(DependencyObject d, Type type, out T value)
+        public bool TryGetNonDefaultValue(Entity d, Type type, out T value)
         {
             return GetMetadata(type).TryGetNonDefaultValue(d, this, out value);
         }

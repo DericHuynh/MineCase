@@ -15,7 +15,7 @@ namespace MineCase.Server.World.EntitySpawner.Ai.Action
         {
         }
 
-        public override void Action(IEntity creature)
+        public override void Action(IMineCaseEntity creature)
         {
             /*
             // 随机选择一个步长

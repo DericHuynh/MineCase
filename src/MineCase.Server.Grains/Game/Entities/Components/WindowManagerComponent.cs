@@ -25,21 +25,21 @@ namespace MineCase.Server.Game.Entities.Components
         {
             _windows = new Dictionary<byte, WindowContext>
             {
-                { 0, new WindowContext { Window = AttachedObject.GetComponent<InventoryComponent>().GetInventoryWindow() } }
+                { 0, new WindowContext { Window = AttachedEntity.GetComponent<InventoryComponent>().GetInventoryWindow() } }
             };
         }
 
         public async Task ClickWindow(byte windowId, short slot, ClickAction clickAction, short actionNumber, Slot clickedItem)
         {
             var window = GetWindow(windowId);
-            await window.Window.Click(AttachedObject, slot, clickAction, clickedItem);
-            await AttachedObject.GetComponent<ClientboundPacketComponent>().GetGenerator()
+            await window.Window.Click(AttachedEntity, slot, clickAction, clickedItem);
+            await AttachedEntity.GetComponent<ClientboundPacketComponent>().GetGenerator()
                 .ConfirmTransaction(windowId, window.ActionNumber++, true);
         }
 
         public async Task CloseWindow(byte windowId)
         {
-            await GetWindow(windowId).Window.Close(AttachedObject);
+            await GetWindow(windowId).Window.Close(AttachedEntity);
             if (windowId != 0)
                 _windows.Remove(windowId);
         }
@@ -63,7 +63,7 @@ namespace MineCase.Server.Game.Entities.Components
             }
 
             if (id != null)
-                await window.OpenWindow(AttachedObject);
+                await window.OpenWindow(AttachedEntity);
         }
 
         private WindowContext GetWindow(byte windowId)

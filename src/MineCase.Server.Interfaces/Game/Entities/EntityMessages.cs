@@ -257,7 +257,7 @@ namespace MineCase.Server.Game.Entities.Components
     public sealed class CollectBy : IEntityMessage
     {
         [Id(0)]
-        public IEntity Entity { get; set; }
+        public IMineCaseEntity Entity { get; set; }
     }
 
     [Orleans.GenerateSerializer]
@@ -265,7 +265,7 @@ namespace MineCase.Server.Game.Entities.Components
     public sealed class AskCollectionResult : IEntityMessage<Slot>
     {
         [Id(0)]
-        public IEntity Source
+        public IMineCaseEntity Source
         {
             get; set;
         }

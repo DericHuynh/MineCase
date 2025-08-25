@@ -27,9 +27,9 @@ namespace MineCase.Server.Game.Entities.Components
         public static readonly DependencyProperty<CreatureState> CreatureStateProperty =
             DependencyProperty.Register<CreatureState>(nameof(CreatureState), typeof(EntityAiComponent));
 
-        public MobType MobType => AttachedObject.GetValue(MobTypeComponent.MobTypeProperty);
+        public MobType MobType => AttachedEntity.GetValue(MobTypeComponent.MobTypeProperty);
 
-        public CreatureState CreatureState => AttachedObject.GetValue(CreatureStateProperty);
+        public CreatureState CreatureState => AttachedEntity.GetValue(CreatureStateProperty);
 
         [Id(0)]
         private Random random;
@@ -45,9 +45,9 @@ namespace MineCase.Server.Game.Entities.Components
         protected override void OnAttached()
         {
             // Register();
-            AttachedObject.SetLocalValue(EntityAiComponent.CreatureStateProperty, CreatureState.Stop);
+            AttachedEntity.SetLocalValue(EntityAiComponent.CreatureStateProperty, CreatureState.Stop);
             CreateAi(MobType);
-            AttachedObject.RegisterPropertyChangedHandler(MobTypeComponent.MobTypeProperty, OnMobTypeChanged);
+            AttachedEntity.RegisterPropertyChangedHandler(MobTypeComponent.MobTypeProperty, OnMobTypeChanged);
         }
 
         private void OnMobTypeChanged(object sender, PropertyChangedEventArgs<MobType> e)
@@ -62,20 +62,20 @@ namespace MineCase.Server.Game.Entities.Components
 
         private void Register()
         {
-            AttachedObject.GetComponent<GameTickComponent>()
+            AttachedEntity.GetComponent<GameTickComponent>()
                 .Tick += OnGameTick;
         }
 
         private void Unregister()
         {
-            AttachedObject.GetComponent<GameTickComponent>()
+            AttachedEntity.GetComponent<GameTickComponent>()
                 .Tick -= OnGameTick;
         }
 
         private void CreateAi(MobType mobType)
         {
-            Func<CreatureState> getter = () => AttachedObject.GetValue(CreatureStateProperty);
-            Action<CreatureState> setter = v => AttachedObject.SetLocalValue(CreatureStateProperty, v);
+            Func<CreatureState> getter = () => AttachedEntity.GetValue(CreatureStateProperty);
+            Action<CreatureState> setter = v => AttachedEntity.SetLocalValue(CreatureStateProperty, v);
             CreatureAi ai;
 
             switch (mobType)
@@ -121,16 +121,16 @@ namespace MineCase.Server.Game.Entities.Components
         private Task ActionStop()
         {
             float theta = (float)(random.NextDouble() * 360);
-            float yaw = AttachedObject.GetValue(EntityLookComponent.YawProperty);
+            float yaw = AttachedEntity.GetValue(EntityLookComponent.YawProperty);
             if (random.Next(20) == 0)
             {
-                AttachedObject.SetLocalValue(EntityLookComponent.YawProperty, theta);
-                AttachedObject.SetLocalValue(EntityLookComponent.HeadYawProperty, theta);
+                AttachedEntity.SetLocalValue(EntityLookComponent.YawProperty, theta);
+                AttachedEntity.SetLocalValue(EntityLookComponent.HeadYawProperty, theta);
             }
             else
             {
-                // AttachedObject.SetLocalValue(EntityLookComponent.YawProperty, yaw);
-                AttachedObject.SetLocalValue(EntityLookComponent.HeadYawProperty, yaw);
+                // AttachedEntity.SetLocalValue(EntityLookComponent.YawProperty, yaw);
+                AttachedEntity.SetLocalValue(EntityLookComponent.HeadYawProperty, yaw);
             }
 
             return Task.CompletedTask;
@@ -140,9 +140,9 @@ namespace MineCase.Server.Game.Entities.Components
         {
             float step = 0.2f;
             float theta = (float)(random.NextDouble() * 2 * Math.PI);
-            float yaw = AttachedObject.GetValue(EntityLookComponent.YawProperty);
+            float yaw = AttachedEntity.GetValue(EntityLookComponent.YawProperty);
             float head;
-            EntityWorldPos pos = AttachedObject.GetValue(EntityWorldPositionComponent.EntityWorldPositionProperty);
+            EntityWorldPos pos = AttachedEntity.GetValue(EntityWorldPositionComponent.EntityWorldPositionProperty);
             if (random.Next(50) == 0)
             {
                 head = theta;
@@ -152,8 +152,8 @@ namespace MineCase.Server.Game.Entities.Components
                 head = (float)(yaw / 180.0f * Math.PI);
             }
 
-            AttachedObject.SetLocalValue(EntityLookComponent.YawProperty, (float)(head / Math.PI * 180.0f));
-            AttachedObject.SetLocalValue(EntityLookComponent.HeadYawProperty, (float)(head / Math.PI * 180.0f));
+            AttachedEntity.SetLocalValue(EntityLookComponent.YawProperty, (float)(head / Math.PI * 180.0f));
+            AttachedEntity.SetLocalValue(EntityLookComponent.HeadYawProperty, (float)(head / Math.PI * 180.0f));
 
             // 新的位置
             EntityWorldPos entityPos = new EntityWorldPos(pos.X - step * (float)Math.Sin(head), pos.Y, pos.Z + step * (float)Math.Cos(head));
@@ -161,7 +161,7 @@ namespace MineCase.Server.Game.Entities.Components
 
             // 检测行进方向的方块是否满足要求
             Cuboid entityBoundbox = new Cuboid(new Point3d(entityPos.X, entityPos.Y, entityPos.Z), new Size(1, 1, 2)); // TODO data from Boundbox component
-            var chunkAccessor = AttachedObject.GetComponent<ChunkAccessorComponent>();
+            var chunkAccessor = AttachedEntity.GetComponent<ChunkAccessorComponent>();
             bool isCollided = false;
 
             // 检测此位置会不会与方块碰撞
@@ -197,7 +197,7 @@ namespace MineCase.Server.Game.Entities.Components
 
             if (!isCollided && canWalk)
             {
-                AttachedObject.SetLocalValue(
+                AttachedEntity.SetLocalValue(
                     EntityWorldPositionComponent.EntityWorldPositionProperty,
                     EntityWorldPos.Add(entityPos, 0, yJumpHeight, 0));
             }
@@ -206,9 +206,9 @@ namespace MineCase.Server.Game.Entities.Components
         private async Task ActionLook()
         {
             // 通知周围creature entity看着玩家
-            EntityWorldPos entityPos = AttachedObject.GetValue(EntityWorldPositionComponent.EntityWorldPositionProperty);
+            EntityWorldPos entityPos = AttachedEntity.GetValue(EntityWorldPositionComponent.EntityWorldPositionProperty);
             ChunkWorldPos chunkPos = entityPos.ToChunkWorldPos();
-            IChunkTrackingHub tracker = GrainFactory.GetGrain<IChunkTrackingHub>(AttachedObject.GetAddressByPartitionKey());
+            IChunkTrackingHub tracker = GrainFactory.GetGrain<IChunkTrackingHub>(AttachedEntity.GetAddressByPartitionKey());
             var list = await tracker.GetTrackedPlayers();
 
             // TODO 多位玩家的话只看一位
@@ -221,9 +221,9 @@ namespace MineCase.Server.Game.Entities.Components
                 {
                     (var yaw, var pitch) = VectorToYawAndPitch(entityPos, playerPosition);
 
-                    AttachedObject.SetLocalValue(EntityLookComponent.YawProperty, yaw);
-                    AttachedObject.SetLocalValue(EntityLookComponent.HeadYawProperty, yaw);
-                    AttachedObject.SetLocalValue(EntityLookComponent.PitchProperty, pitch);
+                    AttachedEntity.SetLocalValue(EntityLookComponent.YawProperty, yaw);
+                    AttachedEntity.SetLocalValue(EntityLookComponent.HeadYawProperty, yaw);
+                    AttachedEntity.SetLocalValue(EntityLookComponent.PitchProperty, pitch);
                     break;
                 }
             }
@@ -236,7 +236,7 @@ namespace MineCase.Server.Game.Entities.Components
 
         private Task ActionEscape()
         {
-            float yaw = AttachedObject.GetValue(EntityLookComponent.YawProperty);
+            float yaw = AttachedEntity.GetValue(EntityLookComponent.YawProperty);
 
             return Task.CompletedTask;
         }
@@ -250,7 +250,7 @@ namespace MineCase.Server.Game.Entities.Components
             // player approaching event
             if (state == CreatureState.Stop)
             {
-                IChunkTrackingHub tracker = GrainFactory.GetGrain<IChunkTrackingHub>(AttachedObject.GetAddressByPartitionKey());
+                IChunkTrackingHub tracker = GrainFactory.GetGrain<IChunkTrackingHub>(AttachedEntity.GetAddressByPartitionKey());
                 var list = await tracker.GetTrackedPlayers();
                 if (list.Count != 0)
                 {
@@ -283,25 +283,25 @@ namespace MineCase.Server.Game.Entities.Components
             /*
             if (e.worldAge % 16 == 0)
             {
-                float pitch = AttachedObject.GetValue(EntityLookComponent.PitchProperty);
+                float pitch = AttachedEntity.GetValue(EntityLookComponent.PitchProperty);
                 pitch += 30 * 360.0f / 255;
                 if (pitch > 360)
                 {
                     pitch = 0;
                 }
 
-                AttachedObject.SetLocalValue(EntityLookComponent.PitchProperty, pitch);
+                AttachedEntity.SetLocalValue(EntityLookComponent.PitchProperty, pitch);
             }
             */
 
             /*
-            ICreatureAi ai = AttachedObject.GetValue(EntityAiComponent.AiTypeProperty);
-            IWorld world = AttachedObject.GetWorld();
-            var chunkAccessor = AttachedObject.GetComponent<ChunkAccessorComponent>();
+            ICreatureAi ai = AttachedEntity.GetValue(EntityAiComponent.AiTypeProperty);
+            IWorld world = AttachedEntity.GetWorld();
+            var chunkAccessor = AttachedEntity.GetComponent<ChunkAccessorComponent>();
             */
 
-            // CreatureAiAction action = AttachedObject.GetValue(EntityAiComponent.CreatureAiActionProperty);
-            // action.Action(AttachedObject);
+            // CreatureAiAction action = AttachedEntity.GetValue(EntityAiComponent.CreatureAiActionProperty);
+            // action.Action(AttachedEntity);
             await GenerateEvent();
 
             // get state

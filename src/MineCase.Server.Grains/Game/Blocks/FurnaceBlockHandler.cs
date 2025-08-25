@@ -23,7 +23,7 @@ namespace MineCase.Server.Game.Blocks
         {
         }
 
-        public override async Task UseBy(IEntity entity, IGrainFactory grainFactory, IWorld world, BlockWorldPos blockPosition, Vector3 cursorPosition)
+        public override async Task UseBy(IMineCaseEntity entity, IGrainFactory grainFactory, IWorld world, BlockWorldPos blockPosition, Vector3 cursorPosition)
         {
             var blockEntity = (await world.GetBlockEntity(grainFactory, blockPosition)).Cast<IFurnaceBlockEntity>();
             await blockEntity.Tell(new UseBy { Entity = entity });

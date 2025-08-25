@@ -10,7 +10,7 @@ using Orleans;
 
 namespace MineCase.Server.Game.BlockEntities
 {
-    public interface IBlockEntity : IDependencyObject, IGrainWithGuidKey
+    public interface IBlockEntity : IEntity, IGrainWithGuidKey
     {
         Task<IWorld> GetWorld();
 

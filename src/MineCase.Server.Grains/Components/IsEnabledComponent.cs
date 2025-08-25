@@ -11,7 +11,7 @@ namespace MineCase.Server.Components
         public static readonly DependencyProperty<bool> IsEnabledProperty =
             DependencyProperty.Register<bool>(nameof(IsEnabled), typeof(IsEnabledComponent));
 
-        public bool IsEnabled => AttachedObject.GetValue(IsEnabledProperty);
+        public bool IsEnabled => AttachedEntity.GetValue(IsEnabledProperty);
 
         public IsEnabledComponent(string name = "isEnabled")
             : base(name)
@@ -20,13 +20,13 @@ namespace MineCase.Server.Components
 
         Task IHandle<Enable>.Handle(Enable message)
         {
-            AttachedObject.SetLocalValue(IsEnabledProperty, true);
+            AttachedEntity.SetLocalValue(IsEnabledProperty, true);
             return Task.CompletedTask;
         }
 
         Task IHandle<Disable>.Handle(Disable message)
         {
-            AttachedObject.SetLocalValue(IsEnabledProperty, false);
+            AttachedEntity.SetLocalValue(IsEnabledProperty, false);
             return Task.CompletedTask;
         }
     }

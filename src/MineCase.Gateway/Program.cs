@@ -67,7 +67,6 @@ namespace MineCase.Gateway
                 {
                     options.DatabaseName = appBuilder.Configuration.GetSection("persistenceOptions")["databaseName"];
                 });
-
             });
             appBuilder.Services.AddHostedService<ConnectionRouter>();
 

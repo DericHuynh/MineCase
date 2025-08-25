@@ -27,13 +27,13 @@ namespace MineCase.Server.Game.Entities.Components
 
         private void Register()
         {
-            AttachedObject.GetComponent<GameTickComponent>()
+            AttachedEntity.GetComponent<GameTickComponent>()
                 .Tick += OnGameTick;
         }
 
         private void Unregister()
         {
-            AttachedObject.GetComponent<GameTickComponent>()
+            AttachedEntity.GetComponent<GameTickComponent>()
                 .Tick -= OnGameTick;
         }
 
@@ -42,9 +42,9 @@ namespace MineCase.Server.Game.Entities.Components
             // Every 40 tick, check whether entities are out of world
             if (e.WorldAge % 40 == 0)
             {
-                if (AttachedObject.Position.Y < -64)
+                if (AttachedEntity.Position.Y < -64)
                 {
-                    var health = AttachedObject.GetComponent<HealthComponent>();
+                    var health = AttachedEntity.GetComponent<HealthComponent>();
                     health.SetHealth(health.Health - 4);
                 }
             }

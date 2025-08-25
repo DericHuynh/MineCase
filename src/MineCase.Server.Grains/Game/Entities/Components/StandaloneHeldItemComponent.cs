@@ -11,7 +11,7 @@ namespace MineCase.Server.Game.Entities.Components
         public static readonly DependencyProperty<Slot> HeldItemProperty =
             DependencyProperty.Register("HeldItem", typeof(StandaloneHeldItemComponent), new PropertyMetadata<Slot>(Slot.Empty));
 
-        public Slot HeldItem => AttachedObject.GetValue(HeldItemProperty);
+        public Slot HeldItem => AttachedEntity.GetValue(HeldItemProperty);
 
         public StandaloneHeldItemComponent(string name = "standaloneHeldItem")
             : base(name)
@@ -19,7 +19,7 @@ namespace MineCase.Server.Game.Entities.Components
         }
 
         public void SetHeldItem(Slot value) =>
-            AttachedObject.SetLocalValue(HeldItemProperty, value);
+            AttachedEntity.SetLocalValue(HeldItemProperty, value);
 
         Task IHandle<SetHeldItemIndex>.Handle(SetHeldItemIndex message)
         {

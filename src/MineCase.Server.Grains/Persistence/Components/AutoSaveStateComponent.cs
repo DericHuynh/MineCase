@@ -24,16 +24,16 @@ namespace MineCase.Server.Persistence.Components
 
         protected override void OnAttached()
         {
-            var tickComponent = AttachedObject.GetComponent<GameTickComponent>();
+            var tickComponent = AttachedEntity.GetComponent<GameTickComponent>();
             if (tickComponent != null)
                 tickComponent.Tick += OnGameTick;
         }
 
         public Task OnGameTick(object sender, GameTickArgs e)
         {
-            if (AttachedObject.ValueStorage.IsDirty && (e.WorldAge % _periodTime == 0))
+            if (AttachedEntity.ValueStorage.IsDirty && (e.WorldAge % _periodTime == 0))
             {
-                return AttachedObject.WriteStateAsync();
+                return AttachedEntity.WriteStateAsync();
             }
 
             return Task.CompletedTask;

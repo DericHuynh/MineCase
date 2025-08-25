@@ -40,9 +40,9 @@ namespace MineCase.Server.Game.BlockEntities.Components
         public static readonly DependencyProperty<IFurnaceWindow> FurnaceWindowProperty =
             DependencyProperty.Register<IFurnaceWindow>("FurnaceWindow", typeof(FurnaceComponent));
 
-        public FurnaceState State => AttachedObject.GetValue(StateProperty);
+        public FurnaceState State => AttachedEntity.GetValue(StateProperty);
 
-        public IFurnaceWindow FurnaceWindow => AttachedObject.GetValue(FurnaceWindowProperty);
+        public IFurnaceWindow FurnaceWindow => AttachedEntity.GetValue(FurnaceWindowProperty);
 
         public FurnaceComponent(string name = "furnace")
             : base(name)
@@ -53,7 +53,7 @@ namespace MineCase.Server.Game.BlockEntities.Components
         {
             if (State == null)
             {
-                AttachedObject.SetLocalValue(StateProperty, new FurnaceState
+                AttachedEntity.SetLocalValue(StateProperty, new FurnaceState
                 {
                     MaxFuelTime = 200
                 });
@@ -114,10 +114,10 @@ namespace MineCase.Server.Game.BlockEntities.Components
         }
 
         private Slot GetSlot(int index) =>
-            AttachedObject.GetComponent<SlotContainerComponent>().GetSlot(index);
+            AttachedEntity.GetComponent<SlotContainerComponent>().GetSlot(index);
 
         private void SetSlot(int index, Slot slot) =>
-            AttachedObject.GetComponent<SlotContainerComponent>().SetSlot(index, slot);
+            AttachedEntity.GetComponent<SlotContainerComponent>().SetSlot(index, slot);
 
         private async Task UpdateFuel()
         {
@@ -200,34 +200,34 @@ namespace MineCase.Server.Game.BlockEntities.Components
         {
             State.IsCooking = true;
             MarkDirty();
-            var meta = (await AttachedObject.World.GetBlockState(GrainFactory, AttachedObject.Position)).MetaValue;
-            await AttachedObject.World.SetBlockState(GrainFactory, AttachedObject.Position, new BlockState { Id = (uint)BlockId.BlastFurnace, MetaValue = meta });
+            var meta = (await AttachedEntity.World.GetBlockState(GrainFactory, AttachedEntity.Position)).MetaValue;
+            await AttachedEntity.World.SetBlockState(GrainFactory, AttachedEntity.Position, new BlockState { Id = (uint)BlockId.BlastFurnace, MetaValue = meta });
         }
 
         private async Task StopCooking()
         {
             State.IsCooking = false;
             MarkDirty();
-            var meta = (await AttachedObject.World.GetBlockState(GrainFactory, AttachedObject.Position)).MetaValue;
-            await AttachedObject.World.SetBlockState(GrainFactory, AttachedObject.Position, new BlockState { Id = (uint)BlockId.Furnace, MetaValue = meta });
+            var meta = (await AttachedEntity.World.GetBlockState(GrainFactory, AttachedEntity.Position)).MetaValue;
+            await AttachedEntity.World.SetBlockState(GrainFactory, AttachedEntity.Position, new BlockState { Id = (uint)BlockId.Furnace, MetaValue = meta });
             Unregister();
         }
 
         private void Register()
         {
-            AttachedObject.GetComponent<GameTickComponent>()
+            AttachedEntity.GetComponent<GameTickComponent>()
                 .Tick += OnGameTick;
         }
 
         private void Unregister()
         {
-            AttachedObject.GetComponent<GameTickComponent>()
+            AttachedEntity.GetComponent<GameTickComponent>()
                 .Tick -= OnGameTick;
         }
 
         async Task IHandle<SpawnBlockEntity>.Handle(SpawnBlockEntity message)
         {
-            State.IsCooking = (await AttachedObject.World.GetBlockState(GrainFactory, AttachedObject.Position))
+            State.IsCooking = (await AttachedEntity.World.GetBlockState(GrainFactory, AttachedEntity.Position))
                 .IsId(BlockId.BlastFurnace);
             MarkDirty();
         }
@@ -243,15 +243,15 @@ namespace MineCase.Server.Game.BlockEntities.Components
         async Task IHandle<UseBy>.Handle(UseBy message)
         {
             if (FurnaceWindow == null)
-                AttachedObject.SetLocalValue(FurnaceWindowProperty, GrainFactory.GetGrain<IFurnaceWindow>(Guid.NewGuid()));
+                AttachedEntity.SetLocalValue(FurnaceWindowProperty, GrainFactory.GetGrain<IFurnaceWindow>(Guid.NewGuid()));
 
-            await FurnaceWindow.SetEntity(AttachedObject);
+            await FurnaceWindow.SetEntity(AttachedEntity);
             await message.Entity.Tell(new OpenWindow { Window = FurnaceWindow });
         }
 
         private void MarkDirty()
         {
-            AttachedObject.ValueStorage.IsDirty = true;
+            AttachedEntity.ValueStorage.IsDirty = true;
         }
     }
 }

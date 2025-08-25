@@ -21,28 +21,28 @@ namespace MineCase.Server.Game.Entities.Components
         {
             var metadata = new EntityMetadata.Player
             {
-                Health = AttachedObject.GetValue(HealthComponent.HealthProperty)
+                Health = AttachedEntity.GetValue(HealthComponent.HealthProperty)
             };
 
-            return generator.SpawnPlayer(AttachedObject.EntityId, AttachedObject.UUID, AttachedObject.Position, AttachedObject.Pitch, AttachedObject.HeadYaw, metadata);
+            return generator.SpawnPlayer(AttachedEntity.EntityId, AttachedEntity.UUID, AttachedEntity.Position, AttachedEntity.Pitch, AttachedEntity.HeadYaw, metadata);
         }
 
         Task IHandle<PlayerLoggedIn>.Handle(PlayerLoggedIn message)
         {
             CompleteSpawn();
-            AttachedObject.QueueOperation(() =>
+            AttachedEntity.QueueOperation(() =>
             {
-                return GrainFactory.GetGrain<IWorldPartition>(AttachedObject.GetAddressByPartitionKey()).Enter(AttachedObject);
+                return GrainFactory.GetGrain<IWorldPartition>(AttachedEntity.GetAddressByPartitionKey()).Enter(AttachedEntity);
             });
             return Task.CompletedTask;
         }
 
         Task IHandle<DestroyEntity>.Handle(DestroyEntity message)
         {
-            if (AttachedObject.EntityId != 0)
+            if (AttachedEntity.EntityId != 0)
             {
-                return AttachedObject.GetComponent<ChunkEventBroadcastComponent>().GetGenerator()
-                    .DestroyEntities(new[] { AttachedObject.EntityId });
+                return AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator()
+                    .DestroyEntities(new[] { AttachedEntity.EntityId });
             }
 
             return Task.CompletedTask;

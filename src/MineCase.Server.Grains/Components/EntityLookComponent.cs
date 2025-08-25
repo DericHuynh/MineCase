@@ -18,11 +18,11 @@ namespace MineCase.Server.Components
         public static readonly DependencyProperty<float> HeadYawProperty =
             DependencyProperty.Register<float>("HeadYaw", typeof(EntityLookComponent));
 
-        public float Pitch => AttachedObject.GetValue(PitchProperty);
+        public float Pitch => AttachedEntity.GetValue(PitchProperty);
 
-        public float Yaw => AttachedObject.GetValue(YawProperty);
+        public float Yaw => AttachedEntity.GetValue(YawProperty);
 
-        public float HeadYaw => AttachedObject.GetValue(HeadYawProperty);
+        public float HeadYaw => AttachedEntity.GetValue(HeadYawProperty);
 
         public EntityLookComponent(string name = "entityLook")
             : base(name)
@@ -30,12 +30,12 @@ namespace MineCase.Server.Components
         }
 
         public void SetPitch(float value) =>
-            AttachedObject.SetLocalValue(PitchProperty, value);
+            AttachedEntity.SetLocalValue(PitchProperty, value);
 
         public void SetYaw(float value) =>
-            AttachedObject.SetLocalValue(YawProperty, value);
+            AttachedEntity.SetLocalValue(YawProperty, value);
 
         public void SetHeadYaw(float value) =>
-            AttachedObject.SetLocalValue(HeadYawProperty, value);
+            AttachedEntity.SetLocalValue(HeadYawProperty, value);
     }
 }

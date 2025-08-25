@@ -21,7 +21,7 @@ namespace MineCase.Algorithm.Game.Entity.Ai.Action
             _itemId = itemId;
         }
 
-        public override void Action(IEntity creature)
+        public override void Action(IMineCaseEntity creature)
         {
             throw new NotImplementedException();
         }

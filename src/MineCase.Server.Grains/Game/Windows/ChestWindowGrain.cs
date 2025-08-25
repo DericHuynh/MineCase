@@ -17,7 +17,7 @@ namespace MineCase.Server.Game.Windows
 
         protected override Chat Title => _title;
 
-        public Task SetEntities(Immutable<IDependencyObject[]> entities)
+        public Task SetEntities(Immutable<IEntity[]> entities)
         {
             SlotAreas.Clear();
 

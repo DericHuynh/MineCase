@@ -25,22 +25,22 @@ namespace MineCase.Server.Game.Entities.Components
         {
             if (face != PlayerDiggingFace.Special)
             {
-                var world = AttachedObject.GetWorld();
+                var world = AttachedEntity.GetWorld();
                 var blockState = await world.GetBlockState(GrainFactory, location);
                 var blockHandler = BlockHandler.Create((BlockId)blockState.Id);
                 if (blockHandler.IsUsable)
                 {
-                    await blockHandler.UseBy(AttachedObject, GrainFactory, world, location, cursorPosition);
+                    await blockHandler.UseBy(AttachedEntity, GrainFactory, world, location, cursorPosition);
                 }
                 else
                 {
-                    var heldItem = await AttachedObject.GetComponent<HeldItemComponent>().GetHeldItem();
+                    var heldItem = await AttachedEntity.GetComponent<HeldItemComponent>().GetHeldItem();
                     if (!heldItem.Slot.IsEmpty)
                     {
                         var itemHandler = ItemHandler.Create(new ItemState { Id = (uint)heldItem.Slot.BlockId, MetaValue = 0 });
                         if (itemHandler.IsPlaceable)
                         {
-                            await itemHandler.PlaceBy(AttachedObject, GrainFactory, world, location, heldItem.Slot, face, cursorPosition);
+                            await itemHandler.PlaceBy(AttachedEntity, GrainFactory, world, location, heldItem.Slot, face, cursorPosition);
                         }
                     }
                 }

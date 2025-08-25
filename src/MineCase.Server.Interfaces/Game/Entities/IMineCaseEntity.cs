@@ -10,7 +10,7 @@ using Orleans;
 
 namespace MineCase.Server.Game.Entities
 {
-    public interface IEntity : IDependencyObject, IGrainWithGuidKey
+    public interface IMineCaseEntity : IEntity, IGrainWithGuidKey
     {
         Task<uint> GetEntityId();
 

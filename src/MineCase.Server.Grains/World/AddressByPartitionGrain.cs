@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using MineCase.Server.Persistence;
 using MineCase.World;
 using Orleans;
 
 namespace MineCase.Server.World
 {
-    internal abstract class AddressByPartitionGrain : Persistence.PersistableDependencyObject, IAddressByPartition
+    internal abstract class AddressByPartitionGrain : PersistableEntity, IAddressByPartition
     {
         protected IWorld World { get; private set; }
 

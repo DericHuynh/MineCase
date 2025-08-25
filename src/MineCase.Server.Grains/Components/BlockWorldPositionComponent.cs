@@ -12,7 +12,7 @@ namespace MineCase.Server.Components
         public static readonly DependencyProperty<BlockWorldPos> BlockWorldPositionProperty =
             DependencyProperty.Register<BlockWorldPos>("BlockWorldPosition", typeof(BlockWorldPositionComponent));
 
-        public BlockWorldPos BlockWorldPosition => AttachedObject.GetValue(BlockWorldPositionProperty);
+        public BlockWorldPos BlockWorldPosition => AttachedEntity.GetValue(BlockWorldPositionProperty);
 
         public BlockWorldPositionComponent(string name = "blockWorldPosition")
             : base(name)
@@ -20,6 +20,6 @@ namespace MineCase.Server.Components
         }
 
         public void SetBlockWorldPosition(BlockWorldPos value) =>
-            AttachedObject.SetLocalValue(BlockWorldPositionProperty, value);
+            AttachedEntity.SetLocalValue(BlockWorldPositionProperty, value);
     }
 }

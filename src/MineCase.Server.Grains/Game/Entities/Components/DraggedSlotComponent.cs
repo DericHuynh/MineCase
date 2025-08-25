@@ -16,9 +16,9 @@ namespace MineCase.Server.Game.Entities.Components
         public static readonly DependencyProperty<List<int>> DraggedPathProperty =
             DependencyProperty.Register("DraggedPath", typeof(DraggedSlotComponent), new PropertyMetadata<List<int>>(new List<int>()));
 
-        public Slot DraggedSlot => AttachedObject.GetValue(DraggedSlotProperty);
+        public Slot DraggedSlot => AttachedEntity.GetValue(DraggedSlotProperty);
 
-        public List<int> DraggedPath => AttachedObject.GetValue(DraggedPathProperty);
+        public List<int> DraggedPath => AttachedEntity.GetValue(DraggedPathProperty);
 
         public DraggedSlotComponent(string name = "draggedSlot")
             : base(name)
@@ -26,7 +26,7 @@ namespace MineCase.Server.Game.Entities.Components
         }
 
         public void SetDraggedSlot(Slot value) =>
-            AttachedObject.SetLocalValue(DraggedSlotProperty, value);
+            AttachedEntity.SetLocalValue(DraggedSlotProperty, value);
 
         Task IHandle<SetDraggedSlot>.Handle(SetDraggedSlot message)
         {
@@ -41,7 +41,7 @@ namespace MineCase.Server.Game.Entities.Components
 
         Task IHandle<SetDraggedPath>.Handle(SetDraggedPath message)
         {
-            AttachedObject.SetLocalValue(DraggedPathProperty, message.Path);
+            AttachedEntity.SetLocalValue(DraggedPathProperty, message.Path);
             return Task.CompletedTask;
         }
 

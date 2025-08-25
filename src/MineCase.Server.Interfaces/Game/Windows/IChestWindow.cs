@@ -10,6 +10,6 @@ namespace MineCase.Server.Game.Windows
 {
     public interface IChestWindow : IWindow
     {
-        Task SetEntities(Immutable<IDependencyObject[]> entities);
+        Task SetEntities(Immutable<IEntity[]> entities);
     }
 }

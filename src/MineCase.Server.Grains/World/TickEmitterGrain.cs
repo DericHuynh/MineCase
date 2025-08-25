@@ -36,7 +36,7 @@ namespace MineCase.Server.World
             SetComponent(new PeriodicSaveStateComponent(TimeSpan.FromMinutes(1)));
         }
 
-        public Task Subscribe(IDependencyObject observer)
+        public Task Subscribe(Engine.IEntity observer)
         {
             bool active = State.Subscription.Count == 0;
             if (State.Subscription.Add(observer))
@@ -49,7 +49,7 @@ namespace MineCase.Server.World
             return Task.CompletedTask;
         }
 
-        public Task Unsubscribe(IDependencyObject observer)
+        public Task Unsubscribe(Engine.IEntity observer)
         {
             if (State.Subscription.Remove(observer))
             {
@@ -76,7 +76,7 @@ namespace MineCase.Server.World
         internal class StateHolder
         {
             [Id(0)]
-            public HashSet<IDependencyObject> Subscription { get; set; }
+            public HashSet<Engine.IEntity> Subscription { get; set; }
 
             public StateHolder()
             {
@@ -84,7 +84,7 @@ namespace MineCase.Server.World
 
             public StateHolder(InitializeStateMark mark)
             {
-                Subscription = new HashSet<IDependencyObject>();
+                Subscription = new HashSet<Engine.IEntity>();
             }
         }
     }

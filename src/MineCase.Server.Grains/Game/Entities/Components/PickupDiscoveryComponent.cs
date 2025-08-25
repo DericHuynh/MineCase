@@ -23,13 +23,13 @@ namespace MineCase.Server.Game.Entities.Components
         protected override Task SendSpawnPacket(ClientPlayPacketGenerator generator)
         {
             // for items, the int value is ignored, but should be set to 1 to indicate that velocity is present.
-            return generator.SpawnObject(AttachedObject.EntityId, AttachedObject.UUID, 2, AttachedObject.Position, AttachedObject.Pitch, AttachedObject.Yaw, 1);
+            return generator.SpawnObject(AttachedEntity.EntityId, AttachedEntity.UUID, 2, AttachedEntity.Position, AttachedEntity.Pitch, AttachedEntity.Yaw, 1);
         }
 
         Task IHandle<DestroyEntity>.Handle(DestroyEntity message)
         {
-            return AttachedObject.GetComponent<ChunkEventBroadcastComponent>().GetGenerator()
-                .DestroyEntities(new[] { AttachedObject.EntityId });
+            return AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator()
+                .DestroyEntities(new[] { AttachedEntity.EntityId });
         }
 
         Task IHandle<SpawnEntity>.Handle(SpawnEntity message)
@@ -37,7 +37,7 @@ namespace MineCase.Server.Game.Entities.Components
             var pos = message.Position;
             var bb = BoundingBox.Item();
             var box = new Cuboid(new Point3d(pos.X, pos.Z, pos.Y), new Size(bb.X, bb.Y, bb.Z));
-            AttachedObject.SetLocalValue(ColliderComponent.ColliderShapeProperty, box);
+            AttachedEntity.SetLocalValue(ColliderComponent.ColliderShapeProperty, box);
             CompleteSpawn();
 
             return Task.CompletedTask;

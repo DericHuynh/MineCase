@@ -17,11 +17,11 @@ namespace MineCase.Server.Game.Entities.Components
         public static readonly DependencyProperty<float> FoodSaturationProperty =
             DependencyProperty.Register<float>("FoodSaturation", typeof(FoodComponent));
 
-        public int Food => AttachedObject.GetValue(FoodProperty);
+        public int Food => AttachedEntity.GetValue(FoodProperty);
 
-        public int MaxFood => AttachedObject.GetValue(MaxFoodProperty);
+        public int MaxFood => AttachedEntity.GetValue(MaxFoodProperty);
 
-        public float FoodSaturation => AttachedObject.GetValue(FoodSaturationProperty);
+        public float FoodSaturation => AttachedEntity.GetValue(FoodSaturationProperty);
 
         public FoodComponent(string name = "food")
             : base(name)
@@ -29,12 +29,12 @@ namespace MineCase.Server.Game.Entities.Components
         }
 
         public void SetFood(int value) =>
-            AttachedObject.SetLocalValue(FoodProperty, value);
+            AttachedEntity.SetLocalValue(FoodProperty, value);
 
         public void SetMaxFood(int value) =>
-            AttachedObject.SetLocalValue(MaxFoodProperty, value);
+            AttachedEntity.SetLocalValue(MaxFoodProperty, value);
 
         public void SetFoodSaturation(float value) =>
-            AttachedObject.SetLocalValue(FoodSaturationProperty, value);
+            AttachedEntity.SetLocalValue(FoodSaturationProperty, value);
     }
 }

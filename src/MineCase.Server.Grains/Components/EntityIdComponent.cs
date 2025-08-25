@@ -12,7 +12,7 @@ namespace MineCase.Server.Components
         public static readonly DependencyProperty<uint> EntityIdProperty =
             DependencyProperty.Register<uint>("EntityId", typeof(EntityIdComponent));
 
-        public uint EntityId => AttachedObject.GetValue(EntityIdProperty);
+        public uint EntityId => AttachedEntity.GetValue(EntityIdProperty);
 
         public EntityIdComponent(string name = "entityId")
             : base(name)
@@ -21,7 +21,7 @@ namespace MineCase.Server.Components
 
         Task IHandle<SpawnEntity>.Handle(SpawnEntity message)
         {
-            AttachedObject.SetLocalValue(EntityIdProperty, message.EntityId);
+            AttachedEntity.SetLocalValue(EntityIdProperty, message.EntityId);
             return Task.CompletedTask;
         }
     }

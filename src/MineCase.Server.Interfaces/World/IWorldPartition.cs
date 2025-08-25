@@ -14,9 +14,9 @@ namespace MineCase.Server.World
 
         Task Leave(IPlayer player);
 
-        Task SubscribeDiscovery(IEntity entity);
+        Task SubscribeDiscovery(IMineCaseEntity entity);
 
-        Task UnsubscribeDiscovery(IEntity entity);
+        Task UnsubscribeDiscovery(IMineCaseEntity entity);
 
         Task SubscribeTickEmitter(ITickEmitter tickEmitter);
 

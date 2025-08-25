@@ -14,9 +14,9 @@ namespace MineCase.Server.Game.Entities.Components
         public static readonly DependencyProperty<int> HealthProperty =
             DependencyProperty.Register<int>("Health", typeof(HealthComponent));
 
-        public int Health => AttachedObject.GetValue(HealthProperty);
+        public int Health => AttachedEntity.GetValue(HealthProperty);
 
-        public int MaxHealth => AttachedObject.GetValue(MaxHealthProperty);
+        public int MaxHealth => AttachedEntity.GetValue(MaxHealthProperty);
 
         public HealthComponent(string name = "health")
             : base(name)
@@ -24,9 +24,9 @@ namespace MineCase.Server.Game.Entities.Components
         }
 
         public void SetHealth(int value) =>
-            AttachedObject.SetLocalValue(HealthProperty, value);
+            AttachedEntity.SetLocalValue(HealthProperty, value);
 
         public void SetMaxHealth(int value) =>
-            AttachedObject.SetLocalValue(MaxHealthProperty, value);
+            AttachedEntity.SetLocalValue(MaxHealthProperty, value);
     }
 }

@@ -25,7 +25,7 @@ namespace MineCase.Engine.Data
         /// </summary>
         /// <param name="d">依赖对象</param>
         /// <returns>EffectiveValue</returns>
-        IEffectiveValue ProviderValue(DependencyObject d);
+        IEffectiveValue ProviderValue(Entity d);
     }
 
     /// <summary>

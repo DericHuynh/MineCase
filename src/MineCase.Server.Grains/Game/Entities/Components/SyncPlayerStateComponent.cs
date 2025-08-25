@@ -28,28 +28,28 @@ namespace MineCase.Server.Game.Entities.Components
 
         async Task IHandle<PlayerLoggedIn>.Handle(PlayerLoggedIn message)
         {
-            var generator = AttachedObject.GetComponent<ClientboundPacketComponent>().GetGenerator();
+            var generator = AttachedEntity.GetComponent<ClientboundPacketComponent>().GetGenerator();
 
             // PositionAndLook
-            var position = AttachedObject.GetEntityWorldPosition();
-            var lookComponent = AttachedObject.GetComponent<EntityLookComponent>();
-            await generator.PositionAndLook(position.X, position.Y, position.Z, lookComponent.Yaw, lookComponent.Pitch, 0, AttachedObject.GetComponent<TeleportComponent>().StartNew());
+            var position = AttachedEntity.GetEntityWorldPosition();
+            var lookComponent = AttachedEntity.GetComponent<EntityLookComponent>();
+            await generator.PositionAndLook(position.X, position.Y, position.Z, lookComponent.Yaw, lookComponent.Pitch, 0, AttachedEntity.GetComponent<TeleportComponent>().StartNew());
 
             // Update view position
             var chunkPos = position.ToChunkWorldPos();
             await generator.UpdateViewPosition(chunkPos.X, chunkPos.Z);
 
             // Health
-            var healthComponent = AttachedObject.GetComponent<HealthComponent>();
-            var foodComponent = AttachedObject.GetComponent<FoodComponent>();
+            var healthComponent = AttachedEntity.GetComponent<HealthComponent>();
+            var foodComponent = AttachedEntity.GetComponent<FoodComponent>();
             await generator.UpdateHealth(healthComponent.Health, healthComponent.MaxHealth, foodComponent.Food, foodComponent.MaxFood, foodComponent.FoodSaturation);
 
             // Experience
-            var expComponent = AttachedObject.GetComponent<ExperienceComponent>();
+            var expComponent = AttachedEntity.GetComponent<ExperienceComponent>();
             await generator.SetExperience(expComponent.ExperienceBar, expComponent.Level, expComponent.TotalExperience);
 
             // Inventory
-            var slots = await AttachedObject.GetComponent<InventoryComponent>().GetInventoryWindow().GetSlots(AttachedObject);
+            var slots = await AttachedEntity.GetComponent<InventoryComponent>().GetInventoryWindow().GetSlots(AttachedEntity);
             await generator.WindowItems(0, slots);
 
             if (!_isHandlersInstalled)
@@ -61,12 +61,12 @@ namespace MineCase.Server.Game.Entities.Components
 
         private void InstallPropertyChangedHandlers()
         {
-            AttachedObject.RegisterPropertyChangedHandler(DraggedSlotComponent.DraggedSlotProperty, OnDraggedSlotChanged);
-            AttachedObject.RegisterPropertyChangedHandler(EntityWorldPositionComponent.EntityWorldPositionProperty, OnEntityWorldPositionChanged);
-            AttachedObject.RegisterPropertyChangedHandler(EntityLookComponent.HeadYawProperty, OnEntityHeadYawChanged);
-            AttachedObject.RegisterPropertyChangedHandler(EntityLookComponent.PitchProperty, OnEntityPitchChanged);
-            AttachedObject.RegisterPropertyChangedHandler(EntityLookComponent.YawProperty, OnEntityYawChanged);
-            AttachedObject.RegisterPropertyChangedHandler(HealthComponent.HealthProperty, OnEntityHealthChanged);
+            AttachedEntity.RegisterPropertyChangedHandler(DraggedSlotComponent.DraggedSlotProperty, OnDraggedSlotChanged);
+            AttachedEntity.RegisterPropertyChangedHandler(EntityWorldPositionComponent.EntityWorldPositionProperty, OnEntityWorldPositionChanged);
+            AttachedEntity.RegisterPropertyChangedHandler(EntityLookComponent.HeadYawProperty, OnEntityHeadYawChanged);
+            AttachedEntity.RegisterPropertyChangedHandler(EntityLookComponent.PitchProperty, OnEntityPitchChanged);
+            AttachedEntity.RegisterPropertyChangedHandler(EntityLookComponent.YawProperty, OnEntityYawChanged);
+            AttachedEntity.RegisterPropertyChangedHandler(HealthComponent.HealthProperty, OnEntityHealthChanged);
         }
 
         [Id(2)]
@@ -74,47 +74,47 @@ namespace MineCase.Server.Game.Entities.Components
 
         private void OnEntityHeadYawChanged(object sender, PropertyChangedEventArgs<float> e)
         {
-            _broadcastComponent = _broadcastComponent ?? AttachedObject.GetComponent<ChunkEventBroadcastComponent>();
-            _broadcastComponent.GetGenerator(AttachedObject)
+            _broadcastComponent = _broadcastComponent ?? AttachedEntity.GetComponent<ChunkEventBroadcastComponent>();
+            _broadcastComponent.GetGenerator(AttachedEntity)
                 .EntityHeadLook(
-                AttachedObject.EntityId,
+                AttachedEntity.EntityId,
                 GetAngle(e.NewValue));
         }
 
         private void OnEntityYawChanged(object sender, PropertyChangedEventArgs<float> e)
         {
-            var yaw = AttachedObject.GetValue(EntityLookComponent.YawProperty);
-            var pitch = AttachedObject.GetValue(EntityLookComponent.PitchProperty);
-            _broadcastComponent = _broadcastComponent ?? AttachedObject.GetComponent<ChunkEventBroadcastComponent>();
-            _broadcastComponent.GetGenerator(AttachedObject)
+            var yaw = AttachedEntity.GetValue(EntityLookComponent.YawProperty);
+            var pitch = AttachedEntity.GetValue(EntityLookComponent.PitchProperty);
+            _broadcastComponent = _broadcastComponent ?? AttachedEntity.GetComponent<ChunkEventBroadcastComponent>();
+            _broadcastComponent.GetGenerator(AttachedEntity)
                 .EntityLook(
-                AttachedObject.EntityId,
+                AttachedEntity.EntityId,
                 GetAngle(yaw),
                 GetAngle(pitch),
-                AttachedObject.GetValue(EntityOnGroundComponent.IsOnGroundProperty));
+                AttachedEntity.GetValue(EntityOnGroundComponent.IsOnGroundProperty));
         }
 
         private void OnEntityPitchChanged(object sender, PropertyChangedEventArgs<float> e)
         {
-            var yaw = AttachedObject.GetValue(EntityLookComponent.YawProperty);
-            var pitch = AttachedObject.GetValue(EntityLookComponent.PitchProperty);
-            _broadcastComponent = _broadcastComponent ?? AttachedObject.GetComponent<ChunkEventBroadcastComponent>();
-            _broadcastComponent.GetGenerator(AttachedObject)
+            var yaw = AttachedEntity.GetValue(EntityLookComponent.YawProperty);
+            var pitch = AttachedEntity.GetValue(EntityLookComponent.PitchProperty);
+            _broadcastComponent = _broadcastComponent ?? AttachedEntity.GetComponent<ChunkEventBroadcastComponent>();
+            _broadcastComponent.GetGenerator(AttachedEntity)
                 .EntityLook(
-                AttachedObject.EntityId,
+                AttachedEntity.EntityId,
                 GetAngle(yaw),
                 GetAngle(pitch),
-                AttachedObject.GetValue(EntityOnGroundComponent.IsOnGroundProperty));
+                AttachedEntity.GetValue(EntityOnGroundComponent.IsOnGroundProperty));
         }
 
         private void OnEntityWorldPositionChanged(object sender, PropertyChangedEventArgs<EntityWorldPos> e)
         {
-            var generator = AttachedObject.GetComponent<ClientboundPacketComponent>().GetGenerator();
+            var generator = AttachedEntity.GetComponent<ClientboundPacketComponent>().GetGenerator();
 
             // Update Collider
             var pos = e.NewValue;
             var box = new Cuboid(new Point3d(pos.X, pos.Z, pos.Y), new Size(0.6f, 0.6f, 1.75f));
-            AttachedObject.SetLocalValue(ColliderComponent.ColliderShapeProperty, box);
+            AttachedEntity.SetLocalValue(ColliderComponent.ColliderShapeProperty, box);
 
             // Check if we need to send UpdateViewPosition packet. If the player walk cross chunk borders, send it.
             var oldChunkPos = e.OldValue.ToChunkWorldPos();
@@ -125,25 +125,25 @@ namespace MineCase.Server.Game.Entities.Components
             }
 
             // Broadcast to trackers
-            _broadcastComponent = _broadcastComponent ?? AttachedObject.GetComponent<ChunkEventBroadcastComponent>();
-            _broadcastComponent.GetGenerator(AttachedObject)
+            _broadcastComponent = _broadcastComponent ?? AttachedEntity.GetComponent<ChunkEventBroadcastComponent>();
+            _broadcastComponent.GetGenerator(AttachedEntity)
                 .EntityRelativeMove(
-                AttachedObject.EntityId,
+                AttachedEntity.EntityId,
                 GetDelta(e.OldValue.X, e.NewValue.X),
                 GetDelta(e.OldValue.Y, e.NewValue.Y),
                 GetDelta(e.OldValue.Z, e.NewValue.Z),
-                AttachedObject.GetValue(EntityOnGroundComponent.IsOnGroundProperty));
+                AttachedEntity.GetValue(EntityOnGroundComponent.IsOnGroundProperty));
         }
 
         private void OnEntityHealthChanged(object sender, PropertyChangedEventArgs<int> e)
         {
-            var generator = AttachedObject.GetComponent<ClientboundPacketComponent>().GetGenerator();
-            var healthComponent = AttachedObject.GetComponent<HealthComponent>();
-            var foodComponent = AttachedObject.GetComponent<FoodComponent>();
+            var generator = AttachedEntity.GetComponent<ClientboundPacketComponent>().GetGenerator();
+            var healthComponent = AttachedEntity.GetComponent<HealthComponent>();
+            var foodComponent = AttachedEntity.GetComponent<FoodComponent>();
             generator.UpdateHealth(healthComponent.Health, healthComponent.MaxHealth, foodComponent.Food, foodComponent.MaxFood, foodComponent.FoodSaturation);
             if (healthComponent.Health < 0)
             {
-                AttachedObject.SetLocalValue(DeathComponent.IsDeathProperty, true);
+                AttachedEntity.SetLocalValue(DeathComponent.IsDeathProperty, true);
             }
         }
 
@@ -159,25 +159,25 @@ namespace MineCase.Server.Game.Entities.Components
 
         private void OnDraggedSlotChanged(object sender, PropertyChangedEventArgs<Slot> e)
         {
-            AttachedObject.QueueOperation(() => AttachedObject.GetComponent<ClientboundPacketComponent>().GetGenerator()
+            AttachedEntity.QueueOperation(() => AttachedEntity.GetComponent<ClientboundPacketComponent>().GetGenerator()
                 .SetSlot(0xFF, 0, e.NewValue));
         }
 
         async Task IHandle<BindToUser>.Handle(BindToUser message)
         {
-            AttachedObject.GetComponent<SlotContainerComponent>().SlotChanged -= InventorySlotChanged;
+            AttachedEntity.GetComponent<SlotContainerComponent>().SlotChanged -= InventorySlotChanged;
 
             _user = message.User;
-            AttachedObject.GetComponent<NameComponent>().SetName(await message.User.GetName());
-            AttachedObject.GetComponent<GameModeComponent>().SetGameMode(await message.User.GetGameMode());
-            AttachedObject.GetComponent<SlotContainerComponent>().SetSlots(await message.User.GetInventorySlots());
+            AttachedEntity.GetComponent<NameComponent>().SetName(await message.User.GetName());
+            AttachedEntity.GetComponent<GameModeComponent>().SetGameMode(await message.User.GetGameMode());
+            AttachedEntity.GetComponent<SlotContainerComponent>().SetSlots(await message.User.GetInventorySlots());
 
-            AttachedObject.GetComponent<SlotContainerComponent>().SlotChanged += InventorySlotChanged;
+            AttachedEntity.GetComponent<SlotContainerComponent>().SlotChanged += InventorySlotChanged;
         }
 
         private void InventorySlotChanged(object sender, (int Index, Slot Slot) e)
         {
-            AttachedObject.QueueOperation(() => _user.SetInventorySlot(e.Index, e.Slot));
+            AttachedEntity.QueueOperation(() => _user.SetInventorySlot(e.Index, e.Slot));
         }
     }
 }

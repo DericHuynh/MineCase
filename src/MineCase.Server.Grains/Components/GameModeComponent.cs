@@ -12,7 +12,7 @@ namespace MineCase.Server.Components
         public static readonly DependencyProperty<GameMode> GameModeProperty =
             DependencyProperty.Register<GameMode>("GameMode", typeof(GameModeComponent));
 
-        public GameMode GameMode => AttachedObject.GetValue(GameModeProperty);
+        public GameMode GameMode => AttachedEntity.GetValue(GameModeProperty);
 
         public GameModeComponent(string name = "gameMode")
             : base(name)
@@ -20,6 +20,6 @@ namespace MineCase.Server.Components
         }
 
         public void SetGameMode(GameMode value) =>
-            AttachedObject.SetLocalValue(GameModeProperty, value);
+            AttachedEntity.SetLocalValue(GameModeProperty, value);
     }
 }

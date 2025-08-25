@@ -21,19 +21,19 @@ namespace MineCase.Server.Game.Entities.Components
 
         Task IHandle<SpawnMob>.Handle(SpawnMob message)
         {
-            AttachedObject.Tell<SpawnEntity>(message);
-            AttachedObject.SetLocalValue(MobTypeComponent.MobTypeProperty, message.MobType);
+            AttachedEntity.Tell<SpawnEntity>(message);
+            AttachedEntity.SetLocalValue(MobTypeComponent.MobTypeProperty, message.MobType);
             CompleteSpawn();
 
-            // Logger.LogInformation($"Mob spawn, key: {AttachedObject.GetAddressByPartitionKey()}");
+            // Logger.LogInformation($"Mob spawn, key: {AttachedEntity.GetAddressByPartitionKey()}");
             // Logger.LogInformation($"Mob spawn, type: {message.MobType}");
             return Task.CompletedTask;
         }
 
         protected override Task SendSpawnPacket(ClientPlayPacketGenerator generator)
         {
-            MobType type = AttachedObject.GetComponent<MobTypeComponent>().MobType;
-            return generator.SpawnMob(AttachedObject.EntityId, AttachedObject.UUID, (byte)type, AttachedObject.Position, AttachedObject.Pitch, AttachedObject.Yaw, new EntityMetadata.Entity { });
+            MobType type = AttachedEntity.GetComponent<MobTypeComponent>().MobType;
+            return generator.SpawnMob(AttachedEntity.EntityId, AttachedEntity.UUID, (byte)type, AttachedEntity.Position, AttachedEntity.Pitch, AttachedEntity.Yaw, new EntityMetadata.Entity { });
         }
     }
 }

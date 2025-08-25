@@ -19,15 +19,15 @@ namespace MineCase.Server.Components
         }
 
         public void SetWorld(IWorld value) =>
-            AttachedObject.SetLocalValue(WorldProperty, value);
+            AttachedEntity.SetLocalValue(WorldProperty, value);
     }
 
     public static class WorldComponentExtensions
     {
-        public static IWorld GetWorld(this DependencyObject d) =>
+        public static IWorld GetWorld(this Entity d) =>
             d.GetValue(WorldComponent.WorldProperty);
 
-        public static bool TryGetWorld(this DependencyObject d, out IWorld value) =>
+        public static bool TryGetWorld(this Entity d, out IWorld value) =>
             d.TryGetLocalValue(WorldComponent.WorldProperty, out value);
     }
 }

@@ -36,13 +36,13 @@ namespace MineCase.Server.Network.Play
 
         protected override void OnAttached()
         {
-            AttachedObject.GetComponent<GameTickComponent>()
+            AttachedEntity.GetComponent<GameTickComponent>()
                 .Tick += OnGameTick;
         }
 
         protected override void OnDetached()
         {
-            AttachedObject.GetComponent<GameTickComponent>()
+            AttachedEntity.GetComponent<GameTickComponent>()
                 .Tick -= OnGameTick;
         }
 
@@ -166,7 +166,7 @@ namespace MineCase.Server.Network.Play
 
         private Task DispatchPacket(TeleportConfirm packet)
         {
-            return AttachedObject.GetComponent<TeleportComponent>().ConfirmTeleport(packet.TeleportId);
+            return AttachedEntity.GetComponent<TeleportComponent>().ConfirmTeleport(packet.TeleportId);
         }
 
         private Task DispatchPacket(ServerboundChatMessage packet)
@@ -180,7 +180,7 @@ namespace MineCase.Server.Network.Play
 
         private Task DispatchPacket(ClientSettings packet)
         {
-            AttachedObject.SetLocalValue(ViewDistanceComponent.ViewDistanceProperty, packet.ViewDistance);
+            AttachedEntity.SetLocalValue(ViewDistanceComponent.ViewDistanceProperty, packet.ViewDistance);
             return Task.CompletedTask;
         }
 
@@ -194,40 +194,40 @@ namespace MineCase.Server.Network.Play
 
         private Task DispatchPacket(ServerboundKeepAlive packet)
         {
-            _keepAliveComponent = _keepAliveComponent ?? AttachedObject.GetComponent<KeepAliveComponent>();
+            _keepAliveComponent = _keepAliveComponent ?? AttachedEntity.GetComponent<KeepAliveComponent>();
             return _keepAliveComponent.ReceiveResponse(packet.KeepAliveId);
         }
 
         private Task DispatchPacket(ServerboundPositionAndLook packet)
         {
             // TODO: check if player movement is valid
-            AttachedObject.SetLocalValue(EntityWorldPositionComponent.EntityWorldPositionProperty, new EntityWorldPos((float)packet.X, (float)packet.FeetY, (float)packet.Z));
-            AttachedObject.SetLocalValue(EntityLookComponent.PitchProperty, packet.Pitch);
-            AttachedObject.SetLocalValue(EntityLookComponent.YawProperty, packet.Yaw);
-            AttachedObject.SetLocalValue(EntityOnGroundComponent.IsOnGroundProperty, packet.OnGround);
+            AttachedEntity.SetLocalValue(EntityWorldPositionComponent.EntityWorldPositionProperty, new EntityWorldPos((float)packet.X, (float)packet.FeetY, (float)packet.Z));
+            AttachedEntity.SetLocalValue(EntityLookComponent.PitchProperty, packet.Pitch);
+            AttachedEntity.SetLocalValue(EntityLookComponent.YawProperty, packet.Yaw);
+            AttachedEntity.SetLocalValue(EntityOnGroundComponent.IsOnGroundProperty, packet.OnGround);
             return Task.CompletedTask;
         }
 
         private Task DispatchPacket(PlayerOnGround packet)
         {
-            AttachedObject.SetLocalValue(EntityOnGroundComponent.IsOnGroundProperty, packet.OnGround);
+            AttachedEntity.SetLocalValue(EntityOnGroundComponent.IsOnGroundProperty, packet.OnGround);
             return Task.CompletedTask;
         }
 
         private Task DispatchPacket(PlayerPosition packet)
         {
             // TODO: check if player movement is valid
-            AttachedObject.SetLocalValue(EntityWorldPositionComponent.EntityWorldPositionProperty, new EntityWorldPos((float)packet.X, (float)packet.FeetY, (float)packet.Z));
-            AttachedObject.SetLocalValue(EntityOnGroundComponent.IsOnGroundProperty, packet.OnGround);
+            AttachedEntity.SetLocalValue(EntityWorldPositionComponent.EntityWorldPositionProperty, new EntityWorldPos((float)packet.X, (float)packet.FeetY, (float)packet.Z));
+            AttachedEntity.SetLocalValue(EntityOnGroundComponent.IsOnGroundProperty, packet.OnGround);
             return Task.CompletedTask;
         }
 
         private Task DispatchPacket(PlayerLook packet)
         {
-            AttachedObject.SetLocalValue(EntityLookComponent.PitchProperty, packet.Pitch);
-            AttachedObject.SetLocalValue(EntityLookComponent.YawProperty, packet.Yaw);
-            AttachedObject.SetLocalValue(EntityLookComponent.HeadYawProperty, packet.Yaw);
-            AttachedObject.SetLocalValue(EntityOnGroundComponent.IsOnGroundProperty, packet.OnGround);
+            AttachedEntity.SetLocalValue(EntityLookComponent.PitchProperty, packet.Pitch);
+            AttachedEntity.SetLocalValue(EntityLookComponent.YawProperty, packet.Yaw);
+            AttachedEntity.SetLocalValue(EntityLookComponent.HeadYawProperty, packet.Yaw);
+            AttachedEntity.SetLocalValue(EntityOnGroundComponent.IsOnGroundProperty, packet.OnGround);
             return Task.CompletedTask;
         }
 
@@ -242,14 +242,14 @@ namespace MineCase.Server.Network.Play
 
         private Task DispatchPacket(ServerboundHeldItemChange packet)
         {
-            AttachedObject.GetComponent<HeldItemComponent>().SetHeldItemIndex(packet.Slot);
+            AttachedEntity.GetComponent<HeldItemComponent>().SetHeldItemIndex(packet.Slot);
             return Task.CompletedTask;
         }
 
         private async Task DispatchPacket(PlayerDigging packet)
         {
             var face = ConvertDiggingFace(packet.Face);
-            var component = AttachedObject.GetComponent<DiggingComponent>();
+            var component = AttachedEntity.GetComponent<DiggingComponent>();
             switch (packet.Status)
             {
                 case PlayerDiggingStatus.StartedDigging:
@@ -285,7 +285,7 @@ namespace MineCase.Server.Network.Play
         private async Task DispatchPacket(PlayerBlockPlacement packet)
         {
             var face = ConvertDiggingFace(packet.Face);
-            await AttachedObject.GetComponent<BlockPlacementComponent>()
+            await AttachedEntity.GetComponent<BlockPlacementComponent>()
                 .PlaceBlock(packet.Location, (EntityInteractHand)packet.Hand, face, new Vector3(packet.CursorPositionX, packet.CursorPositionY, packet.CursorPositionZ));
         }
 
@@ -298,7 +298,7 @@ namespace MineCase.Server.Network.Play
         {
             try
             {
-                await AttachedObject.GetComponent<WindowManagerComponent>()
+                await AttachedEntity.GetComponent<WindowManagerComponent>()
                     .ClickWindow(packet.WindowId, packet.Slot, ToClickAction(packet.Button, packet.Mode, packet.Slot), packet.ActionNumber, packet.ClickedItem);
             }
             catch
@@ -308,7 +308,7 @@ namespace MineCase.Server.Network.Play
 
         private Task DispatchPacket(ServerboundCloseWindow packet)
         {
-            return AttachedObject.GetComponent<WindowManagerComponent>()
+            return AttachedEntity.GetComponent<WindowManagerComponent>()
                 .CloseWindow(packet.WindowId);
         }
 

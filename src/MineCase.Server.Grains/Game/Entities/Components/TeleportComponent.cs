@@ -24,8 +24,8 @@ namespace MineCase.Server.Game.Entities.Components
 
         public Task Teleport(EntityWorldPos position, float yaw, float pitch)
         {
-            var generator = AttachedObject.GetComponent<ClientboundPacketComponent>().GetGenerator();
-            uint teleportId = AttachedObject.GetComponent<TeleportComponent>().StartNew();
+            var generator = AttachedEntity.GetComponent<ClientboundPacketComponent>().GetGenerator();
+            uint teleportId = AttachedEntity.GetComponent<TeleportComponent>().StartNew();
             return generator.PositionAndLook(position.X, position.Y, position.Z, yaw, pitch, 0, teleportId);
         }
 

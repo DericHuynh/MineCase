@@ -18,7 +18,7 @@ namespace MineCase.Server.Game.Entities.Components
 
         protected override void OnAttached()
         {
-            if (AttachedObject.GetValue(IsEnabledComponent.IsEnabledProperty))
+            if (AttachedEntity.GetValue(IsEnabledComponent.IsEnabledProperty))
                 InstallPropertyChangedHandlers();
         }
 
@@ -30,52 +30,52 @@ namespace MineCase.Server.Game.Entities.Components
 
         private void InstallPropertyChangedHandlers()
         {
-            AttachedObject.RegisterPropertyChangedHandler(EntityLookComponent.HeadYawProperty, OnHeadYawChanged);
-            AttachedObject.RegisterPropertyChangedHandler(EntityLookComponent.YawProperty, OnYawChanged);
-            AttachedObject.RegisterPropertyChangedHandler(EntityLookComponent.PitchProperty, OnPitchChanged);
-            AttachedObject.RegisterPropertyChangedHandler(EntityWorldPositionComponent.EntityWorldPositionProperty, OnPositionChanged);
+            AttachedEntity.RegisterPropertyChangedHandler(EntityLookComponent.HeadYawProperty, OnHeadYawChanged);
+            AttachedEntity.RegisterPropertyChangedHandler(EntityLookComponent.YawProperty, OnYawChanged);
+            AttachedEntity.RegisterPropertyChangedHandler(EntityLookComponent.PitchProperty, OnPitchChanged);
+            AttachedEntity.RegisterPropertyChangedHandler(EntityWorldPositionComponent.EntityWorldPositionProperty, OnPositionChanged);
         }
 
         private void OnHeadYawChanged(object sender, PropertyChangedEventArgs<float> e)
         {
-            uint eid = AttachedObject.GetValue(EntityIdComponent.EntityIdProperty);
-            byte headyaw = (byte)(AttachedObject.GetValue(EntityLookComponent.HeadYawProperty) / 360 * 255);
-            AttachedObject.QueueOperation(() => AttachedObject.GetComponent<ChunkEventBroadcastComponent>().GetGenerator().EntityHeadLook(eid, headyaw));
+            uint eid = AttachedEntity.GetValue(EntityIdComponent.EntityIdProperty);
+            byte headyaw = (byte)(AttachedEntity.GetValue(EntityLookComponent.HeadYawProperty) / 360 * 255);
+            AttachedEntity.QueueOperation(() => AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator().EntityHeadLook(eid, headyaw));
         }
 
         private void OnYawChanged(object sender, PropertyChangedEventArgs<float> e)
         {
             /*
-            uint eid = AttachedObject.GetValue(EntityIdComponent.EntityIdProperty);
-            byte yaw = (byte)(AttachedObject.GetValue(EntityLookComponent.YawProperty) / 360 * 255);
-            byte pitch = (byte)(AttachedObject.GetValue(EntityLookComponent.PitchProperty) / 360 * 255);
-            bool onGround = AttachedObject.GetValue(EntityOnGroundComponent.IsOnGroundProperty);
+            uint eid = AttachedEntity.GetValue(EntityIdComponent.EntityIdProperty);
+            byte yaw = (byte)(AttachedEntity.GetValue(EntityLookComponent.YawProperty) / 360 * 255);
+            byte pitch = (byte)(AttachedEntity.GetValue(EntityLookComponent.PitchProperty) / 360 * 255);
+            bool onGround = AttachedEntity.GetValue(EntityOnGroundComponent.IsOnGroundProperty);
 
-            // return AttachedObject.GetComponent<ChunkEventBroadcastComponent>().GetGenerator().EntityLook(eid, yaw, pitch, onGround);
-            return AttachedObject.GetComponent<ChunkEventBroadcastComponent>().GetGenerator().EntityLookAndRelativeMove(eid, 0, 0, 0, yaw, pitch, onGround);
+            // return AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator().EntityLook(eid, yaw, pitch, onGround);
+            return AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator().EntityLookAndRelativeMove(eid, 0, 0, 0, yaw, pitch, onGround);
             */
         }
 
         private void OnPitchChanged(object sender, PropertyChangedEventArgs<float> e)
         {
-            uint eid = AttachedObject.GetValue(EntityIdComponent.EntityIdProperty);
-            byte yaw = (byte)(AttachedObject.GetValue(EntityLookComponent.YawProperty) / 360 * 255);
-            byte pitch = (byte)(AttachedObject.GetValue(EntityLookComponent.PitchProperty) / 360 * 255);
-            bool onGround = AttachedObject.GetValue(EntityOnGroundComponent.IsOnGroundProperty);
+            uint eid = AttachedEntity.GetValue(EntityIdComponent.EntityIdProperty);
+            byte yaw = (byte)(AttachedEntity.GetValue(EntityLookComponent.YawProperty) / 360 * 255);
+            byte pitch = (byte)(AttachedEntity.GetValue(EntityLookComponent.PitchProperty) / 360 * 255);
+            bool onGround = AttachedEntity.GetValue(EntityOnGroundComponent.IsOnGroundProperty);
 
-            // return AttachedObject.GetComponent<ChunkEventBroadcastComponent>().GetGenerator().EntityLook(eid, yaw, pitch, onGround);
-            AttachedObject.QueueOperation(() => AttachedObject.GetComponent<ChunkEventBroadcastComponent>().GetGenerator().EntityLook(eid, yaw, pitch, onGround));
+            // return AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator().EntityLook(eid, yaw, pitch, onGround);
+            AttachedEntity.QueueOperation(() => AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator().EntityLook(eid, yaw, pitch, onGround));
         }
 
         private void OnPositionChanged(object sender, PropertyChangedEventArgs<EntityWorldPos> e)
         {
-            uint eid = AttachedObject.GetValue(EntityIdComponent.EntityIdProperty);
+            uint eid = AttachedEntity.GetValue(EntityIdComponent.EntityIdProperty);
             short x = (short)((e.NewValue.X - e.OldValue.X) * 32 * 128);
             short y = (short)((e.NewValue.Y - e.OldValue.Y) * 32 * 128);
             short z = (short)((e.NewValue.Z - e.OldValue.Z) * 32 * 128);
-            bool isOnGround = AttachedObject.GetValue(EntityOnGroundComponent.IsOnGroundProperty);
+            bool isOnGround = AttachedEntity.GetValue(EntityOnGroundComponent.IsOnGroundProperty);
 
-            AttachedObject.QueueOperation(() => AttachedObject.GetComponent<ChunkEventBroadcastComponent>().GetGenerator().EntityRelativeMove(eid, x, y, z, isOnGround));
+            AttachedEntity.QueueOperation(() => AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator().EntityRelativeMove(eid, x, y, z, isOnGround));
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MineCase.Server.Game.Entities
 {
-    public interface IMob : IEntity
+    public interface IMob : IMineCaseEntity
     {
     }
 }

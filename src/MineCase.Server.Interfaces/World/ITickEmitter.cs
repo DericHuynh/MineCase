@@ -12,9 +12,9 @@ namespace MineCase.Server.World
 {
     public interface ITickEmitter : IAddressByPartition
     {
-        Task Subscribe(IDependencyObject observer);
+        Task Subscribe(Engine.IEntity observer);
 
-        Task Unsubscribe(IDependencyObject observer);
+        Task Unsubscribe(Engine.IEntity observer);
 
         Task OnGameTick(GameTickArgs e);
     }

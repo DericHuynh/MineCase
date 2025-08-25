@@ -45,13 +45,13 @@ namespace MineCase.Server.Game.Entities.Components
             if (_isOnline && _keepAliveWaiters.Count >= ClientKeepInterval)
             {
                 _isOnline = false;
-                await AttachedObject.Tell(new KickPlayer());
+                await AttachedEntity.Tell(new KickPlayer());
             }
             else if (_isOnline && e.WorldAge % 20 == 0)
             {
                 var id = _keepAliveId++;
                 _keepAliveWaiters.Add(id, DateTime.UtcNow);
-                await AttachedObject.GetComponent<ClientboundPacketComponent>().GetGenerator().KeepAlive(id);
+                await AttachedEntity.GetComponent<ClientboundPacketComponent>().GetGenerator().KeepAlive(id);
             }
         }
 
@@ -59,14 +59,14 @@ namespace MineCase.Server.Game.Entities.Components
         {
             _keepAliveWaiters.Clear();
             _isOnline = true;
-            AttachedObject.GetComponent<GameTickComponent>()
+            AttachedEntity.GetComponent<GameTickComponent>()
                 .Tick += OnGameTick;
             return Task.CompletedTask;
         }
 
         Task IHandle<KickPlayer>.Handle(KickPlayer message)
         {
-            AttachedObject.GetComponent<GameTickComponent>()
+            AttachedEntity.GetComponent<GameTickComponent>()
                 .Tick -= OnGameTick;
             _isOnline = false;
             return Task.CompletedTask;
@@ -74,7 +74,7 @@ namespace MineCase.Server.Game.Entities.Components
 
         Task IHandle<BeginLogin>.Handle(BeginLogin message)
         {
-            AttachedObject.GetComponent<GameTickComponent>()
+            AttachedEntity.GetComponent<GameTickComponent>()
                 .Tick -= OnGameTick;
             _isOnline = false;
             return Task.CompletedTask;
