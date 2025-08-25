@@ -73,10 +73,10 @@ namespace MineCase.Server.User
 
         private async Task<bool> StreamChunk(ChunkWorldPos chunkPos)
         {
-            var trunkSender = GrainFactory.GetGrain<IChunkSender>(_world.GetPrimaryKeyString());
+            var chunkSender = GrainFactory.GetGrain<IChunkSender>(_world.GetPrimaryKeyString());
             if (!_sentChunks.Contains(chunkPos) && _sendingChunks.Add(chunkPos))
             {
-                await trunkSender.PostChunk(chunkPos, new[] { _sink }, new[] { this.AsReference<IUserChunkLoader>() });
+                await chunkSender.PostChunk(chunkPos, new[] { _sink }, new[] { this.AsReference<IUserChunkLoader>() });
                 await GrainFactory.GetPartitionGrain<IChunkTrackingHub>(_world, chunkPos).Subscribe(_player);
                 await GrainFactory.GetPartitionGrain<IWorldPartition>(_world, chunkPos).Enter(_player);
                 return true;
