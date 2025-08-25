@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MineCase.Block;
 using MineCase.Item;
+using Orleans;
 
 namespace MineCase
 {
@@ -146,16 +147,23 @@ namespace MineCase
         }
     }
 
+    [GenerateSerializer]
     public class FurnaceRecipe
     {
+        [Id(0)]
         public Slot Input;
+        [Id(1)]
         public int Time;
+        [Id(2)]
         public Slot Output;
     }
 
+    [GenerateSerializer]
     public class FurnaceFuel
     {
+        [Id(0)]
         public Slot Slot;
+        [Id(1)]
         public int Time;
     }
 }
