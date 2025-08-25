@@ -19,6 +19,7 @@ using MongoDB.Bson.Serialization.Serializers;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
+using Orleans.Runtime;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -72,6 +73,9 @@ namespace MineCase.Server
                     options.ClusterId = "dev";
                     options.ServiceId = "MineCaseService";
                 });
+#pragma warning disable ORLEANSEXP001
+                siloBuilder.AddActivationRepartitioner();
+#pragma warning restore ORLEANSEXP001
                 siloBuilder.ConfigureEndpoints(siloPort: siloPort, gatewayPort: gatewayPort);
                 siloBuilder.UseMongoDBClient(hostBuilder.Configuration.GetSection("persistenceOptions")["connectionString"]);
                 siloBuilder.AddMemoryStreams("JobsProvider");
