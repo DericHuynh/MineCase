@@ -11,9 +11,11 @@ using MineCase.Server.World;
 using MineCase.World;
 using Orleans;
 using Orleans.Concurrency;
+using Orleans.Runtime;
 
 namespace MineCase.Server.User
 {
+    [KeepAlive]
     [Reentrant]
     internal class UserChunkLoaderGrain : Grain, IUserChunkLoader
     {
