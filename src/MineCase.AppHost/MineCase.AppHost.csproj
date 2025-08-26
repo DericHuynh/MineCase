@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ActivationRebalancing.Frontend\ActivationRebalancing.Frontend.csproj" />
+    <ProjectReference Include="..\DashboardToy.Frontend\DashboardToy.Frontend.csproj" />
     <ProjectReference Include="..\MineCase.Gateway\MineCase.Gateway.csproj" />
     <ProjectReference Include="..\MineCase.Server\MineCase.Server.csproj" />
   </ItemGroup>

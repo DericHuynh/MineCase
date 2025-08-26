@@ -10,8 +10,8 @@ namespace MineCase.Server.User
     {
         Task<IUser> GetUser();
 
-        Task<uint> GetProtocolVersion();
+        Task<int> GetProtocolVersion();
 
-        Task SetProtocolVersion(uint version);
+        Task SetProtocolVersion(int version);
     }
 }

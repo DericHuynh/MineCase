@@ -17,7 +17,7 @@ namespace MineCase.Protocol.Login
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(1)]
-        public uint PublicKeyLength;
+        public int PublicKeyLength;
 
         [SerializeAs(DataType.ByteArray, ArrayLengthMember = nameof(PublicKeyLength))]
         [Orleans.Id(2)]
@@ -25,7 +25,7 @@ namespace MineCase.Protocol.Login
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(3)]
-        public uint VerifyTokenLength;
+        public int VerifyTokenLength;
 
         [SerializeAs(DataType.ByteArray, ArrayLengthMember = nameof(VerifyTokenLength))]
         [Orleans.Id(4)]
@@ -39,7 +39,7 @@ namespace MineCase.Protocol.Login
     {
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(0)]
-        public uint SharedSecretLength;
+        public int SharedSecretLength;
 
         [SerializeAs(DataType.ByteArray, ArrayLengthMember = nameof(SharedSecretLength))]
         [Orleans.Id(1)]
@@ -47,7 +47,7 @@ namespace MineCase.Protocol.Login
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(2)]
-        public uint VerifyTokenLength;
+        public int VerifyTokenLength;
 
         [SerializeAs(DataType.ByteArray, ArrayLengthMember = nameof(VerifyTokenLength))]
         [Orleans.Id(3)]

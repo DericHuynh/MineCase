@@ -10,23 +10,23 @@ namespace MineCase.Server.Game.Entities.Components
     [Orleans.GenerateSerializer]
     internal class ExperienceComponent : Component
     {
-        public static readonly DependencyProperty<uint> ExperienceProperty =
-            DependencyProperty.Register<uint>("Experience", typeof(ExperienceComponent));
+        public static readonly DependencyProperty<int> ExperienceProperty =
+            DependencyProperty.Register<int>("Experience", typeof(ExperienceComponent));
 
         [Orleans.Id(0)]
-        private uint _levelMaxExp = 7;
+        private int _levelMaxExp = 7;
         [Orleans.Id(1)]
-        private uint _totalExp = 0;
+        private int _totalExp = 0;
         [Orleans.Id(2)]
-        private uint _level = 0;
+        private int _level = 0;
 
-        public uint Experience => AttachedEntity.GetValue(ExperienceProperty);
+        public int Experience => AttachedEntity.GetValue(ExperienceProperty);
 
         public float ExperienceBar => (float)Experience / _levelMaxExp;
 
-        public uint Level => _level;
+        public int Level => _level;
 
-        public uint TotalExperience => _totalExp;
+        public int TotalExperience => _totalExp;
 
         public ExperienceComponent(string name = "experience")
             : base(name)

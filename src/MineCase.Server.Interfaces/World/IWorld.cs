@@ -12,7 +12,7 @@ namespace MineCase.Server.World
 {
     public interface IWorld : IGrainWithStringKey
     {
-        Task<uint> NewEntityId();
+        Task<int> NewEntityId();
 
         [ReadOnly]
         Task<WorldTime> GetTime();

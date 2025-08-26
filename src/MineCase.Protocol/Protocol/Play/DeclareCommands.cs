@@ -13,7 +13,7 @@ namespace MineCase.Protocol.Play
     {
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(0)]
-        public uint Count;
+        public int Count;
 
         [SerializeAs(DataType.Array)]
         [Orleans.Id(1)]
@@ -21,7 +21,7 @@ namespace MineCase.Protocol.Play
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(2)]
-        public uint RootIndex;
+        public int RootIndex;
 
         // TODO : complete serialization and deserialization
         public void Serialize(BinaryWriter bw)

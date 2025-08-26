@@ -38,7 +38,7 @@ namespace MineCase.Server.Game.Entities.Components
 
         private void OnHeadYawChanged(object sender, PropertyChangedEventArgs<float> e)
         {
-            uint eid = AttachedEntity.GetValue(EntityIdComponent.EntityIdProperty);
+            int eid = AttachedEntity.GetValue(EntityIdComponent.EntityIdProperty);
             byte headyaw = (byte)(AttachedEntity.GetValue(EntityLookComponent.HeadYawProperty) / 360 * 255);
             AttachedEntity.QueueOperation(() => AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator().EntityHeadLook(eid, headyaw));
         }
@@ -58,7 +58,7 @@ namespace MineCase.Server.Game.Entities.Components
 
         private void OnPitchChanged(object sender, PropertyChangedEventArgs<float> e)
         {
-            uint eid = AttachedEntity.GetValue(EntityIdComponent.EntityIdProperty);
+            int eid = AttachedEntity.GetValue(EntityIdComponent.EntityIdProperty);
             byte yaw = (byte)(AttachedEntity.GetValue(EntityLookComponent.YawProperty) / 360 * 255);
             byte pitch = (byte)(AttachedEntity.GetValue(EntityLookComponent.PitchProperty) / 360 * 255);
             bool onGround = AttachedEntity.GetValue(EntityOnGroundComponent.IsOnGroundProperty);
@@ -69,7 +69,7 @@ namespace MineCase.Server.Game.Entities.Components
 
         private void OnPositionChanged(object sender, PropertyChangedEventArgs<EntityWorldPos> e)
         {
-            uint eid = AttachedEntity.GetValue(EntityIdComponent.EntityIdProperty);
+            int eid = AttachedEntity.GetValue(EntityIdComponent.EntityIdProperty);
             short x = (short)((e.NewValue.X - e.OldValue.X) * 32 * 128);
             short y = (short)((e.NewValue.Y - e.OldValue.Y) * 32 * 128);
             short z = (short)((e.NewValue.Z - e.OldValue.Z) * 32 * 128);

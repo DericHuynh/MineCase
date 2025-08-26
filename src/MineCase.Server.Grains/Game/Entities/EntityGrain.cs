@@ -22,7 +22,7 @@ namespace MineCase.Server.Game.Entities
     {
         public Guid UUID => this.GetPrimaryKey();
 
-        public uint EntityId => GetValue(EntityIdComponent.EntityIdProperty);
+        public int EntityId => GetValue(EntityIdComponent.EntityIdProperty);
 
         public EntityWorldPos Position => GetValue(EntityWorldPositionComponent.EntityWorldPositionProperty);
 
@@ -48,7 +48,7 @@ namespace MineCase.Server.Game.Entities
             SetComponent(new AutoSaveStateComponent(AutoSaveStateComponent.PerMinute));
         }
 
-        Task<uint> IMineCaseEntity.GetEntityId() =>
+        Task<int> IMineCaseEntity.GetEntityId() =>
             Task.FromResult(EntityId);
 
         Task<EntityWorldPos> IMineCaseEntity.GetPosition() =>

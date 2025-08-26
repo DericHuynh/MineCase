@@ -51,7 +51,7 @@ namespace MineCase.Server.Network
             await SendPacket(prepared.PacketId, prepared.Data.AsImmutable());
         }
 
-        public Task SendPacket(uint packetId, Immutable<byte[]> data)
+        public Task SendPacket(int packetId, Immutable<byte[]> data)
         {
             var packet = new UncompressedPacket
             {

@@ -13,7 +13,7 @@ namespace MineCase.Server.Network.Play
     public sealed class PacketForwardToPlayer : IEntityMessage
     {
         [Id(0)]
-        public uint PacketId { get; set; }
+        public int PacketId { get; set; }
 
         [Id(1)]
         public byte[] Data { get; set; }
@@ -24,7 +24,7 @@ namespace MineCase.Server.Network.Play
     public sealed class PacketBroadcastToChunk : IEntityMessage
     {
         [Id(0)]
-        public uint PacketId { get; set; }
+        public int PacketId { get; set; }
 
         [Id(1)]
         public byte[] Data { get; set; }

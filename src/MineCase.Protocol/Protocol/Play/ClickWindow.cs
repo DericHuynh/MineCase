@@ -29,7 +29,7 @@ namespace MineCase.Protocol.Play
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(4)]
-        public uint Mode;
+        public int Mode;
 
         [SerializeAs(DataType.Slot)]
         [Orleans.Id(5)]

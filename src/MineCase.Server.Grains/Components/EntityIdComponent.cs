@@ -9,10 +9,10 @@ namespace MineCase.Server.Components
 {
     internal class EntityIdComponent : Component, IHandle<SpawnEntity>
     {
-        public static readonly DependencyProperty<uint> EntityIdProperty =
-            DependencyProperty.Register<uint>("EntityId", typeof(EntityIdComponent));
+        public static readonly DependencyProperty<int> EntityIdProperty =
+            DependencyProperty.Register<int>("EntityId", typeof(EntityIdComponent));
 
-        public uint EntityId => AttachedEntity.GetValue(EntityIdProperty);
+        public int EntityId => AttachedEntity.GetValue(EntityIdProperty);
 
         public EntityIdComponent(string name = "entityId")
             : base(name)

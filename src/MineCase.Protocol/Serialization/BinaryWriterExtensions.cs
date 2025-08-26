@@ -21,20 +21,27 @@ namespace MineCase.Serialization
             bw.Write(value);
 
         // http://wiki.vg/Protocol#VarInt_and_VarLong
-        public static void WriteAsVarInt(this BinaryWriter bw, uint value, out uint bytesWrite)
+        public static void WriteAsVarInt(this BinaryWriter bw, int value, out int bytesWrite)
         {
-            uint numWrite = 0;
-            do
+            const int SEGMENTS_BITS = 0x7F;
+            const int CONTINUE_BIT = 0x80;
+            int bytesWritten = 0;
+
+            while (true)
             {
-                byte temp = (byte)(value & 0b01111111);
-                value >>= 7;
-                if (value != 0)
-                    temp |= 0b10000000;
-                bw.Write(temp);
-                numWrite++;
+                bytesWritten++;
+                if ((value & ~SEGMENTS_BITS) == 0)
+                {
+                    bw.WriteAsByte((byte)value);
+                    bytesWrite = bytesWritten;
+                    return;
+                }
+
+                bw.WriteAsByte((byte)((value & SEGMENTS_BITS) | CONTINUE_BIT));
+
+                // Note: >>> means that the sign bit is shifted with the rest of the number rather than being left alone
+                value >>>= 7;
             }
-            while (value != 0);
-            bytesWrite = numWrite;
         }
 
         public static void WriteAsByteArray(this BinaryWriter bw, byte[] value) =>
@@ -46,7 +53,7 @@ namespace MineCase.Serialization
                 bw.WriteAsInt(eachInt);
         }
 
-        public static void WriteAsVarIntArray(this BinaryWriter bw, uint[] value)
+        public static void WriteAsVarIntArray(this BinaryWriter bw, int[] value)
         {
             foreach (var eachInt in value)
                 bw.WriteAsVarInt(eachInt, out _);
@@ -61,7 +68,7 @@ namespace MineCase.Serialization
         public static void WriteAsString(this BinaryWriter bw, string value)
         {
             var bytes = Encoding.UTF8.GetBytes(value);
-            bw.WriteAsVarInt((uint)bytes.Length, out _);
+            bw.WriteAsVarInt(bytes.Length, out _);
             bw.Write(bytes);
         }
 
@@ -159,7 +166,7 @@ namespace MineCase.Serialization
             bw.WriteAsBoolean(!slot.IsEmpty);
             if (!slot.IsEmpty)
             {
-                bw.WriteAsVarInt((uint)slot.BlockId, out _);
+                bw.WriteAsVarInt(slot.BlockId, out _);
                 bw.WriteAsByte(slot.ItemCount);
                 if (slot.NBT != null)
                     slot.NBT.WriteTo(bw.BaseStream);
@@ -178,12 +185,12 @@ namespace MineCase.Serialization
 
     internal static class DataTypeSizeExtensions
     {
-        public static uint SizeOfVarInt(this uint value)
+        public static int SizeOfVarInt(this int value)
         {
-            uint numWrite = 0;
+            int numWrite = 0;
             do
             {
-                value >>= 7;
+                value >>>= 7;
                 numWrite++;
             }
             while (value != 0);

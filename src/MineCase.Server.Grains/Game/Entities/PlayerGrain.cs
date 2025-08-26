@@ -25,7 +25,7 @@ namespace MineCase.Server.Game.Entities
     [Reentrant]
     internal class PlayerGrain : EntityGrain, IPlayer
     {
-        public uint ViewDistance => GetValue(ViewDistanceComponent.ViewDistanceProperty);
+        public int ViewDistance => GetValue(ViewDistanceComponent.ViewDistanceProperty);
 
         protected override void InitializeComponents()
         {
@@ -85,7 +85,7 @@ namespace MineCase.Server.Game.Entities
             throw new NotImplementedException();
         }
 
-        public Task<uint> GetViewDistance()
+        public Task<int> GetViewDistance()
         {
             return Task.FromResult(ViewDistance);
         }

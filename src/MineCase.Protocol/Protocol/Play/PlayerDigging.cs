@@ -6,7 +6,7 @@ using MineCase.Serialization;
 
 namespace MineCase.Protocol.Play
 {
-    public enum PlayerDiggingStatus : uint
+    public enum PlayerDiggingStatus : int
     {
         StartedDigging = 0,
         CancelledDigging = 1,

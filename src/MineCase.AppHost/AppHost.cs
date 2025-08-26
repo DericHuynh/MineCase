@@ -34,7 +34,13 @@ var rebalanceVisual = builder.AddProject<Projects.ActivationRebalancing_Frontend
                      .WithEnvironment("persistenceOptions:connectionString", minecaseDb)
                      .WithEnvironment("persistenceOptions:databaseName", databaseName);
 
-gateway.WaitFor(silos);
+rebalanceVisual.WaitFor(silos);
+
+var dashboardToy = builder.AddProject<Projects.DashboardToy_Frontend>("toy-frontend")
+                     .WithEnvironment("persistenceOptions:connectionString", minecaseDb)
+                     .WithEnvironment("persistenceOptions:databaseName", databaseName);
+
+dashboardToy.WaitFor(silos);
 
 var healthchecksUi = builder.AddHealthChecksUI("healthchecks-ui")
                      .WithReference(silos)

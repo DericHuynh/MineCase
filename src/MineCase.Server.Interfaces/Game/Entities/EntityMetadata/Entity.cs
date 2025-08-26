@@ -26,7 +26,7 @@ namespace MineCase.Server.Game.Entities.EntityMetadata
         public bool FlyingWithElytra { get; set; }
 
         [Orleans.Id(6)]
-        public uint Air { get; set; } = 300;
+        public int Air { get; set; } = 300;
 
         [Orleans.Id(7)]
         public string CustomName { get; set; } = string.Empty;

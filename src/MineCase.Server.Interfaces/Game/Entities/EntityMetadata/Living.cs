@@ -17,12 +17,12 @@ namespace MineCase.Server.Game.Entities.EntityMetadata
         public float Health { get; set; }
 
         [Orleans.Id(3)]
-        public uint PotionEffectColor { get; set; }
+        public int PotionEffectColor { get; set; }
 
         [Orleans.Id(4)]
         public bool IsPotionEffectAmbient { get; set; }
 
         [Orleans.Id(5)]
-        public uint NumberOfArrows { get; set; }
+        public int NumberOfArrows { get; set; }
     }
 }

@@ -21,6 +21,11 @@ namespace MineCase.Server.Network
         private Task DispatchStatusPackets(UncompressedPacket packet)
         {
             var br = new SpanReader(packet.Data);
+            using var activity = ActivitySources.NetworkActivitySource.StartActivity("Status Packet", ActivityKind.Server, parentId: Activity.Current?.ParentId);
+            activity.AddTag("PacketId", packet.PacketId);
+            activity.AddTag("Length", packet.Length);
+            activity.AddTag("Data", packet.Data != null ? string.Join(", ", packet.Data) : "");
+
             switch (packet.PacketId)
             {
                 // Request

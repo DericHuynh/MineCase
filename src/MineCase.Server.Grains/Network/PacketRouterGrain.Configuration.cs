@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,11 @@ namespace MineCase.Server.Network
         private Task DispatchConfigurationPackets(UncompressedPacket packet)
         {
             var br = new SpanReader(packet.Data);
+            using var activity = ActivitySources.NetworkActivitySource.StartActivity("Configuration Packet", ActivityKind.Server, parentId: Activity.Current?.ParentId);
+            activity.AddTag("PacketId", packet.PacketId);
+            activity.AddTag("Length", packet.Length);
+            activity.AddTag("Data", string.Join(", ", packet.Data));
+
             switch (packet.PacketId)
             {
                 // Client Information

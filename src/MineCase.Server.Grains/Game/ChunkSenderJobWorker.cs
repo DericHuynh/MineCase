@@ -56,7 +56,10 @@ namespace MineCase.Server.Game
         {
             var chunkColumn = GrainFactory.GetGrain<IChunkColumn>(job.World.MakeAddressByPartitionKey(job.ChunkPosition));
             var generator = new ClientPlayPacketGenerator(new BroadcastPacketSink(job.Clients, _packetPackager));
-            await generator.ChunkData(Dimension.Overworld, job.ChunkPosition.X, job.ChunkPosition.Z, await chunkColumn.GetState());
+            var chunkColumnStorage = await chunkColumn.GetState();
+            await generator.ChunkData(Dimension.Overworld, job.ChunkPosition.X, job.ChunkPosition.Z, chunkColumnStorage);
+
+            await generator.LightUpdate(Dimension.Overworld, job.ChunkPosition.X, job.ChunkPosition.Z, chunkColumnStorage);
             foreach (var loader in job.Loaders)
                 loader.OnChunkSent(job.ChunkPosition).Ignore();
         }

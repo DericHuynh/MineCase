@@ -17,7 +17,7 @@ namespace MineCase.Server.Game.Entities
         public GameMode GameMode { get; set; }
 
         [Orleans.Id(3)]
-        public uint Ping { get; set; }
+        public int Ping { get; set; }
 
         [Orleans.Id(4)]
         public string DisplayName { get; set; }

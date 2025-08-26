@@ -22,7 +22,7 @@ namespace MineCase.Server.Game.Entities.Components
 
         protected override Task SendLookPacket(ClientPlayPacketGenerator generator)
         {
-            uint eid = AttachedEntity.GetComponent<EntityIdComponent>().EntityId;
+            int eid = AttachedEntity.GetComponent<EntityIdComponent>().EntityId;
             float yaw = AttachedEntity.GetComponent<EntityLookComponent>().Yaw;
             float pitch = AttachedEntity.GetComponent<EntityLookComponent>().Pitch;
             bool onGround = AttachedEntity.GetComponent<EntityOnGroundComponent>().IsOnGround;

@@ -13,7 +13,7 @@ namespace MineCase.Server.Game.Entities.Components
     internal class KeepAliveComponent : Component, IHandle<BeginLogin>, IHandle<PlayerLoggedIn>, IHandle<KickPlayer>
     {
         [Orleans.Id(0)]
-        private uint _keepAliveId = 0;
+        private int _keepAliveId = 0;
         [Orleans.Id(1)]
         public readonly Dictionary<long, DateTime> _keepAliveWaiters = new Dictionary<long, DateTime>();
         [Orleans.Id(2)]
@@ -22,7 +22,7 @@ namespace MineCase.Server.Game.Entities.Components
         private const int ClientKeepInterval = 6;
 
         [Orleans.Id(3)]
-        public uint Ping { get; private set; }
+        public int Ping { get; private set; }
 
         public KeepAliveComponent(string name = "keepAlive")
             : base(name)
@@ -34,7 +34,7 @@ namespace MineCase.Server.Game.Entities.Components
             if (_keepAliveWaiters.TryGetValue(keepAliveId, out var sendTime))
             {
                 _keepAliveWaiters.Remove(keepAliveId);
-                Ping = (uint)(DateTime.UtcNow - sendTime).TotalMilliseconds;
+                Ping = (int)(DateTime.UtcNow - sendTime).TotalMilliseconds;
             }
 
             return Task.CompletedTask;

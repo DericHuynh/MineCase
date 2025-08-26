@@ -649,7 +649,6 @@ namespace MineCase.Engine
         /// <param name="message">The message instance to send.</param>
         /// <param name="messageType">The specific type of the message.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        [OneWay]
         private async Task Tell(IEntityMessage message, Type messageType)
         {
             // Get or create the dynamic invoker delegate for this message type

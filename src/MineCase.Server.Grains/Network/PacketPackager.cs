@@ -20,7 +20,7 @@ namespace MineCase.Server.Network
             _memoryStreamMgr = memoryStreamMgr;
         }
 
-        public Task<(uint PacketId, byte[] Data)> PreparePacket(IPacket packet)
+        public Task<(int PacketId, byte[] Data)> PreparePacket(IPacket packet)
         {
             using (var stream = _memoryStreamMgr.GetStream())
             {
@@ -30,7 +30,7 @@ namespace MineCase.Server.Network
             }
         }
 
-        private uint GetPacketId(IPacket packet)
+        private int GetPacketId(IPacket packet)
         {
             var typeInfo = packet.GetType().GetTypeInfo();
             var attr = typeInfo.GetCustomAttribute<PacketAttribute>();

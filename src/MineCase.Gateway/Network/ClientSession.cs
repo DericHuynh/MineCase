@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.ObjectPool;
+﻿using DnsClient.Internal;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
 using MineCase.Buffers;
 using MineCase.Protocol;
 using MineCase.Serialization;
@@ -29,13 +31,15 @@ namespace MineCase.Gateway.Network
         private readonly ObjectPool<UncompressedPacket> _uncompressedPacketObjectPool;
         private readonly IBufferPool<byte> _bufferPool;
         private readonly IPacketCompress _packetCompress;
+        private readonly ILogger<ClientSession> _logger;
 
-        private uint _compressThreshold;
+        private int _compressThreshold;
 
-        public ClientSession(TcpClient tcpClient, IClusterClient grainFactory, IBufferPool<byte> bufferPool, ObjectPool<UncompressedPacket> uncompressedPacketObjectPool, IPacketCompress packetCompress)
+        public ClientSession(TcpClient tcpClient, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory,  IClusterClient grainFactory, IBufferPool<byte> bufferPool, ObjectPool<UncompressedPacket> uncompressedPacketObjectPool, IPacketCompress packetCompress)
         {
             _sessionId = Guid.NewGuid();
             _tcpClient = tcpClient;
+            _logger = loggerFactory.CreateLogger<ClientSession>();
             _grainFactory = grainFactory;
             _bufferPool = bufferPool;
             _packetCompress = packetCompress;
@@ -75,7 +79,10 @@ namespace MineCase.Gateway.Network
                 }
                 catch (IOException ex)
                 {
+                    var router = _grainFactory.GetGrain<IPacketRouter>(_sessionId);
+                    await router.Close();
 
+                    await _outcomingPacketDispatcher.Completion;
                 }
             }
         }
@@ -134,7 +141,7 @@ namespace MineCase.Gateway.Network
             }
         }
 
-        private static uint GetCompressionThreshold(UncompressedPacket packet)
+        private static int GetCompressionThreshold(UncompressedPacket packet)
         {
             var br = new SpanReader(packet.Data);
             return br.ReadAsVarInt(out _);

@@ -13,10 +13,10 @@ namespace MineCase.Protocol.Play
     {
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(0)]
-        public uint Count;
+        public int Count;
 
         [SerializeAs(DataType.VarIntArray, ArrayLengthMember = nameof(Count))]
         [Orleans.Id(1)]
-        public uint[] EntityIds;
+        public int[] EntityIds;
     }
 }

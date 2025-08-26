@@ -14,6 +14,6 @@ namespace MineCase.Server.Game.Entities
 {
     public interface IPlayer : IMineCaseEntity
     {
-        Task<uint> GetViewDistance();
+        Task<int> GetViewDistance();
     }
 }

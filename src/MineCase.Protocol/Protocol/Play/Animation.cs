@@ -5,7 +5,7 @@ using MineCase.Serialization;
 
 namespace MineCase.Protocol.Play
 {
-    public enum Hand : uint
+    public enum Hand : int
     {
         Main = 0,
         Off = 1

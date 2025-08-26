@@ -31,12 +31,12 @@ namespace MineCase.Server.User
             return user;
         }
 
-        public Task<uint> GetProtocolVersion()
+        public Task<int> GetProtocolVersion()
         {
             return Task.FromResult(State.ProtocolVersion);
         }
 
-        public Task SetProtocolVersion(uint version)
+        public Task SetProtocolVersion(int version)
         {
             State.ProtocolVersion = version;
             return Task.CompletedTask;
@@ -49,7 +49,7 @@ namespace MineCase.Server.User
             public Guid UUID { get; set; }
 
             [Id(1)]
-            public uint ProtocolVersion { get; set; }
+            public int ProtocolVersion { get; set; }
 
             public StateHolder()
             {

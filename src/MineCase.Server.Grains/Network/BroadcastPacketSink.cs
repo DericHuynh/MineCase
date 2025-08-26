@@ -31,7 +31,7 @@ namespace MineCase.Server.Network
             }
         }
 
-        public Task SendPacket(uint packetId, Immutable<byte[]> data)
+        public Task SendPacket(int packetId, Immutable<byte[]> data)
         {
             return Task.WhenAll(from sink in _sinks
                                 select sink.SendPacket(packetId, data));
@@ -46,7 +46,7 @@ namespace MineCase.Server.Network
             }
         }
 
-        public Task SendPacket(uint packetId, Immutable<byte[]> data, IPacketSink except)
+        public Task SendPacket(int packetId, Immutable<byte[]> data, IPacketSink except)
         {
             return Task.WhenAll(from sink in _sinks
                                 where !sink.Equals(except)

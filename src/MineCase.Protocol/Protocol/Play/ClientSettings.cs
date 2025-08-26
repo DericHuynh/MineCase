@@ -21,7 +21,7 @@ namespace MineCase.Protocol.Play
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(2)]
-        public uint ChatMode;
+        public int ChatMode;
 
         [SerializeAs(DataType.Boolean)]
         [Orleans.Id(3)]
@@ -33,6 +33,6 @@ namespace MineCase.Protocol.Play
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(5)]
-        public uint MainHand;
+        public int MainHand;
     }
 }

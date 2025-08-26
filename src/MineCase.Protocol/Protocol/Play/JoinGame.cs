@@ -37,7 +37,7 @@ namespace MineCase.Protocol.Play
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(6)]
-        public uint ViewDistance;
+        public int ViewDistance;
 
         [SerializeAs(DataType.Boolean)]
         [Orleans.Id(7)]

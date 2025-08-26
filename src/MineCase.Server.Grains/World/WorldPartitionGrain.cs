@@ -42,6 +42,7 @@ namespace MineCase.Server.World
 
         private Task OnFixedUpdate(object sender, GameTickArgs e)
         {
+            Activity.Current = null;
             return _tickEmitter.OnGameTick(e);
         }
 

@@ -28,7 +28,7 @@ namespace MineCase.Server.User
     [Reentrant]
     internal class UserGrain : PersistableEntity, IUser
     {
-        private uint _protocolVersion;
+        private int _protocolVersion;
         private IClientboundPacketSink _sink;
         private IPacketRouter _packetRouter;
         private ClientPlayPacketGenerator _generator;
@@ -166,12 +166,12 @@ namespace MineCase.Server.User
             return Task.CompletedTask;
         }
 
-        public Task<uint> GetProtocolVersion()
+        public Task<int> GetProtocolVersion()
         {
             return Task.FromResult(_protocolVersion);
         }
 
-        public Task SetProtocolVersion(uint version)
+        public Task SetProtocolVersion(int version)
         {
             _protocolVersion = version;
             return Task.CompletedTask;

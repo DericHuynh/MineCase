@@ -12,7 +12,7 @@ namespace MineCase.Server.Game.Entities
 {
     public interface IMineCaseEntity : IEntity, IGrainWithGuidKey
     {
-        Task<uint> GetEntityId();
+        Task<int> GetEntityId();
 
         Task<IWorld> GetWorld();
 

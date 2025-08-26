@@ -36,25 +36,29 @@ namespace MineCase.Serialization
             return Chat.Parse(str);
         }
 
-        public uint ReadAsVarInt(out int bytesRead)
+        public int ReadAsVarInt(out int bytesRead)
         {
-            int numRead = 0;
-            uint result = 0;
-            byte read;
+            const int SEGMENTS_BITS = 0x7F;
+            const int CONTINUE_BIT = 0x80;
+            int result = 0;
+            int amountRead = 0;
+            byte currentByte;
+
             do
             {
-                read = _span[numRead];
-                uint value = (uint)(read & 0b01111111);
-                result |= value << (7 * numRead);
+                currentByte = _span[amountRead];
+                result |= (currentByte & SEGMENTS_BITS) << (amountRead * 7);
+                amountRead++;
 
-                numRead++;
-                if (numRead > 5)
+                if ((currentByte & CONTINUE_BIT) == 0) break;
+
+                if (amountRead > 5)
                     throw new InvalidDataException("VarInt is too big");
             }
-            while ((read & 0b10000000) != 0);
+            while (true);
 
-            bytesRead = numRead;
-            Advance(numRead);
+            bytesRead = amountRead;
+            Advance(amountRead);
             return result;
         }
 
@@ -180,9 +184,9 @@ namespace MineCase.Serialization
             return ret;
         }
 
-        public uint[] ReadAsVarIntArray(int length)
+        public int[] ReadAsVarIntArray(int length)
         {
-            var array = new uint[length];
+            var array = new int[length];
             var subReader = new SpanReader(_span);
             for (int i = 0; i < array.Length; i++)
                 array[i] = subReader.ReadAsVarInt(out _);

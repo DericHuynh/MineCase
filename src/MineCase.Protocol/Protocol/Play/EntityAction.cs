@@ -6,7 +6,7 @@ using MineCase.Serialization;
 
 namespace MineCase.Protocol.Play
 {
-    public enum ActionId : uint
+    public enum ActionId : int
     {
         StartSneaking = 0,
         StopSneaking = 1,
@@ -26,7 +26,7 @@ namespace MineCase.Protocol.Play
     {
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(0)]
-        public uint EntityId;
+        public int EntityId;
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(1)]
@@ -34,6 +34,6 @@ namespace MineCase.Protocol.Play
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(2)]
-        public uint JumpBoost;
+        public int JumpBoost;
     }
 }

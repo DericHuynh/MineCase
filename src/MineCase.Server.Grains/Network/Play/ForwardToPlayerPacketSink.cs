@@ -30,7 +30,7 @@ namespace MineCase.Server.Network.Play
             await SendPacket(package.PacketId, package.Data.AsImmutable());
         }
 
-        public Task SendPacket(uint packetId, Immutable<byte[]> data)
+        public Task SendPacket(int packetId, Immutable<byte[]> data)
         {
             _player.Tell(new PacketForwardToPlayer
             {

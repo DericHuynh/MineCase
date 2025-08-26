@@ -21,7 +21,7 @@ namespace MineCase.Server.Network
     internal partial class PacketRouterGrain : Grain, IPacketRouter
     {
         private SessionState _state = SessionState.Handshaking;
-        private uint _protocolVersion;
+        private int _protocolVersion;
         private string _userName;
         private IUser _user;
         private readonly ILogger _logger;
@@ -33,6 +33,7 @@ namespace MineCase.Server.Network
 
         public Task SendPacket(UncompressedPacket packet)
         {
+            using var activity = ActivitySources.NetworkActivitySource.StartActivity("Send Packet");
             Activity.Current?.SetTag("SessionState", Enum.GetName(typeof(SessionState), _state));
             Activity.Current?.SetTag("PacketId", $"0x{packet.PacketId:X2}");
 

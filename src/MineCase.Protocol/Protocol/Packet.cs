@@ -14,11 +14,11 @@ namespace MineCase.Protocol
     {
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(0)]
-        public uint Length;
+        public int Length;
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(1)]
-        public uint PacketId;
+        public int PacketId;
 
         [SerializeAs(DataType.ByteArray)]
         [Orleans.Id(2)]
@@ -26,7 +26,7 @@ namespace MineCase.Protocol
 
         public async Task SerializeAsync(Stream stream)
         {
-            Length = (uint)Data.Count + PacketId.SizeOfVarInt();
+            Length = Data.Count + PacketId.SizeOfVarInt();
 
             using (var bw = new BinaryWriter(stream, Encoding.UTF8, true))
             {
@@ -58,17 +58,17 @@ namespace MineCase.Protocol
     public class CompressedPacket
     {
         [SerializeAs(DataType.VarInt)]
-        public uint PacketLength;
+        public int PacketLength;
 
         [SerializeAs(DataType.VarInt)]
-        public uint DataLength;
+        public int DataLength;
 
         [SerializeAs(DataType.VarInt)]
         public byte[] CompressedData;
 
         public async Task SerializeAsync(Stream stream)
         {
-            PacketLength = (uint)CompressedData.Length + DataLength.SizeOfVarInt();
+            PacketLength = CompressedData.Length + DataLength.SizeOfVarInt();
 
             using (var bw = new BinaryWriter(stream, Encoding.UTF8, true))
             {
@@ -100,9 +100,9 @@ namespace MineCase.Protocol
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
     public sealed class PacketAttribute : Attribute
     {
-        public uint PacketId { get; }
+        public int PacketId { get; }
 
-        public PacketAttribute(uint packetId)
+        public PacketAttribute(int packetId)
         {
             PacketId = packetId;
         }

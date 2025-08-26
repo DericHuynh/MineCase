@@ -13,6 +13,6 @@ namespace MineCase.Protocol.Play
     {
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(0)]
-        public uint TeleportId;
+        public int TeleportId;
     }
 }

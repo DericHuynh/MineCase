@@ -15,11 +15,11 @@ namespace MineCase.Protocol.Play
     {
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(0)]
-        public uint Action;
+        public int Action;
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(1)]
-        public uint NumberOfPlayers;
+        public int NumberOfPlayers;
 
         [SerializeAs(DataType.Array, ArrayLengthMember = nameof(NumberOfPlayers))]
         [Orleans.Id(2)]
@@ -53,15 +53,15 @@ namespace MineCase.Protocol.Play
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(1)]
-        public uint NumberOfProperties;
+        public int NumberOfProperties;
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(2)]
-        public uint GameMode;
+        public int GameMode;
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(3)]
-        public uint Ping;
+        public int Ping;
 
         [SerializeAs(DataType.Boolean)]
         [Orleans.Id(4)]

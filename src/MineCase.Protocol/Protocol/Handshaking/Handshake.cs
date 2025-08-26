@@ -13,7 +13,7 @@ namespace MineCase.Protocol.Handshaking
     {
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(0)]
-        public uint ProtocolVersion;
+        public int ProtocolVersion;
 
         [SerializeAs(DataType.String)]
         [Orleans.Id(1)]
@@ -25,6 +25,6 @@ namespace MineCase.Protocol.Handshaking
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(3)]
-        public uint NextState;
+        public int NextState;
     }
 }

@@ -129,7 +129,7 @@ namespace MineCase.CodeGeneration
                             (int)DataType.UnsignedByte => $"WriteAsUnsignedByte({OptionalEnumCastFrom(field.fieldSymbol.Type, "byte")}{field.fieldSymbol.Name})",
                             (int)DataType.UnsignedShort => $"WriteAsUnsignedShort({OptionalEnumCastFrom(field.fieldSymbol.Type, "ushort")}{field.fieldSymbol.Name})",
                             (int)DataType.UUID => $"WriteAsUUID({field.fieldSymbol.Name})",
-                            (int)DataType.VarInt => $"WriteAsVarInt({OptionalEnumCastFrom(field.fieldSymbol.Type, "uint")}{field.fieldSymbol.Name}, out _)",
+                            (int)DataType.VarInt => $"WriteAsVarInt({OptionalEnumCastFrom(field.fieldSymbol.Type, "int")}{field.fieldSymbol.Name}, out _)",
                             (int)DataType.VarIntArray => $"WriteAsVarIntArray({field.fieldSymbol.Name})",
                             (int)DataType.VarLong => $"WriteAsVarLong({OptionalEnumCastFrom(field.fieldSymbol.Type, "ulong")}{field.fieldSymbol.Name})",
                             _ => ""

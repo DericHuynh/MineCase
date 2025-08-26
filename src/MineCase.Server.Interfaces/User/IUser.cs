@@ -20,9 +20,9 @@ namespace MineCase.Server.User
 
         Task SetName(string name);
 
-        Task<uint> GetProtocolVersion();
+        Task<int> GetProtocolVersion();
 
-        Task SetProtocolVersion(uint version);
+        Task SetProtocolVersion(int version);
 
         Task<IWorld> GetWorld();
 

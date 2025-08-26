@@ -11,19 +11,19 @@ namespace MineCase.Protocol
 {
     public interface IPacketCompress
     {
-        CompressedPacket Compress(UncompressedPacket packet, uint threshold);
+        CompressedPacket Compress(UncompressedPacket packet, int threshold);
 
-        UncompressedPacket Decompress(CompressedPacket packet, uint threshold);
+        UncompressedPacket Decompress(CompressedPacket packet, int threshold);
     }
 
     public class PacketCompress : IPacketCompress
     {
-        public UncompressedPacket Decompress(CompressedPacket packet, uint threshold)
+        public UncompressedPacket Decompress(CompressedPacket packet, int threshold)
         {
             if (packet.DataLength != 0 && packet.DataLength < threshold)
                 throw new InvalidDataException("Uncompressed data length is lower than threshold.");
             bool useCompression = packet.DataLength != 0;
-            var dataLength = useCompression ? packet.DataLength : (uint)packet.CompressedData.Length;
+            var dataLength = useCompression ? packet.DataLength : packet.CompressedData.Length;
 
             var targetPacket = new UncompressedPacket();
             using (var stream = new MemoryStream(packet.CompressedData))
@@ -39,12 +39,12 @@ namespace MineCase.Protocol
             return targetPacket;
         }
 
-        public CompressedPacket Compress(UncompressedPacket packet, uint threshold)
+        public CompressedPacket Compress(UncompressedPacket packet, int threshold)
         {
             var targetPacket = new CompressedPacket();
             using (var stream = new MemoryStream())
             {
-                var dataLength = packet.PacketId.SizeOfVarInt() + (uint)packet.Data.Count;
+                var dataLength = packet.PacketId.SizeOfVarInt() + packet.Data.Count;
                 bool useCompression = dataLength >= threshold;
                 targetPacket.DataLength = useCompression ? dataLength : 0;
 

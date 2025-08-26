@@ -18,7 +18,7 @@ namespace MineCase.Server.Network.Login
     internal class LoginFlowGrain : Grain, ILoginFlow
     {
         // private bool _useAuthentication = false;
-        private const uint CompressPacketThreshold = 256;
+        private const int CompressPacketThreshold = 256;
 
         public async Task DispatchPacket(LoginStart packet)
         {
@@ -188,9 +188,9 @@ namespace MineCase.Server.Network.Login
             EncryptionRequest encryptionRequestPacket = new EncryptionRequest
             {
                 ServerID = serverID,
-                PublicKeyLength = (uint)publicKey.Length,
+                PublicKeyLength = publicKey.Length,
                 PublicKey = publicKey,
-                VerifyTokenLength = (uint)verifyToken.Length,
+                VerifyTokenLength = verifyToken.Length,
                 VerifyToken = verifyToken
             };
 

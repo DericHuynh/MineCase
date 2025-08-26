@@ -125,7 +125,7 @@ namespace MineCase.Server.Game.Entities.Components
         public IWorld World { get; set; }
 
         [Id(1)]
-        public uint EntityId { get; set; }
+        public int EntityId { get; set; }
 
         [Id(2)]
         public EntityWorldPos Position { get; set; }

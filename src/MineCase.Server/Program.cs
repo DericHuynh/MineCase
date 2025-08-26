@@ -22,6 +22,7 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Runtime;
+using Orleans.Runtime.Placement;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -50,8 +51,8 @@ namespace MineCase.Server
             BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
 
             hostBuilder.AddServiceDefaults();
-            hostBuilder.Services.AddOpenTelemetry()
-                                .WithTracing(x => x.AddProcessor(new TailSamplingProcessor()));
+            hostBuilder.Services.AddOpenTelemetry();
+                                //.WithTracing(x => x.AddProcessor(new TailSamplingProcessor()));
 
             hostBuilder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
             hostBuilder.Host.ConfigureContainer<ContainerBuilder>(ConfigureAutofac);
@@ -71,14 +72,21 @@ namespace MineCase.Server
             hostBuilder.UseOrleans((siloBuilder) =>
             {
                 //siloBuilder.UseDashboard();
-                siloBuilder.AddActivityPropagation();
+                //siloBuilder.AddActivityPropagation();
                 siloBuilder.Configure<ClusterOptions>(options =>
                 {
                     options.ClusterId = "dev";
                     options.ServiceId = "MineCaseService";
                 });
 #pragma warning disable ORLEANSEXP001
-                //siloBuilder.AddActivationRepartitioner(); // Doesnt work, but it should, so there's something wrong with the current grain persistence and state mechanisms.
+                siloBuilder.AddActivationRepartitioner(); // Doesnt work, but it should, so there's something wrong with the current grain persistence and state mechanisms.
+                siloBuilder.Configure<ActivationRepartitionerOptions>(o =>
+                {
+                    o.MinRoundPeriod = TimeSpan.FromSeconds(5000);
+                    o.MaxRoundPeriod = TimeSpan.FromSeconds(15000);
+                    o.RecoveryPeriod = TimeSpan.FromSeconds(2000);
+                });
+                siloBuilder.ConfigureServices(services => services.AddSingleton<PlacementStrategy, PreferLocalPlacement>());
 #pragma warning restore ORLEANSEXP001
                 siloBuilder.ConfigureEndpoints(siloPort: siloPort, gatewayPort: gatewayPort);
                 siloBuilder.UseMongoDBClient(hostBuilder.Configuration.GetSection("persistenceOptions")["connectionString"]);

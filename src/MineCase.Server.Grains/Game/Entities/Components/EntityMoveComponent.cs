@@ -30,7 +30,7 @@ namespace MineCase.Server.Game.Entities.Components
 
         protected Task SendMovePacket(ClientPlayPacketGenerator generator)
         {
-            uint eid = AttachedEntity.GetValue(EntityIdComponent.EntityIdProperty);
+            int eid = AttachedEntity.GetValue(EntityIdComponent.EntityIdProperty);
             EntityWorldPos pos = AttachedEntity.GetValue(EntityWorldPositionComponent.EntityWorldPositionProperty);
             short x = (short)(pos.X * 32 * 128);
             short y = (short)(pos.Y * 32 * 128);

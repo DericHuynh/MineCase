@@ -48,7 +48,7 @@ namespace MineCase.Server.World
             return Task.FromResult(new WorldTime { WorldAge = State.WorldAge, TimeOfDay = State.WorldAge % 24000 });
         }
 
-        public Task<uint> NewEntityId()
+        public Task<int> NewEntityId()
         {
             var id = State.NextAvailEId++;
             MarkDirty();
@@ -112,7 +112,7 @@ namespace MineCase.Server.World
             public long WorldAge { get; set; }
 
             [Id(1)]
-            public uint NextAvailEId { get; set; }
+            public int NextAvailEId { get; set; }
 
             public StateHolder()
             {

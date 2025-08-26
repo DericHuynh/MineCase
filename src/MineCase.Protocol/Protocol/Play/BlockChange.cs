@@ -17,6 +17,6 @@ namespace MineCase.Protocol.Play
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(1)]
-        public uint BlockId;
+        public int BlockId;
     }
 }

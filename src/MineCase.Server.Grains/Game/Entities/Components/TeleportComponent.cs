@@ -13,23 +13,23 @@ namespace MineCase.Server.Game.Entities.Components
     internal class TeleportComponent : Component
     {
         [Orleans.Id(0)]
-        private uint _teleportId = 0;
+        private int _teleportId = 0;
 
         public TeleportComponent(string name = "teleport")
             : base(name)
         {
         }
 
-        public uint StartNew() => _teleportId++;
+        public int StartNew() => _teleportId++;
 
         public Task Teleport(EntityWorldPos position, float yaw, float pitch)
         {
             var generator = AttachedEntity.GetComponent<ClientboundPacketComponent>().GetGenerator();
-            uint teleportId = AttachedEntity.GetComponent<TeleportComponent>().StartNew();
+            int teleportId = AttachedEntity.GetComponent<TeleportComponent>().StartNew();
             return generator.PositionAndLook(position.X, position.Y, position.Z, yaw, pitch, 0, teleportId);
         }
 
-        public Task ConfirmTeleport(uint teleportId)
+        public Task ConfirmTeleport(int teleportId)
         {
             return Task.CompletedTask;
         }

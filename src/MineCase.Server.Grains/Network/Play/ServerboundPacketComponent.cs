@@ -317,7 +317,7 @@ namespace MineCase.Server.Network.Play
             return (PlayerDiggingFace)face;
         }
 
-        private ClickAction ToClickAction(byte button, uint mode, short slot)
+        private ClickAction ToClickAction(byte button, int mode, short slot)
         {
             switch (mode)
             {

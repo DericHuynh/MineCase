@@ -17,10 +17,10 @@ namespace MineCase.Protocol.Play
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(1)]
-        public uint Level;
+        public int Level;
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(2)]
-        public uint TotalExperience;
+        public int TotalExperience;
     }
 }

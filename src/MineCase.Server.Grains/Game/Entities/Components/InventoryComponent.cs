@@ -29,7 +29,7 @@ namespace MineCase.Server.Game.Entities.Components
             if (after.ItemCount != message.Slot.ItemCount)
             {
                 await AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator()
-                    .CollectItem(await message.Source.GetEntityId(), AttachedEntity.EntityId, (uint)message.Slot.ItemCount - after.ItemCount);
+                    .CollectItem(await message.Source.GetEntityId(), AttachedEntity.EntityId, message.Slot.ItemCount - after.ItemCount);
             }
 
             return after;

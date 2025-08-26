@@ -10,7 +10,7 @@ namespace MineCase.Protocol.Play
     {
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(0)]
-        public uint EntityID;
+        public int EntityID;
 
         [SerializeAs(DataType.Position)]
         [Orleans.Id(1)]

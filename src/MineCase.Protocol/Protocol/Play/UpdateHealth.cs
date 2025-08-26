@@ -17,7 +17,7 @@ namespace MineCase.Protocol.Play
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(1)]
-        public uint Food;
+        public int Food;
 
         [SerializeAs(DataType.Float)]
         [Orleans.Id(2)]

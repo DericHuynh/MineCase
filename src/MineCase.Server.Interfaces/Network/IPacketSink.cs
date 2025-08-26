@@ -12,13 +12,13 @@ namespace MineCase.Server.Network
     {
         Task SendPacket(IPacket packet);
 
-        Task SendPacket(uint packetId, Immutable<byte[]> data);
+        Task SendPacket(int packetId, Immutable<byte[]> data);
     }
 
     public interface IBroadcastPacketSink
     {
         Task SendPacket(IPacket packet, IPlayer except);
 
-        Task SendPacket(uint packetId, Immutable<byte[]> data, IPlayer except);
+        Task SendPacket(int packetId, Immutable<byte[]> data, IPlayer except);
     }
 }

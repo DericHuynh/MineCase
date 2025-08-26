@@ -27,7 +27,7 @@ namespace MineCase.Protocol.Play
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(3)]
-        public uint PrimaryBitMask;
+        public int PrimaryBitMask;
 
         [SerializeAs(DataType.NBTTag)]
         [Orleans.Id(4)]
@@ -35,7 +35,7 @@ namespace MineCase.Protocol.Play
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(5)]
-        public uint Size;
+        public int Size;
 
         [SerializeAs(DataType.Array)]
         [Orleans.Id(6)]
@@ -47,7 +47,7 @@ namespace MineCase.Protocol.Play
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(8)]
-        public uint NumberOfBlockEntities;
+        public int NumberOfBlockEntities;
 
         [SerializeAs(DataType.NbtArray)]
         [Orleans.Id(9)]
@@ -101,7 +101,7 @@ namespace MineCase.Protocol.Play
                     dbw.WriteAsArray(Data);
 
                 var dataBytes = mem.ToArray();
-                Size = (uint)dataBytes.Length;
+                Size = dataBytes.Length;
 
                 bw.WriteAsVarInt(Size, out _);
                 bw.WriteAsByteArray(dataBytes);
@@ -125,15 +125,15 @@ namespace MineCase.Protocol.Play
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(2)]
-        public uint PaletteLength;
+        public int PaletteLength;
 
         [SerializeAs(DataType.Array)]
         [Orleans.Id(3)]
-        public uint[] Palette;
+        public int[] Palette;
 
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(4)]
-        public uint DataArrayLength;
+        public int DataArrayLength;
 
         [SerializeAs(DataType.Array)]
         [Orleans.Id(5)]
@@ -157,7 +157,7 @@ namespace MineCase.Protocol.Play
                 if (result.PaletteLength != 0)
                 {
                     var paletteReader = br.ReadAsSubReader((int)result.PaletteLength);
-                    var palette = new List<uint>();
+                    var palette = new List<int>();
                     while (!paletteReader.IsCosumed)
                         palette.Add(paletteReader.ReadAsVarInt(out _));
                     result.Palette = palette.ToArray();
@@ -179,7 +179,7 @@ namespace MineCase.Protocol.Play
 
         public void Serialize(BinaryWriter bw)
         {
-            DataArrayLength = (uint)DataArray.Length;
+            DataArrayLength = DataArray.Length;
             bw.WriteAsShort(BlockCount);
             bw.WriteAsByte(BitsPerBlock);
 
@@ -200,7 +200,7 @@ namespace MineCase.Protocol.Play
                         }
 
                         var paletteBytes = mem.ToArray();
-                        PaletteLength = (uint)paletteBytes.Length;
+                        PaletteLength = paletteBytes.Length;
                         bw.WriteAsVarInt(PaletteLength, out _);
                         bw.WriteAsByteArray(paletteBytes);
                     }

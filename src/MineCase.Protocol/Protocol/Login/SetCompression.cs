@@ -13,6 +13,6 @@ namespace MineCase.Protocol.Login
     {
         [SerializeAs(DataType.VarInt)]
         [Orleans.Id(0)]
-        public uint Threshold;
+        public int Threshold;
     }
 }

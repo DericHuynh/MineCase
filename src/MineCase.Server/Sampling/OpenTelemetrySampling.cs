@@ -49,12 +49,7 @@ namespace MineCase.Server.Sampling
 
             if (isError)
             {
-                Console.WriteLine($"Including error activity with id {activity.Id} and status {activity.Status}");
                 activity.ActivityTraceFlags |= ActivityTraceFlags.Recorded;
-            }
-            else
-            {
-                Console.WriteLine($"Dropping activity with id {activity.Id} and status {activity.Status}");
             }
         }
     }

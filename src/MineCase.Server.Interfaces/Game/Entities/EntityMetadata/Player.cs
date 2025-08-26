@@ -12,7 +12,7 @@ namespace MineCase.Server.Game.Entities.EntityMetadata
         public float AdditionalHearts { get; set; }
 
         [Orleans.Id(1)]
-        public uint Score { get; set; }
+        public int Score { get; set; }
 
         [Orleans.Id(2)]
         public bool CapeEnabled { get; set; }

@@ -38,7 +38,7 @@ namespace MineCase.Server.World
             return _broadcastPacketSink.SendPacket(packet, exceptSink);
         }
 
-        public Task SendPacket(uint packetId, Immutable<byte[]> data, IPlayer except)
+        public Task SendPacket(int packetId, Immutable<byte[]> data, IPlayer except)
         {
             IPacketSink exceptSink = null;
             if (except != null)

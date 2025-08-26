@@ -17,6 +17,7 @@ using MineCase.Server.Game.Entities.EntityMetadata;
 using MineCase.Server.World;
 using MineCase.World;
 using Orleans.Concurrency;
+using static System.Collections.Specialized.BitVector32;
 
 namespace MineCase.Server.Network.Play
 {
@@ -46,7 +47,7 @@ namespace MineCase.Server.Network.Play
             _except = except;
         }
 
-        public Task SpawnObject(uint entityId, Guid uuid, byte objectType, Vector3 position, float pitch, float yaw, int data)
+        public Task SpawnObject(int entityId, Guid uuid, byte objectType, Vector3 position, float pitch, float yaw, int data)
         {
             return SendPacket(new SpawnObject
             {
@@ -62,7 +63,7 @@ namespace MineCase.Server.Network.Play
             });
         }
 
-        public Task SpawnMob(uint entityId, Guid uuid, byte entityType, Vector3 position, float pitch, float yaw, Game.Entities.EntityMetadata.Entity metadata)
+        public Task SpawnMob(int entityId, Guid uuid, byte entityType, Vector3 position, float pitch, float yaw, Game.Entities.EntityMetadata.Entity metadata)
         {
             return SendPacket(CreateSpawnMob(entityId, uuid, entityType, position, pitch, yaw, metadata, bw =>
                  {
@@ -70,7 +71,7 @@ namespace MineCase.Server.Network.Play
                  }));
         }
 
-        public Task SpawnPlayer(uint entityId, Guid uuid, Vector3 position, float pitch, float yaw, Game.Entities.EntityMetadata.Player metadata)
+        public Task SpawnPlayer(int entityId, Guid uuid, Vector3 position, float pitch, float yaw, Game.Entities.EntityMetadata.Player metadata)
         {
             // TODO: This metadata may be used in other places
             var metaPacket = CreateEntityMetadata(entityId, metadata, bw =>
@@ -101,16 +102,16 @@ namespace MineCase.Server.Network.Play
             });
         }
 
-        public Task DestroyEntities(uint[] entityIds)
+        public Task DestroyEntities(int[] entityIds)
         {
             return SendPacket(new DestroyEntities
             {
-                Count = (uint)entityIds.Length,
+                Count = entityIds.Length,
                 EntityIds = entityIds
             });
         }
 
-        public Task EntityMetadata(uint entityId, Game.Entities.EntityMetadata.Entity metadata)
+        public Task EntityMetadata(int entityId, Game.Entities.EntityMetadata.Entity metadata)
         {
             return SendPacket(CreateEntityMetadata(entityId, metadata, bw =>
             {
@@ -118,7 +119,7 @@ namespace MineCase.Server.Network.Play
             }));
         }
 
-        public Task EntityMetadata(uint entityId, Pickup metadata)
+        public Task EntityMetadata(int entityId, Pickup metadata)
         {
             return SendPacket(CreateEntityMetadata(entityId, metadata, bw =>
             {
@@ -231,7 +232,7 @@ namespace MineCase.Server.Network.Play
             // TODO: And NBT fields
         }
 
-        private static EntityMetadata CreateEntityMetadata<T>(uint entityId, T metadata, Action<BinaryWriter> action)
+        private static EntityMetadata CreateEntityMetadata<T>(int entityId, T metadata, Action<BinaryWriter> action)
         {
             using (var stream = new MemoryStream())
             {
@@ -245,7 +246,7 @@ namespace MineCase.Server.Network.Play
             }
         }
 
-        private static SpawnMob CreateSpawnMob<T>(uint entityId, Guid uuid, byte entityType, Vector3 position, float pitch, float yaw, T metadata, Action<BinaryWriter> action)
+        private static SpawnMob CreateSpawnMob<T>(int entityId, Guid uuid, byte entityType, Vector3 position, float pitch, float yaw, T metadata, Action<BinaryWriter> action)
         {
             using (var stream = new MemoryStream())
             {
@@ -271,7 +272,7 @@ namespace MineCase.Server.Network.Play
         }
 
         // TODO update params for 1.15.2
-        public Task JoinGame(uint eid, GameMode gameMode, Dimension dimension, Difficulty difficulty, byte maxPlayers, uint viewDistance, string levelType, bool reducedDebugInfo)
+        public Task JoinGame(int eid, GameMode gameMode, Dimension dimension, Difficulty difficulty, byte maxPlayers, int viewDistance, string levelType, bool reducedDebugInfo)
         {
             return SendPacket(new JoinGame
             {
@@ -287,7 +288,7 @@ namespace MineCase.Server.Network.Play
             });
         }
 
-        public Task EntityRelativeMove(uint eid, short deltaX, short deltaY, short deltaZ, bool onGround)
+        public Task EntityRelativeMove(int eid, short deltaX, short deltaY, short deltaZ, bool onGround)
         {
             return SendPacket(new EntityRelativeMove
             {
@@ -299,7 +300,7 @@ namespace MineCase.Server.Network.Play
             });
         }
 
-        public Task EntityLookAndRelativeMove(uint eid, short deltaX, short deltaY, short deltaZ, byte yaw, byte pitch, bool onGround)
+        public Task EntityLookAndRelativeMove(int eid, short deltaX, short deltaY, short deltaZ, byte yaw, byte pitch, bool onGround)
         {
             return SendPacket(new EntityLookAndRelativeMove
             {
@@ -313,7 +314,7 @@ namespace MineCase.Server.Network.Play
             });
         }
 
-        public Task EntityLook(uint eid, byte yaw, byte pitch, bool onGround)
+        public Task EntityLook(int eid, byte yaw, byte pitch, bool onGround)
         {
             return SendPacket(new EntityLook
             {
@@ -324,7 +325,7 @@ namespace MineCase.Server.Network.Play
             });
         }
 
-        public Task EntityHeadLook(uint eid, byte yaw)
+        public Task EntityHeadLook(int eid, byte yaw)
         {
             return SendPacket(new EntityHeadLook
             {
@@ -333,7 +334,7 @@ namespace MineCase.Server.Network.Play
             });
         }
 
-        public Task KeepAlive(uint id)
+        public Task KeepAlive(int id)
         {
             return SendPacket(new ClientboundKeepAlive
             {
@@ -346,12 +347,12 @@ namespace MineCase.Server.Network.Play
             return SendPacket(new UpdateHealth
             {
                 Health = (float)health / maxHealth * 20,
-                Food = (uint)((float)food / maxFood * 20),
+                Food = (int)((float)food / maxFood * 20),
                 FoodSaturation = foodSaturation
             });
         }
 
-        public Task SetExperience(float experienceBar, uint level, uint totalExp)
+        public Task SetExperience(float experienceBar, int level, int totalExp)
         {
             return SendPacket(new SetExperience
             {
@@ -375,7 +376,7 @@ namespace MineCase.Server.Network.Play
             return SendPacket(new PlayerInfo<PlayerInfoAddPlayerAction>
             {
                 Action = 0,
-                NumberOfPlayers = (uint)desc.Count,
+                NumberOfPlayers = desc.Count,
                 Players = (from d in desc
                            select new PlayerInfoAddPlayerAction
                            {
@@ -394,7 +395,7 @@ namespace MineCase.Server.Network.Play
             return SendPacket(new PlayerInfo<PlayerInfoRemovePlayerAction>
             {
                 Action = 4,
-                NumberOfPlayers = (uint)desc.Count,
+                NumberOfPlayers = desc.Count,
                 Players = (from d in desc
                            select new PlayerInfoRemovePlayerAction
                            {
@@ -413,7 +414,7 @@ namespace MineCase.Server.Network.Play
             });
         }
 
-        public Task PositionAndLook(double x, double y, double z, float yaw, float pitch, RelativeFlags relative, uint teleportId)
+        public Task PositionAndLook(double x, double y, double z, float yaw, float pitch, RelativeFlags relative, int teleportId)
         {
             return SendPacket(new ClientboundPositionAndLook
             {
@@ -436,7 +437,7 @@ namespace MineCase.Server.Network.Play
             });
         }
 
-        public Task CollectItem(uint collectedEntityId, uint entityId, uint itemCount)
+        public Task CollectItem(int collectedEntityId, int entityId, int itemCount)
         {
             return SendPacket(new CollectItem
             {
@@ -448,7 +449,8 @@ namespace MineCase.Server.Network.Play
 
         public Task ChunkData(Dimension dimension, int chunkX, int chunkZ, ChunkColumnCompactStorage chunkColumn)
         {
-            return SendPacket(new ChunkData
+            using var activity = ActivitySources.NetworkActivitySource.StartActivity("Chunk Data");
+            var data = new ChunkData
             {
                 ChunkX = chunkX,
                 ChunkZ = chunkZ,
@@ -467,7 +469,40 @@ namespace MineCase.Server.Network.Play
                         }).ToArray(),
                 NumberOfBlockEntities = 0,
                 BlockEntities = new Nbt.Tags.NbtCompound[0], // TODO : read real block entities
-            });
+            };
+
+            activity.AddTag("ChunkX", data.ChunkX);
+            activity.AddTag("ChunkZ", data.ChunkZ);
+            activity.AddTag("FullChunk", data.FullChunk);
+            activity.AddTag("PrimaryBitMask", data.PrimaryBitMask);
+
+            return SendPacket(data);
+        }
+
+        public Task LightUpdate(Dimension dimension, int chunkX, int chunkZ, ChunkColumnCompactStorage chunkColumn)
+        {
+            using var activity = ActivitySources.NetworkActivitySource.StartActivity("Light Data");
+
+            // The light masks determine which sections have light data to send.
+            var skyLightMask = chunkColumn.SkyLightMask;
+            var blockLightMask = chunkColumn.BlockLightMask;
+
+            LightArray[] skyLights = chunkColumn.GetSkyLightArrays().Select(x => new LightArray { Length = x.Length, Lights = x }).ToArray();
+            LightArray[] blockLights = chunkColumn.GetBlockLightArrays().Select(x => new LightArray { Length = x.Length, Lights = x }).ToArray();
+
+            var data = new UpdateLight
+            {
+                ChunkX = chunkX,
+                ChunkZ = chunkZ,
+                SkyLightMask = skyLightMask,
+                BlockLightMask = blockLightMask,
+                EmptySkyLightMask = chunkColumn.EmptySkyLightMask,
+                EmptyBlockLightMask = chunkColumn.EmptyBlockLightMask,
+                SkyLights = skyLights,
+                BlockLights = blockLights
+            };
+
+            return SendPacket(data);
         }
 
         public static byte ToByte(GameMode gameMode)
@@ -484,7 +519,7 @@ namespace MineCase.Server.Network.Play
             });
         }
 
-        public Task SendClientAnimation(uint entityID, ClientboundAnimationId animationID)
+        public Task SendClientAnimation(int entityID, ClientboundAnimationId animationID)
         {
             return SendPacket(new ClientboundAnimation
             {
@@ -498,7 +533,7 @@ namespace MineCase.Server.Network.Play
             return SendPacket(new BlockChange
             {
                 Location = location,
-                BlockId = blockState.ToUInt32()
+                BlockId = (int)blockState.ToUInt32(),
             });
         }
 
@@ -550,7 +585,7 @@ namespace MineCase.Server.Network.Play
             });
         }
 
-        public Task EntityTeleport(uint entityId, Vector3 position, byte pitch, byte yaw, bool onGround)
+        public Task EntityTeleport(int entityId, Vector3 position, byte pitch, byte yaw, bool onGround)
         {
             return SendPacket(new EntityTeleport
             {
@@ -584,7 +619,7 @@ namespace MineCase.Server.Network.Play
             });
         }
 
-        public Task SendPacket(uint packetId, byte[] data)
+        public Task SendPacket(int packetId, byte[] data)
         {
             if (Sink != null)
                 return Sink.SendPacket(packetId, data.AsImmutable());

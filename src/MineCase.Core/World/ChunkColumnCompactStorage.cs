@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using MineCase.Block;
@@ -19,21 +20,38 @@ namespace MineCase.World
         public const int BlocksInSection = BlockEdgeWidthInSection * BlockEdgeWidthInSection * BlockEdgeWidthInSection;
 
         public const int BlocksInChunk = BlocksInSection * SectionsPerChunk;
+        public static readonly byte[] EmptyLights = Enumerable.Repeat(0, BlocksInSection / 2).Select(x => (byte)x).ToArray();
+        public static readonly byte[] FullLights = Enumerable.Repeat(255, BlocksInSection / 2).Select(x => (byte)x).ToArray();
     }
 
     [Orleans.GenerateSerializer]
     public sealed class ChunkColumnCompactStorage : IChunkColumnStorage
     {
-        public uint SectionBitMask
+        [Orleans.Id(0)]
+        public ChunkSectionCompactStorage[] Sections { get; } = new ChunkSectionCompactStorage[ChunkConstants.SectionsPerChunk];
+
+        [Orleans.Id(1)]
+        public int[,] GroundHeight { get; } = new int[ChunkConstants.BlockEdgeWidthInSection, ChunkConstants.BlockEdgeWidthInSection];
+
+        [Orleans.Id(2)]
+        public int[] Biomes { get; }
+
+        public BlockState this[int x, int y, int z]
+        {
+            get => Sections[y / 16].Data[x, y % 16, z];
+            set => Sections[y / 16].Data[x, y % 16, z] = value;
+        }
+
+        public int SectionBitMask
         {
             get
             {
-                uint mask = 0;
+                int mask = 0;
                 int index = 0;
                 while (index < ChunkConstants.SectionsPerChunk)
                 {
                     mask <<= 1;
-                    mask |= Sections[index++] != null ? 1u : 0;
+                    mask |= Sections[index++] != null ? 1 : 0;
                 }
 
                 return mask;
@@ -74,19 +92,93 @@ namespace MineCase.World
             }
         }
 
-        [Orleans.Id(0)]
-        public ChunkSectionCompactStorage[] Sections { get; } = new ChunkSectionCompactStorage[ChunkConstants.SectionsPerChunk];
-
-        [Orleans.Id(1)]
-        public int[,] GroundHeight { get; } = new int[ChunkConstants.BlockEdgeWidthInSection, ChunkConstants.BlockEdgeWidthInSection];
-
-        [Orleans.Id(2)]
-        public int[] Biomes { get; }
-
-        public BlockState this[int x, int y, int z]
+        public int SkyLightMask
         {
-            get => Sections[y / 16].Data[x, y % 16, z];
-            set => Sections[y / 16].Data[x, y % 16, z] = value;
+            get
+            {
+                int mask = 1 << 17;
+
+                // The 18-bit mask: bit 0 is for section y=-1, bit 1 for y=0, ..., bit 16 for y=15.
+                // Sections[i] corresponds to bit i + 1.
+                for (int i = 0; i < ChunkConstants.SectionsPerChunk; i++)
+                {
+                    if (Sections[i] != null && Sections[i].SkyLight != null && !Sections[i].SkyLight.IsAllZero())
+                    {
+                        mask |= 1 << (i + 1);
+                    }
+                }
+
+                return mask;
+            }
+        }
+
+        public int EmptySkyLightMask => SkyLightMask ^ 0b11_1111_1111_1111_1111;
+
+        public int BlockLightMask
+        {
+            get
+            {
+                int mask = 0;
+                for (int i = 0; i < ChunkConstants.SectionsPerChunk; i++)
+                {
+                    // BlockLight is always initialized if the section exists.
+                    if (Sections[i] != null && !Sections[i].BlockLight.IsAllZero())
+                    {
+                        mask |= 1 << (i + 1);
+                    }
+                }
+
+                return mask;
+            }
+        }
+
+        public int EmptyBlockLightMask => BlockLightMask ^ 0b11_1111_1111_1111_1111;
+
+        public List<byte[]> GetSkyLightArrays()
+        {
+            int skyLightMask = SkyLightMask;
+            List<byte> indices = new List<byte>();
+
+            for (int i = 0; i < ChunkConstants.SectionsPerChunk; i++)
+            {
+                // Check the bit for section 'i'.
+                if ((skyLightMask & (1 << (i + 1))) != 0)
+                    indices.Add((byte)i);
+            }
+
+            List<byte[]> lightArrays = new List<byte[]>(indices.Count + 1);
+
+            foreach (byte index in indices)
+            {
+                lightArrays.Add(Sections[index].SkyLight.Storage);
+            }
+
+            // Temporarily add the out of chunk skylight
+            lightArrays.Add(ChunkConstants.FullLights);
+
+            return lightArrays;
+        }
+
+        public List<byte[]> GetBlockLightArrays()
+        {
+            int blockLightMask = BlockLightMask;
+            List<byte> indices = new List<byte>();
+
+            for (int i = 0; i < ChunkConstants.SectionsPerChunk; i++)
+            {
+                // Check the bit for section 'i'.
+                if ((blockLightMask & (1 << (i + 1))) != 0)
+                    indices.Add((byte)i);
+            }
+
+            List<byte[]> lightArrays = new List<byte[]>(indices.Count + 1);
+
+            foreach (byte index in indices)
+            {
+                lightArrays.Add(Sections[index].BlockLight.Storage);
+            }
+
+            return lightArrays;
         }
 
         public ChunkColumnCompactStorage()
@@ -212,7 +304,7 @@ namespace MineCase.World
                 {
                     var offset = GetBlockSerialIndex(x, y, z);
                     var value = Storage[offset / 2];
-                    return offset % 2 == 0 ? (byte)(value >> 0xF) : (byte)(value & 0xF);
+                    return offset % 2 == 0 ? (byte)((value >> 4) & 0xF) : (byte)(value & 0xF);
                 }
 
                 set
@@ -226,14 +318,30 @@ namespace MineCase.World
                 }
             }
 
+            public bool IsAllZero()
+            {
+                if (Storage == null) return true;
+                foreach (byte b in Storage)
+                {
+                    if (b != 0)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
             public NibbleArray(byte[] storage)
             {
                 Storage = storage;
+                if (Storage is not null && Storage.Length > 2048)
+                    throw new ArgumentOutOfRangeException("Light array is too big.");
             }
 
             public NibbleArray()
             {
-                Storage = new byte[ChunkConstants.BlocksInSection / 2];
+                Storage = new byte[2048];
             }
         }
 
