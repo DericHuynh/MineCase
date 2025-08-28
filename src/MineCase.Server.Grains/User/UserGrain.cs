@@ -31,7 +31,7 @@ namespace MineCase.Server.User
         private int _protocolVersion;
         private IClientboundPacketSink _sink;
         private IPacketRouter _packetRouter;
-        private ClientPlayPacketGenerator _generator;
+        private ClientPlayPacketFactory _generator;
         private IPlayer _player;
         private UserState _userState;
 
@@ -90,7 +90,7 @@ namespace MineCase.Server.User
         public Task SetClientPacketSink(IClientboundPacketSink sink)
         {
             _sink = sink;
-            _generator = new ClientPlayPacketGenerator(sink);
+            _generator = new ClientPlayPacketFactory(sink);
             return Task.CompletedTask;
         }
 

@@ -17,10 +17,17 @@ using Orleans.Concurrency;
 
 namespace MineCase.Server.World
 {
+    /// <summary>
+    /// Key is World and Chunkpos.
+    /// </summary>
     [Reentrant]
     internal class ChunkTrackingHub : Grain, IChunkTrackingHub
     {
         private readonly IPacketPackager _packetPackager;
+
+        /// <summary>
+        /// TODO: Stop using this system and have a per-chunk streams, where on the Orleans client they actively subscribe and unsubscribe.
+        /// </summary>
         private readonly Dictionary<IPlayer, IPacketSink> _trackingPlayers = new Dictionary<IPlayer, IPacketSink>();
         private BroadcastPacketSink _broadcastPacketSink;
 

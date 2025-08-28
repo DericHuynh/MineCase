@@ -22,7 +22,7 @@ using static System.Collections.Specialized.BitVector32;
 namespace MineCase.Server.Network.Play
 {
     [Orleans.GenerateSerializer]
-    internal struct ClientPlayPacketGenerator
+    public struct ClientPlayPacketFactory
     {
         [Orleans.Id(0)]
         public IPacketSink Sink { get; }
@@ -33,14 +33,14 @@ namespace MineCase.Server.Network.Play
         [Orleans.Id(2)]
         private IPlayer _except;
 
-        public ClientPlayPacketGenerator(IPacketSink sink)
+        public ClientPlayPacketFactory(IPacketSink sink)
         {
             Sink = sink;
             BroadcastSink = null;
             _except = null;
         }
 
-        public ClientPlayPacketGenerator(IBroadcastPacketSink sink, IPlayer except)
+        public ClientPlayPacketFactory(IBroadcastPacketSink sink, IPlayer except)
         {
             Sink = null;
             BroadcastSink = sink;
@@ -481,9 +481,7 @@ namespace MineCase.Server.Network.Play
 
         public Task LightUpdate(Dimension dimension, int chunkX, int chunkZ, ChunkColumnCompactStorage chunkColumn)
         {
-            using var activity = ActivitySources.NetworkActivitySource.StartActivity("Light Data");
-
-            // The light masks determine which sections have light data to send.
+            // The light masks determine which sections have light data to send. Also they need to be optimized
             var skyLightMask = chunkColumn.SkyLightMask;
             var blockLightMask = chunkColumn.BlockLightMask;
 

@@ -17,7 +17,7 @@ namespace MineCase.Server.Game.Entities.Components
         {
         }
 
-        protected override Task SendSpawnPacket(ClientPlayPacketGenerator generator)
+        protected override Task SendSpawnPacket(ClientPlayPacketFactory generator)
         {
             var metadata = new EntityMetadata.Player
             {

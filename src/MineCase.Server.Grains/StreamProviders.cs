@@ -6,9 +6,7 @@ namespace MineCase.Server
 {
     internal class StreamProviders
     {
-        public const string JobsProvider = "JobsProvider";
-
-        public const string TransientProvider = "TransientProvider";
+        public const string MinecraftStreamProvider = "MinecraftStreamProvider";
 
         public static class Namespaces
         {

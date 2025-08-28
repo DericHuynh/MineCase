@@ -8,6 +8,11 @@ using Orleans.Concurrency;
 
 namespace MineCase.Server.World
 {
+    /// <summary>
+    /// Why is this seperate from a chunk when the key is world, chunk_pos.
+    /// Should merge with Chunk (A chunk is a world partition by definition).
+    /// Although this is more lightweight than a chunk grain so for Activation Repartitioning this might work better idk.
+    /// </summary>
     public interface IWorldPartition : IAddressByPartition
     {
         Task Enter(IPlayer player);

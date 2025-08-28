@@ -19,8 +19,8 @@ namespace MineCase.Server.Game.Entities.Components
         {
         }
 
-        private ClientPlayPacketGenerator GetPlayerPacketGenerator(IPlayer player) =>
-            new ClientPlayPacketGenerator(new ForwardToPlayerPacketSink(player, ServiceProvider.GetRequiredService<IPacketPackager>()));
+        private ClientPlayPacketFactory GetPlayerPacketGenerator(IPlayer player) =>
+            new ClientPlayPacketFactory(new ForwardToPlayerPacketSink(player, ServiceProvider.GetRequiredService<IPacketPackager>()));
 
         async Task IHandle<DiscoveredByPlayer>.Handle(DiscoveredByPlayer message)
         {
@@ -33,7 +33,7 @@ namespace MineCase.Server.Game.Entities.Components
             await SendSpawnPacket(AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator(AttachedEntity as IPlayer));
         }
 
-        protected abstract Task SendSpawnPacket(ClientPlayPacketGenerator generator);
+        protected abstract Task SendSpawnPacket(ClientPlayPacketFactory generator);
 
         protected void CompleteSpawn()
         {

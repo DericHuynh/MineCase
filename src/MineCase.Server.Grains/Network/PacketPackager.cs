@@ -9,6 +9,9 @@ using MineCase.Protocol;
 
 namespace MineCase.Server.Network
 {
+    /// <summary>
+    /// We can remove this interface and implement it into PacketSink, behind an abstract class and have the other sinks extend from it.
+    /// </summary>
     [Orleans.GenerateSerializer]
     internal class PacketPackager : IPacketPackager
     {
@@ -20,6 +23,11 @@ namespace MineCase.Server.Network
             _memoryStreamMgr = memoryStreamMgr;
         }
 
+        /// <summary>
+        /// This isn't even asynchronous so this is quite useless. As a matter of fact any class that uses this can just extend an abstract class, although DI kinda makes sense aswell.
+        /// </summary>
+        /// <param name="packet">Packet.</param>
+        /// <returns>PacketId and data.</returns>
         public Task<(int PacketId, byte[] Data)> PreparePacket(IPacket packet)
         {
             using (var stream = _memoryStreamMgr.GetStream())

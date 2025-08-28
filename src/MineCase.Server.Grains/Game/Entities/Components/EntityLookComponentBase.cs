@@ -19,14 +19,14 @@ namespace MineCase.Server.Game.Entities.Components
         {
         }
 
-        private ClientPlayPacketGenerator GetPlayerPacketGenerator(IPlayer player) =>
-            new ClientPlayPacketGenerator(new ForwardToPlayerPacketSink(player, ServiceProvider.GetRequiredService<IPacketPackager>()));
+        private ClientPlayPacketFactory GetPlayerPacketGenerator(IPlayer player) =>
+            new ClientPlayPacketFactory(new ForwardToPlayerPacketSink(player, ServiceProvider.GetRequiredService<IPacketPackager>()));
 
         async Task IHandle<EntityLook>.Handle(EntityLook message)
         {
             await SendLookPacket(AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator());
         }
 
-        protected abstract Task SendLookPacket(ClientPlayPacketGenerator generator);
+        protected abstract Task SendLookPacket(ClientPlayPacketFactory generator);
     }
 }

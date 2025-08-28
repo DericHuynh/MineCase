@@ -15,15 +15,15 @@ namespace MineCase.Server.Components
         {
         }
 
-        public ClientPlayPacketGenerator GetGenerator(IPlayer except = null)
+        public ClientPlayPacketFactory GetGenerator(IPlayer except = null)
         {
-            return new ClientPlayPacketGenerator(GrainFactory.GetGrain<IChunkTrackingHub>(AttachedEntity.GetAddressByPartitionKey()), except);
+            return new ClientPlayPacketFactory(GrainFactory.GetGrain<IChunkTrackingHub>(AttachedEntity.GetAddressByPartitionKey()), except);
         }
     }
 
     internal static class ChunkEventBroadcastComponentExtensions
     {
-        public static ClientPlayPacketGenerator GetBroadcaster(this Entity d) =>
+        public static ClientPlayPacketFactory GetBroadcaster(this Entity d) =>
             d.GetComponent<ChunkEventBroadcastComponent>().GetGenerator();
     }
 }

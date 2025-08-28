@@ -25,8 +25,8 @@ namespace MineCase.Server.Network.Play
         {
         }
 
-        public ClientPlayPacketGenerator GetGenerator()
-            => new ClientPlayPacketGenerator(_sink);
+        public ClientPlayPacketFactory GetGenerator()
+            => new ClientPlayPacketFactory(_sink);
 
         public async Task Kick()
         {

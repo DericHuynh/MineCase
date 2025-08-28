@@ -20,15 +20,15 @@ namespace MineCase.Server.Game.Entities.Components
         {
         }
 
-        private ClientPlayPacketGenerator GetPlayerPacketGenerator(IPlayer player) =>
-            new ClientPlayPacketGenerator(new ForwardToPlayerPacketSink(player, ServiceProvider.GetRequiredService<IPacketPackager>()));
+        private ClientPlayPacketFactory GetPlayerPacketGenerator(IPlayer player) =>
+            new ClientPlayPacketFactory(new ForwardToPlayerPacketSink(player, ServiceProvider.GetRequiredService<IPacketPackager>()));
 
         async Task IHandle<EntityMove>.Handle(EntityMove message)
         {
             await SendMovePacket(AttachedEntity.GetComponent<ChunkEventBroadcastComponent>().GetGenerator());
         }
 
-        protected Task SendMovePacket(ClientPlayPacketGenerator generator)
+        protected Task SendMovePacket(ClientPlayPacketFactory generator)
         {
             int eid = AttachedEntity.GetValue(EntityIdComponent.EntityIdProperty);
             EntityWorldPos pos = AttachedEntity.GetValue(EntityWorldPositionComponent.EntityWorldPositionProperty);

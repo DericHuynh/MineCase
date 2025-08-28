@@ -20,7 +20,7 @@ namespace MineCase.Server.Game.Entities.Components
         {
         }
 
-        protected override Task SendLookPacket(ClientPlayPacketGenerator generator)
+        protected override Task SendLookPacket(ClientPlayPacketFactory generator)
         {
             int eid = AttachedEntity.GetComponent<EntityIdComponent>().EntityId;
             byte yaw = (byte)(AttachedEntity.GetComponent<EntityLookComponent>().Yaw / 360 * 255);

@@ -13,6 +13,13 @@ namespace MineCase.Server.Network
     {
         [Orleans.Id(0)]
         private IReadOnlyCollection<IPacketSink> _sinks;
+
+        /// <summary>
+        /// Quite pointless, either.
+        /// A) remove and implement functions inside the packet sink.
+        /// B) make stateless worker (but like why?) .
+        /// C) honestly just add these functions to IPacketSink, create a abstract PacketSink class and extend that.
+        /// </summary>
         [Orleans.Id(1)]
         private readonly IPacketPackager _packetPackager;
 

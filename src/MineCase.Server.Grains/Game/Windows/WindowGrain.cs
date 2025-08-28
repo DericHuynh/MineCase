@@ -59,8 +59,8 @@ namespace MineCase.Server.Game.Windows
         private Task<byte> GetWindowId(IPlayer player) =>
             player.Ask(new AskWindowId { Window = this.AsReference<IWindow>() });
 
-        private ClientPlayPacketGenerator GetPlayerPacketGenerator(IPlayer player) =>
-            new ClientPlayPacketGenerator(new ForwardToPlayerPacketSink(player, ServiceProvider.GetRequiredService<IPacketPackager>()));
+        private ClientPlayPacketFactory GetPlayerPacketGenerator(IPlayer player) =>
+            new ClientPlayPacketFactory(new ForwardToPlayerPacketSink(player, ServiceProvider.GetRequiredService<IPacketPackager>()));
 
         internal async Task NotifySlotChanged(SlotArea slotArea, IPlayer player, int slotIndex, Slot item)
         {

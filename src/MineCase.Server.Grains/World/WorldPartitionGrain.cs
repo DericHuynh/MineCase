@@ -16,6 +16,9 @@ using Orleans.Concurrency;
 
 namespace MineCase.Server.World
 {
+    /// <summary>
+    /// This seems to be like a chunk.
+    /// </summary>
     [PersistTableName("worldPartition")]
     [Reentrant]
     internal class WorldPartitionGrain : AddressByPartitionGrain, IWorldPartition

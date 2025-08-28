@@ -58,7 +58,7 @@ namespace MineCase.Server.Game
         public async Task JoinGame(IUser user)
         {
             var sink = await user.GetClientPacketSink();
-            var generator = new ClientPlayPacketGenerator(sink);
+            var generator = new ClientPlayPacketFactory(sink);
             var settings = await GrainFactory.GetGrain<IServerSettings>(0).GetSettings();
 
             _users[user] = new UserContext
@@ -156,7 +156,7 @@ namespace MineCase.Server.Game
 
         private class UserContext
         {
-            public ClientPlayPacketGenerator Generator { get; set; }
+            public ClientPlayPacketFactory Generator { get; set; }
         }
     }
 }

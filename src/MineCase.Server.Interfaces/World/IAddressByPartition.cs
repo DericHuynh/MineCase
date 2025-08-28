@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using MineCase.Library;
 using MineCase.World;
 using Orleans;
 using Orleans.Runtime;
@@ -16,6 +17,21 @@ namespace MineCase.Server.World
         public static string MakeAddressByPartitionKey(this IWorld world, ChunkWorldPos chunkWorldPos)
         {
             return $"{world.GetPrimaryKeyString()},{chunkWorldPos.X},{chunkWorldPos.Z}";
+        }
+
+        public static Guid MakeGuidByPartition(this IWorld world, ChunkWorldPos chunkWorldPos)
+        {
+            // World/Level int
+            int hash = world.GetPrimaryKeyString().GetFNV1aHash();
+            byte[] worldKeyBytes = BitConverter.GetBytes(hash);
+            byte[] xBytes = BitConverter.GetBytes(chunkWorldPos.X);
+            byte[] zBytes = BitConverter.GetBytes(chunkWorldPos.Z);
+            byte[] bytes =
+            [
+                0, 0, 0, 0, .. worldKeyBytes, .. xBytes, .. zBytes
+            ];
+
+            return new Guid(bytes);
         }
 
         public static TGrainInterface GetPartitionGrain<TGrainInterface>(this IGrainFactory grainFactory, IWorld world, ChunkWorldPos chunkWorldPos)

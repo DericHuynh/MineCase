@@ -15,16 +15,16 @@ using Orleans.Concurrency;
 namespace MineCase.Server.Network
 {
     /// <summary>
-    /// Packet router grain. It send different packet to partial class by its session state.
+    /// Packet router grain for a session. PacketID meanings are relative to current SessionState.
     /// </summary>
     [Reentrant]
     internal partial class PacketRouterGrain : Grain, IPacketRouter
     {
+        private readonly ILogger _logger;
         private SessionState _state = SessionState.Handshaking;
         private int _protocolVersion;
         private string _userName;
         private IUser _user;
-        private readonly ILogger _logger;
 
         public PacketRouterGrain(ILoggerFactory loggerFactory)
         {

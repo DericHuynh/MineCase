@@ -30,7 +30,7 @@ namespace MineCase.Server.Game.Entities.Components
             return Task.CompletedTask;
         }
 
-        protected override Task SendSpawnPacket(ClientPlayPacketGenerator generator)
+        protected override Task SendSpawnPacket(ClientPlayPacketFactory generator)
         {
             MobType type = AttachedEntity.GetComponent<MobTypeComponent>().MobType;
             return generator.SpawnMob(AttachedEntity.EntityId, AttachedEntity.UUID, (byte)type, AttachedEntity.Position, AttachedEntity.Pitch, AttachedEntity.Yaw, new EntityMetadata.Entity { });

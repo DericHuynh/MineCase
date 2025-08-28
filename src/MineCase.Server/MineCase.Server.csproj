@@ -32,7 +32,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="obj\**" />
+    <EmbeddedResource Remove="obj\**" />
     <None Remove="*.log;*.txt" />
+    <None Remove="obj\**" />
   </ItemGroup>
 
   <ItemGroup>

@@ -11,6 +11,7 @@ using MineCase.Server.World;
 using MineCase.World;
 using Orleans;
 using Orleans.Concurrency;
+using Orleans.Runtime;
 using Orleans.Streams;
 
 namespace MineCase.Server.Game
@@ -31,7 +32,7 @@ namespace MineCase.Server.Game
         public IReadOnlyCollection<IUserChunkLoader> Loaders { get; set; }
     }
 
-    internal interface IChunkSenderJobWorker : IGrainWithGuidKey
+    internal interface IChunkSenderJobWorker : IGrainWithStringKey
     {
     }
 
@@ -39,6 +40,10 @@ namespace MineCase.Server.Game
     [Reentrant]
     internal class ChunkSenderJobWorker : Grain, IChunkSenderJobWorker
     {
+        /// <summary>
+        /// Why the fuck are you using different jobId's per reactivation (like if the chunk is unloaded) if you want to recycle the streams?
+        /// Makes no sense.
+        /// </summary>
         private readonly IPacketPackager _packetPackager;
 
         public ChunkSenderJobWorker(IPacketPackager packetPackager)
@@ -48,17 +53,20 @@ namespace MineCase.Server.Game
 
         public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            var stream = this.GetStreamProvider(StreamProviders.JobsProvider).GetStream<SendChunkJob>(StreamProviders.Namespaces.ChunkSender, this.GetPrimaryKey());
+            var streamProvider = this.GetStreamProvider(StreamProviders.MinecraftStreamProvider);
+            var streamId = StreamId.Create(StreamProviders.Namespaces.ChunkSender, this.GetPrimaryKeyString());
+            var stream = streamProvider.GetStream<SendChunkJob>(streamId);
             await stream.SubscribeAsync(OnNextAsync);
         }
 
         private async Task OnNextAsync(SendChunkJob job, StreamSequenceToken token)
         {
             var chunkColumn = GrainFactory.GetGrain<IChunkColumn>(job.World.MakeAddressByPartitionKey(job.ChunkPosition));
-            var generator = new ClientPlayPacketGenerator(new BroadcastPacketSink(job.Clients, _packetPackager));
+            var generator = new ClientPlayPacketFactory(new BroadcastPacketSink(job.Clients, _packetPackager));
             var chunkColumnStorage = await chunkColumn.GetState();
             await generator.ChunkData(Dimension.Overworld, job.ChunkPosition.X, job.ChunkPosition.Z, chunkColumnStorage);
 
+            // I think you always need to send light updates, which is why newest version packets are "Send Chunk and Light" instead of just chunks. Update for 1.21.8
             await generator.LightUpdate(Dimension.Overworld, job.ChunkPosition.X, job.ChunkPosition.Z, chunkColumnStorage);
             foreach (var loader in job.Loaders)
                 loader.OnChunkSent(job.ChunkPosition).Ignore();

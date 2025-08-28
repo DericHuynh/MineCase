@@ -21,6 +21,7 @@ using OpenTelemetry.Trace;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
+using Orleans.Providers.MongoDB.StorageProviders.Serializers;
 using Orleans.Runtime;
 using Orleans.Runtime.Placement;
 using System;
@@ -65,7 +66,8 @@ namespace MineCase.Server
                                 .AddCheck<SettingsHealthCheck>("settingsHealthCheck");
 
             hostBuilder.Services.Configure<PersistenceOptions>(hostBuilder.Configuration.GetSection("persistenceOptions"));
-
+            hostBuilder.Services.AddSingleton<IGrainStateSerializer, BinaryGrainStateSerializer>();
+            
             var siloPort = GetAvailablePort();
             var gatewayPort = GetAvailablePort();
 
@@ -82,16 +84,16 @@ namespace MineCase.Server
                 siloBuilder.AddActivationRepartitioner(); // Doesnt work, but it should, so there's something wrong with the current grain persistence and state mechanisms.
                 siloBuilder.Configure<ActivationRepartitionerOptions>(o =>
                 {
-                    o.MinRoundPeriod = TimeSpan.FromSeconds(5000);
-                    o.MaxRoundPeriod = TimeSpan.FromSeconds(15000);
-                    o.RecoveryPeriod = TimeSpan.FromSeconds(2000);
+                    o.MinRoundPeriod = TimeSpan.FromSeconds(1000);
+                    o.MaxRoundPeriod = TimeSpan.FromSeconds(1500);
+                    o.RecoveryPeriod = TimeSpan.FromSeconds(1000);
                 });
-                siloBuilder.ConfigureServices(services => services.AddSingleton<PlacementStrategy, PreferLocalPlacement>());
+                // siloBuilder.ConfigureServices(services => services.AddSingleton<PlacementStrategy, ResourceOptimizedPlacement>());
 #pragma warning restore ORLEANSEXP001
                 siloBuilder.ConfigureEndpoints(siloPort: siloPort, gatewayPort: gatewayPort);
                 siloBuilder.UseMongoDBClient(hostBuilder.Configuration.GetSection("persistenceOptions")["connectionString"]);
-                siloBuilder.AddMemoryStreams("JobsProvider");
-                siloBuilder.AddMemoryStreams("TransientProvider");
+                // This is just a factory to implement different settings for streams, no need for different types.
+                siloBuilder.AddMemoryStreams("MinecraftStreamProvider");
                 siloBuilder.UseMongoDBReminders(options =>
                 {
                     options.DatabaseName = hostBuilder.Configuration.GetSection("persistenceOptions")["databaseName"];

@@ -24,7 +24,7 @@ namespace MineCase.Engine.Serialization
     }
 
     /// <summary>
-    /// DependencyObject 状态序列化器
+    /// DependencyObject MongoDB BSON Serializer.
     /// </summary>
     [Orleans.GenerateSerializer]
     public class DependencyObjectStateSerializer : ClassSerializerBase<DependencyObjectState>, IBsonDocumentSerializer

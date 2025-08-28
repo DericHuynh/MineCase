@@ -20,7 +20,7 @@ namespace MineCase.Server.Game.Entities.Components
         {
         }
 
-        protected override Task SendSpawnPacket(ClientPlayPacketGenerator generator)
+        protected override Task SendSpawnPacket(ClientPlayPacketFactory generator)
         {
             // for items, the int value is ignored, but should be set to 1 to indicate that velocity is present.
             return generator.SpawnObject(AttachedEntity.EntityId, AttachedEntity.UUID, 2, AttachedEntity.Position, AttachedEntity.Pitch, AttachedEntity.Yaw, 1);

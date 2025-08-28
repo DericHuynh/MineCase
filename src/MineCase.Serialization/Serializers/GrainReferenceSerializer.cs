@@ -11,13 +11,13 @@ using Orleans.Runtime;
 namespace MineCase.Serialization.Serializers
 {
     [Orleans.GenerateSerializer]
-    public class GrainRerferenceSerializer<TInterface> : SealedClassSerializerBase<TInterface>
+    public class GrainReferenceSerializer<TInterface> : SealedClassSerializerBase<TInterface>
         where TInterface : class, IAddressable
     {
         [Id(0)]
         private IGrainFactory _grainFactory;
 
-        public GrainRerferenceSerializer(IServiceProvider serviceProvider)
+        public GrainReferenceSerializer(IServiceProvider serviceProvider)
         {
             _grainFactory = serviceProvider.GetRequiredService<IGrainFactory>();
         }
@@ -47,7 +47,7 @@ namespace MineCase.Serialization.Serializers
         [Id(2)]
         private readonly IServiceProvider _serviceProvider;
         [Id(3)]
-        private readonly Type _serializerTypeGen = typeof(GrainRerferenceSerializer<>);
+        private readonly Type _serializerTypeGen = typeof(GrainReferenceSerializer<>);
 
         public GrainRerferenceSerializerProvider(IServiceProvider serviceProvider)
         {
