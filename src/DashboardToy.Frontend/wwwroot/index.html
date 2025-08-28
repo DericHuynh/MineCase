@@ -86,6 +86,7 @@
         let width = svg.node().clientWidth;
         let height = svg.node().clientHeight;
         let isPaused = false;
+        let selectedNodeId = null;
 
         function mergeObjects(updated, existing) {
             for (let key in existing) {
@@ -132,6 +133,7 @@
                 name: d.name,
                 key: d.key,
                 type: "grain",
+                weight: d.weight
             }));
             const newNodes = newHostNodes.concat(newGrainNodes);
 
@@ -205,10 +207,23 @@
 
             var colorScheme = [...d3.schemeTableau10];
             colorScheme.splice(2, 1); // Remove red since we use that for badness (inter-host links)
-            const color = d3.scaleOrdinal(colorScheme);
+            const hostColor = d3.scaleOrdinal(colorScheme);
             const linkColor = d3
                 .scaleSequential(d3.interpolateOrRd)
                 .domain([0, state.maxEdgeValue]);
+
+            const darknessScale = d3.scaleLinear()
+                .domain([1, 10])
+                .range([0, 2.5]);
+
+            const edgeWidthScale = d3.scaleLog()
+                // Domain: from 1 call up to the maximum number of calls observed.
+                // Using Math.max(1, ...) prevents an invalid domain like [1, 0] if there are no calls.
+                .domain([1, Math.max(1, state.maxEdgeValue)])
+                // Range: map the call count to a stroke width between 1px and 8px.
+                .range([1, 8])
+                // Clamp ensures that any value outside the domain returns the min/max range value.
+                .clamp(true);
 
             const nodeData = graphContainer
                 .select(".nodes")
@@ -233,7 +248,8 @@
                 .on("mouseover", (event, d) => {
                     tooltip.transition().duration(200).style("opacity", 0.9);
                     tooltip
-                        .html(d.name.replace(/,/g, ",\n")) // Break long names at commas
+                        .html(d.name.replace(/,/g, ",\n")
+                                    .replace(/\//g, "/\n")) // Break long names at commas
                         .style("left", event.pageX + 15 + "px")
                         .style("top", event.pageY - 15 + "px");
                 })
@@ -275,12 +291,26 @@
                 .attr("r", (d) =>
                     d.isHost
                         ? 10 + (15 * d.activationCount) / state.maxActivationCount
-                        : 8
+                        : 5 + d.weight
                 )
                 .attr("stroke", "#222")
                 .attr("stroke-width", (d) => (d.isHost ? 2 : 1))
                 .attr("class", (d) => (d.isHost ? "host-circle" : ""))
-                .attr("fill", (d) => (d.isHost ? color(d.index) : color(d.host)));
+                .attr("fill", (d) => {
+                    if (d.isHost) {
+                        // Hosts get their plain, bright base color
+                        return hostColor(d.index);
+                    } else {
+                        // Grains start with their host's base color...
+                        const baseColor = d3.color(hostColor(d.host));
+
+                        // ...then get a darkness factor based on their weight...
+                        const darknessFactor = darknessScale(d.weight);
+
+                        // ...and apply it.
+                        return baseColor.darker(darknessFactor);
+                    }
+                });
 
             // Links
             const linkData = graphContainer
@@ -293,14 +323,22 @@
                     (exit) => exit.remove()
                 )
                 .filter((d) => !d.isHostToHostLink)
-                .attr("stroke-width", (d) =>
-                    d.isHostLink ? 0.25 : 1 + d.weight / state.maxEdgeValue
-                )
+                .attr("stroke-width", (d) => {
+                    if (d.isHostLink) {
+                        // Keep the links from a grain to its host very thin.
+                        return 0.25;
+                    }
+
+                    // For grain-to-grain links, use the log scale.
+                    // Log scales cannot process 0, so we handle that case explicitly.
+                    // An edge with 0 calls will be very faint.
+                    return d.weight > 0 ? edgeWidthScale(d.weight) : 0.5;
+                })
                 .attr("stroke", (d) =>
                     d.isHostLink
-                        ? color(d.host)
+                        ? hostColor(d.host)
                         : d.sourceHost == d.targetHost
-                            ? color(d.sourceHost)
+                            ? hostColor(d.sourceHost)
                             : "red"
                 );
 
@@ -309,7 +347,7 @@
                     .forceSimulation(state.nodes)
                     .force(
                         "center",
-                        d3.forceCenter(width / 2, height / 2).strength(0.05)
+                        d3.forceCenter(width / 2, height / 2).strength(0.2)
                     )
                     .force(
                         "link",
@@ -317,23 +355,19 @@
                             .forceLink(state.links)
                             .id((d) => d.id)
                             .strength((d) =>
-                                d.isHostToHostLink
-                                    ? 2
-                                    : d.isHostLink
-                                        ? 1
-                                        : d.source.host == d.target.host
-                                            ? 0.2
-                                            : 0.1 * (d.weight / state.maxEdgeValue)
-                            )
-                            .distance((d) =>
-                                d.isHostToHostLink
-                                    ? 600
-                                    : d.isHostLink
-                                        ? 150
-                                        : d.source.host == d.target.host
-                                            ? 15
-                                            : 30 * (1 - d.weight / state.maxEdgeValue)
-                            )
+                            {
+                                if (d.isHostToHostLink) return 0.1; // Weakly keep hosts at their distance
+                                if (d.isHostLink) return 1; // Strong link between a grain and its host
+                                // Local links are strong to form tight clusters.
+                                // Cross-silo links are weak so they don't overpower everything.
+                                return d.source.host === d.target.host ? 0.4 : 0.2;
+                            })
+                            .distance((d) =>{
+                                if (d.isHostToHostLink) return 600; // Keep hosts far apart
+                                if (d.isHostLink) return 150; // Distance from grain to its host center
+                                // Local links are close. Cross-silo links are long.
+                                return d.source.host === d.target.host ? 15 : 30 * (1 - d.weight / state.maxEdgeValue);
+                            })
                     )
                     .force(
                         "charge",
@@ -357,6 +391,63 @@
                 state.simulation.on("tick", ticked);
                 state.simulation.alpha(0.02).restart();
             }
+
+            function updateHighlight() {
+                if (!selectedNodeId) {
+                    // If nothing is selected, reset everything to full opacity
+                    nodeData.style("opacity", 1);
+                    linkData.style("opacity", 1);
+                    return;
+                }
+
+                // Create sets for quick lookups of highlighted elements
+                const highlightedNodeIds = new Set([selectedNodeId]);
+                const highlightedLinkIds = new Set();
+
+                // Find all direct neighbors and connecting links
+                linkData.each(function (d) {
+                    // The source/target properties on the link data are now objects after the simulation runs.
+                    // We need to check their IDs.
+                    const sourceId = d.source.id;
+                    const targetId = d.target.id;
+                    if (sourceId === selectedNodeId) {
+                        highlightedNodeIds.add(targetId);
+                        highlightedLinkIds.add(d.id);
+                    } else if (targetId === selectedNodeId) {
+                        highlightedNodeIds.add(sourceId);
+                        highlightedLinkIds.add(d.id);
+                    }
+                });
+
+                // Apply styles based on whether the element is in our highlighted sets
+                nodeData
+                    .style("opacity", d => highlightedNodeIds.has(d.id) ? 1 : 0)
+                    .filter(d => highlightedNodeIds.has(d.id))
+                    .raise(); // Bring highlighted nodes to the front
+
+                linkData
+                    .style("opacity", d => highlightedLinkIds.has(d.id) ? 1 : 0)
+                    .filter(d => highlightedLinkIds.has(d.id))
+                    .raise(); // Bring highlighted links to the front (but behind nodes)
+            }
+
+            nodeData.on("click", function (event, d) {
+                event.stopPropagation(); // Prevent the SVG's click handler from firing
+
+                // Toggle selection: if clicking the same node, deselect. Otherwise, select the new one.
+                selectedNodeId = (selectedNodeId === d.id) ? null : d.id;
+                updateHighlight();
+            });
+
+            // Add click event handler to the SVG background to clear selection
+            svg.on("click", function () {
+                selectedNodeId = null;
+                updateHighlight();
+            });
+
+            // Call the highlight function at the end of every render
+            // to maintain the highlight state across data refreshes.
+            updateHighlight();
 
             function ticked() {
                 linkData
