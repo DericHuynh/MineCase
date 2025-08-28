@@ -195,7 +195,7 @@ namespace MineCase.CodeGeneration
             return new GenerationResult()
             {
                 SourceCode = sb.ToString(),
-                FileName = $"{parentClass.Name}_Serializer.g.cs"
+                FileName = $"{parentClass.ContainingNamespace.ToDisplayString()}_{parentClass.Name}_Serializer.g.cs"
             };
         }
 
