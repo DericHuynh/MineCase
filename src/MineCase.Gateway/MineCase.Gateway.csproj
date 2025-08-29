@@ -38,6 +38,8 @@
   <ItemGroup>
     <ProjectReference Include="..\MineCase.Core\MineCase.Core.csproj" />
     <ProjectReference Include="..\MineCase.Protocol\MineCase.Protocol.csproj" />
+    <ProjectReference Include="..\MineCase.Serialization\MineCase.Serialization.csproj" />
+    <ProjectReference Include="..\MineCase.Server.Grains\MineCase.Server.Grains.csproj" />
     <ProjectReference Include="..\MineCase.Server.Interfaces\MineCase.Server.Interfaces.csproj" />
     <ProjectReference Include="..\MineCase.ServiceDefaults\MineCase.ServiceDefaults.csproj" />
   </ItemGroup>

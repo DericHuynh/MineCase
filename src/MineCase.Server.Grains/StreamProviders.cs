@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MineCase.Server
 {
-    internal class StreamProviders
+    public static class StreamProviders
     {
         public const string MinecraftStreamProvider = "MinecraftStreamProvider";
 

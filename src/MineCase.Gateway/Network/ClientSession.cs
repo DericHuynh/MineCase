@@ -1,41 +1,45 @@
-﻿using DnsClient.Internal;
+﻿using System;
+using System.IO;
+using System.Net.Sockets;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 using MineCase.Buffers;
 using MineCase.Protocol;
 using MineCase.Serialization;
-using MineCase.Server.Game;
+using MineCase.Server;
 using MineCase.Server.Network;
 using Orleans;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
+using Orleans.Streams;
 
 namespace MineCase.Gateway.Network
 {
     class ClientSession : IDisposable
     {
-        private readonly TcpClient _tcpClient;
-        private Stream _remoteStream;
+        #region Dependency Injection
         private readonly IClusterClient _grainFactory;
-        private volatile bool _useCompression = false;
-        private readonly Guid _sessionId;
-        private readonly OutcomingPacketObserver _outcomingPacketObserver;
-        private IClientboundPacketObserver _clientboundPacketObserverRef;
-        private readonly ActionBlock<object> _outcomingPacketDispatcher;
+        private readonly ILogger<ClientSession> _logger;
+        private readonly IPacketCompress _packetCompress;
         private readonly ObjectPool<UncompressedPacket> _uncompressedPacketObjectPool;
         private readonly IBufferPool<byte> _bufferPool;
-        private readonly IPacketCompress _packetCompress;
-        private readonly ILogger<ClientSession> _logger;
+        private readonly TcpClient _tcpClient;
+        #endregion
 
+        private volatile bool _useCompression = false;
         private int _compressThreshold;
 
-        public ClientSession(TcpClient tcpClient, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory,  IClusterClient grainFactory, IBufferPool<byte> bufferPool, ObjectPool<UncompressedPacket> uncompressedPacketObjectPool, IPacketCompress packetCompress)
+        private readonly Guid _sessionId;
+        private readonly ActionBlock<UncompressedPacket> _outcomingPacketDispatcher;
+        private Stream _minecraftClientStream;
+
+        // Streams for bi-directional communication with the silo
+        private IAsyncStream<UncompressedPacket> _incomingStream; // To the silo
+        private IAsyncStream<UncompressedPacket> _outgoingStream; // From the silo
+        private StreamSubscriptionHandle<UncompressedPacket> _outgoingStreamSubscription;
+
+        public ClientSession(TcpClient tcpClient, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory, IClusterClient grainFactory, IBufferPool<byte> bufferPool, ObjectPool<UncompressedPacket> uncompressedPacketObjectPool, IPacketCompress packetCompress)
         {
             _sessionId = Guid.NewGuid();
             _tcpClient = tcpClient;
@@ -44,100 +48,124 @@ namespace MineCase.Gateway.Network
             _bufferPool = bufferPool;
             _packetCompress = packetCompress;
             _uncompressedPacketObjectPool = uncompressedPacketObjectPool;
-            _outcomingPacketObserver = new OutcomingPacketObserver(this);
-            _outcomingPacketDispatcher = new ActionBlock<object>(SendOutcomingPacket);
+
+            _outcomingPacketDispatcher = new ActionBlock<UncompressedPacket>(async packet =>
+            {
+                if (packet == null)
+                {
+                    if (_tcpClient.Connected)
+                        _tcpClient.Client.Shutdown(SocketShutdown.Send);
+                }
+                else
+                {
+                    await SendPacketToClient(packet);
+                }
+            });
         }
 
         public async Task Startup(CancellationToken cancellationToken)
         {
-            using (_remoteStream = _tcpClient.GetStream())
+            using (_minecraftClientStream = _tcpClient.GetStream())
             {
-                // subscribe observer to get packet from server
-                _clientboundPacketObserverRef = _grainFactory.CreateObjectReference<IClientboundPacketObserver>(_outcomingPacketObserver);
-                await _grainFactory.GetGrain<IClientboundPacketSink>(_sessionId).Subscribe(_clientboundPacketObserverRef);
+                var streamProvider = _grainFactory.GetStreamProvider(StreamProviders.MinecraftStreamProvider);
+                var router = _grainFactory.GetGrain<IPacketRouter>(_sessionId);
+
+                // 1. Set up the stream for packets FROM the silo TO this client.
+                _outgoingStream = streamProvider.GetStream<UncompressedPacket>("session-stream", _sessionId);
+                _outgoingStreamSubscription = await _outgoingStream.SubscribeAsync(
+                    (packet, token) =>
+                    {
+                        DispatchOutcomingPacket(packet);
+                        return Task.CompletedTask;
+                    });
+
+                // 2. Set up the stream for packets FROM this client TO the silo.
+                _incomingStream = streamProvider.GetStream<UncompressedPacket>("client-incoming", _sessionId);
+
+                // 3. Tell the router grain which stream to use to send packets back to us.
+                await router.SetClientStream(_outgoingStream.StreamId);
+
                 try
                 {
-                    DateTime expiredTime = DateTime.Now + TimeSpan.FromSeconds(10);
-                    while (!cancellationToken.IsCancellationRequested &&
-                        !_outcomingPacketDispatcher.Completion.IsCompleted)
+                    while (!cancellationToken.IsCancellationRequested && !_outcomingPacketDispatcher.Completion.IsCompleted && _tcpClient.Connected)
                     {
-                        await DispatchIncomingPacket();
-                        // renew subscribe, 10 sec
-                        if (DateTime.Now > expiredTime)
-                        {
-                            await _grainFactory.GetGrain<IClientboundPacketSink>(_sessionId).Subscribe(_clientboundPacketObserverRef);
-                            expiredTime = DateTime.Now + TimeSpan.FromSeconds(10);
-                        }
+                        await ReadAndPublishIncomingPacket();
                     }
                 }
-                catch (EndOfStreamException)
+                catch (Exception ex) when (ex is EndOfStreamException || ex is IOException)
                 {
-                    var router = _grainFactory.GetGrain<IPacketRouter>(_sessionId);
-                    await router.Close();
-
-                    await _outcomingPacketDispatcher.Completion;
+                    _logger.LogInformation("Client {SessionId} disconnected: {ExceptionMessage}", _sessionId, ex.Message);
                 }
-                catch (IOException ex)
+                finally
                 {
-                    var router = _grainFactory.GetGrain<IPacketRouter>(_sessionId);
                     await router.Close();
 
+                    _outcomingPacketDispatcher.Post(null); // Signal the sender to shut down.
                     await _outcomingPacketDispatcher.Completion;
+
+                    if (_incomingStream != null)
+                    {
+                        // Signal that this client will not be sending any more packets.
+                        await _incomingStream.OnCompletedAsync();
+                    }
+
+                    if (_outgoingStreamSubscription != null)
+                    {
+                        await _outgoingStreamSubscription.UnsubscribeAsync();
+                    }
                 }
             }
         }
 
-        private void OnClosed()
-        {
-            _outcomingPacketDispatcher.Post(null);
-        }
-
-        private async Task DispatchIncomingPacket()
+        private async Task ReadAndPublishIncomingPacket()
         {
             using (var bufferScope = _bufferPool.CreateScope())
             {
                 UncompressedPacket packet;
                 if (_useCompression)
                 {
-                    var compressedPacket = await CompressedPacket.DeserializeAsync(_remoteStream, null);
+                    var compressedPacket = await CompressedPacket.DeserializeAsync(_minecraftClientStream, null);
                     packet = _packetCompress.Decompress(compressedPacket, _compressThreshold);
                 }
                 else
                 {
-                    packet = await UncompressedPacket.DeserializeAsync(_remoteStream, bufferScope);
+                    packet = await UncompressedPacket.DeserializeAsync(_minecraftClientStream, bufferScope);
                 }
 
-                await DispatchIncomingPacket(packet);
+                // Publish the packet to the stream. The implicitly subscribed PacketRouterGrain will receive it.
+                await _incomingStream.OnNextAsync(packet);
             }
         }
 
-        private async Task SendOutcomingPacket(object packetOrCommand)
+        private async Task SendPacketToClient(UncompressedPacket packet)
         {
-            if (packetOrCommand == null)
-            {
-                _tcpClient.Client.Shutdown(SocketShutdown.Send);
-                _outcomingPacketDispatcher.Complete();
-            }
-            else if (packetOrCommand is UncompressedPacket packet)
+            try
             {
                 using (var bufferScope = _bufferPool.CreateScope())
                 {
                     if (_useCompression)
                     {
                         var newPacket = _packetCompress.Compress(packet, _compressThreshold);
-                        await newPacket.SerializeAsync(_remoteStream);
+                        await newPacket.SerializeAsync(_minecraftClientStream);
                     }
                     else
                     {
-                        await packet.SerializeAsync(_remoteStream);
+                        await packet.SerializeAsync(_minecraftClientStream);
                     }
 
-                    if (!_useCompression && packet.PacketId == Protocol.Protocol.SetCompressionPacketId)
+                    // Hardcoded packet ID, consider using a constant from your protocol definition.
+                    if (!_useCompression && packet.PacketId == 0x03) // Protocol.Protocol.SetCompressionPacketId
                     {
                         _compressThreshold = GetCompressionThreshold(packet);
                         _useCompression = true;
+                        _logger.LogDebug("Compression enabled for session {SessionId} with threshold {Threshold}", _sessionId, _compressThreshold);
                     }
                 }
+            }
+            catch (IOException ex)
+            {
+                _logger.LogWarning(ex, "Failed to send packet to client {SessionId}, connection may be closed.", _sessionId);
+                _outcomingPacketDispatcher.Complete();
             }
         }
 
@@ -147,47 +175,16 @@ namespace MineCase.Gateway.Network
             return br.ReadAsVarInt(out _);
         }
 
-        private async Task DispatchIncomingPacket(UncompressedPacket packet)
+        private void DispatchOutcomingPacket(UncompressedPacket packet)
         {
-            var router = _grainFactory.GetGrain<IPacketRouter>(_sessionId);
-            await router.SendPacket(packet);
-        }
-
-        private async void DispatchOutcomingPacket(object packet)
-        {
-            try
+            if (!_outcomingPacketDispatcher.Post(packet))
             {
-                if (!_outcomingPacketDispatcher.Completion.IsCompleted)
-                    await _outcomingPacketDispatcher.SendAsync(packet);
-            }
-            catch
-            {
-                _outcomingPacketDispatcher.Complete();
-            }
-        }
-
-        class OutcomingPacketObserver : IClientboundPacketObserver
-        {
-            private readonly ClientSession _session;
-
-            public OutcomingPacketObserver(ClientSession session)
-            {
-                _session = session;
-            }
-
-            public void OnClosed()
-            {
-                _session.OnClosed();
-            }
-
-            public void ReceivePacket(UncompressedPacket packet)
-            {
-                _session.DispatchOutcomingPacket(packet);
+                _logger.LogWarning("Could not post packet to dispatcher for session {SessionId}. It may be shutting down.", _sessionId);
             }
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; // 要检测冗余调用
+        private bool disposedValue = false;
 
         protected virtual void Dispose(bool disposing)
         {

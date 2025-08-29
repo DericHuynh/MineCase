@@ -93,7 +93,7 @@ namespace MineCase.Server
                 siloBuilder.ConfigureEndpoints(siloPort: siloPort, gatewayPort: gatewayPort);
                 siloBuilder.UseMongoDBClient(hostBuilder.Configuration.GetSection("persistenceOptions")["connectionString"]);
                 // This is just a factory to implement different settings for streams, no need for different types.
-                siloBuilder.AddMemoryStreams("MinecraftStreamProvider");
+                siloBuilder.AddMemoryStreams(StreamProviders.MinecraftStreamProvider);
                 siloBuilder.UseMongoDBReminders(options =>
                 {
                     options.DatabaseName = hostBuilder.Configuration.GetSection("persistenceOptions")["databaseName"];

@@ -10,6 +10,7 @@ using MineCase.Buffers;
 using MineCase.Gateway.Health_Checks;
 using MineCase.Gateway.Network;
 using MineCase.Protocol;
+using MineCase.Serialization.Serializers;
 using MineCase.Server;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -33,6 +34,7 @@ namespace MineCase.Gateway
         static async Task Main(string[] args)
         {
             var appBuilder = WebApplication.CreateBuilder();
+            Serializers.RegisterAll();
 
             appBuilder.AddServiceDefaults();
 
@@ -62,6 +64,7 @@ namespace MineCase.Gateway
                     configure.ClusterId = "dev";
                     configure.ServiceId = "MineCaseService";
                 });
+                c.AddMemoryStreams(StreamProviders.MinecraftStreamProvider);
                 c.UseMongoDBClient(appBuilder.Configuration.GetSection("persistenceOptions")["connectionString"]);
                 c.UseMongoDBClustering(options =>
                 {
@@ -71,6 +74,7 @@ namespace MineCase.Gateway
             appBuilder.Services.AddHostedService<ConnectionRouter>();
 
             var host = appBuilder.Build();
+            Serializers.RegisterAll(host.Services);
 
             if (host.Environment.IsDevelopment())
             {
